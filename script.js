@@ -2589,16 +2589,170 @@ function normalizeFileKey(rawKey) {
       studioPreview.srcdoc = buildFullPlaygroundDocument();
     }
 
+// =========================================================================
+    // محرك الثيمات الخمسة الاحترافية لمحرر Monaco وواجهة VS Code Studio
+    // =========================================================================
+    let studioThemesRegistered = false;
+    let currentStudioTheme = localStorage.getItem('codemasr_studio_theme') || 'cyberpunk-neon';
+
+    function registerCustomMonacoThemes() {
+      if (studioThemesRegistered || !window.monaco) return;
+      studioThemesRegistered = true;
+
+      // 1. Cyberpunk Neon
+      window.monaco.editor.defineTheme('cyberpunk-neon', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+          { token: 'tag', foreground: 'ff2a85', fontStyle: 'bold' },
+          { token: 'attribute.name', foreground: '00f2fe' },
+          { token: 'attribute.value', foreground: 'f9f871' },
+          { token: 'string', foreground: 'f9f871' },
+          { token: 'keyword', foreground: 'ff2a85', fontStyle: 'bold' },
+          { token: 'comment', foreground: '636d9c', fontStyle: 'italic' },
+          { token: 'delimiter', foreground: 'a5b4fc' }
+        ],
+        colors: {
+          'editor.background': '#0b0c1b',
+          'editor.foreground': '#e2e8f0',
+          'editorCursor.foreground': '#00f2fe',
+          'editor.lineHighlightBackground': '#161836',
+          'editorLineNumber.foreground': '#4c5380',
+          'editor.selectionBackground': '#ff084445'
+        }
+      });
+
+      // 2. Dracula Pro
+      window.monaco.editor.defineTheme('dracula-pro', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+          { token: 'tag', foreground: 'ff79c6', fontStyle: 'bold' },
+          { token: 'attribute.name', foreground: '50fa7b' },
+          { token: 'attribute.value', foreground: 'f1fa8c' },
+          { token: 'string', foreground: 'f1fa8c' },
+          { token: 'keyword', foreground: 'bd93f9', fontStyle: 'bold' },
+          { token: 'comment', foreground: '6272a4', fontStyle: 'italic' }
+        ],
+        colors: {
+          'editor.background': '#282a36',
+          'editor.foreground': '#f8f8f2',
+          'editorCursor.foreground': '#ff79c6',
+          'editor.lineHighlightBackground': '#343746',
+          'editorLineNumber.foreground': '#6272a4',
+          'editor.selectionBackground': '#bd93f940'
+        }
+      });
+
+      // 3. Synthwave '84
+      window.monaco.editor.defineTheme('synthwave-84', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+          { token: 'tag', foreground: 'ff7edb', fontStyle: 'bold' },
+          { token: 'attribute.name', foreground: 'fede5d' },
+          { token: 'attribute.value', foreground: 'ff8b39' },
+          { token: 'string', foreground: 'ff8b39' },
+          { token: 'keyword', foreground: '36f9f6', fontStyle: 'bold' },
+          { token: 'comment', foreground: '84649c', fontStyle: 'italic' }
+        ],
+        colors: {
+          'editor.background': '#1a1025',
+          'editor.foreground': '#fff5f9',
+          'editorCursor.foreground': '#fede5d',
+          'editor.lineHighlightBackground': '#291a3a',
+          'editorLineNumber.foreground': '#705487',
+          'editor.selectionBackground': '#ff7edb38'
+        }
+      });
+
+      // 4. Emerald Matrix
+      window.monaco.editor.defineTheme('emerald-matrix', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+          { token: 'tag', foreground: '00ff9d', fontStyle: 'bold' },
+          { token: 'attribute.name', foreground: '34d399' },
+          { token: 'attribute.value', foreground: 'a7f3d0' },
+          { token: 'string', foreground: '6ee7b7' },
+          { token: 'keyword', foreground: '00ff9d', fontStyle: 'bold' },
+          { token: 'comment', foreground: '276749', fontStyle: 'italic' }
+        ],
+        colors: {
+          'editor.background': '#06110c',
+          'editor.foreground': '#d1fae5',
+          'editorCursor.foreground': '#00ff9d',
+          'editor.lineHighlightBackground': '#0c2117',
+          'editorLineNumber.foreground': '#1e523a',
+          'editor.selectionBackground': '#00ff9d30'
+        }
+      });
+
+      // 5. Aurora Light
+      window.monaco.editor.defineTheme('aurora-light', {
+        base: 'vs',
+        inherit: true,
+        rules: [
+          { token: 'tag', foreground: 'e11d48', fontStyle: 'bold' },
+          { token: 'attribute.name', foreground: '6c5ce7' },
+          { token: 'attribute.value', foreground: '0284c7' },
+          { token: 'string', foreground: '0284c7' },
+          { token: 'keyword', foreground: '7c3aed', fontStyle: 'bold' },
+          { token: 'comment', foreground: '94a3b8', fontStyle: 'italic' }
+        ],
+        colors: {
+          'editor.background': '#f8fafc',
+          'editor.foreground': '#1e293b',
+          'editorCursor.foreground': '#6c5ce7',
+          'editor.lineHighlightBackground': '#f1f5f9',
+          'editorLineNumber.foreground': '#94a3b8',
+          'editor.selectionBackground': '#6c5ce725'
+        }
+      });
+    }
+
+    function applyStudioTheme(themeName) {
+      currentStudioTheme = themeName || 'cyberpunk-neon';
+      localStorage.setItem('codemasr_studio_theme', currentStudioTheme);
+
+      if (studioModal) {
+        studioModal.setAttribute('data-studio-theme', currentStudioTheme);
+      }
+
+      const selectEl = document.getElementById('studio-theme-select');
+      if (selectEl && selectEl.value !== currentStudioTheme) {
+        selectEl.value = currentStudioTheme;
+      }
+
+      if (window.monaco) {
+        registerCustomMonacoThemes();
+        window.monaco.editor.setTheme(currentStudioTheme);
+      }
+
+      // تلوين المحرر البديل في حال عدم اتصال الإنترنت
+      const fallbackEl = document.getElementById('fallback-editor');
+      if (fallbackEl) {
+        const isLight = currentStudioTheme === 'aurora-light';
+        fallbackEl.style.background = isLight ? '#f8fafc' : 'var(--st-bg-main)';
+        fallbackEl.style.color = isLight ? '#1e293b' : '#f8f8f2';
+      }
+    }
+
+    document.getElementById('studio-theme-select')?.addEventListener('change', (e) => {
+      applyStudioTheme(e.target.value);
+      showToast(`🎨 تم تفعيل ثيم ${e.target.options[e.target.selectedIndex].text}`);
+    });
+
     if (openStudioBtn && studioModal) {
       openStudioBtn.addEventListener('click', () => {
         studioModal.hidden = false;
-        // نقل المحرر الفعلي إلى داخل شاشة الفول سكرين
         if (editorHost && studioEditorContainer) {
           studioEditorContainer.appendChild(editorHost);
           editorHost.style.height = '100%';
         }
         renderStudioTabs();
         switchPlaygroundFileTab(state.activePlaygroundFile || 'html');
+        applyStudioTheme(currentStudioTheme);
         updateStudioPreview();
         setTimeout(() => {
           if (monacoEditorInstance) monacoEditorInstance.layout();
