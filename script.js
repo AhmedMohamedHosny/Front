@@ -1994,10 +1994,76 @@ if (btn) {
     }
   }
 
+// محرك التعرف التلقائي على نوع ولغة الملف من امتداده (.html, .css, .js, .json, .py, .md)
+  function getFileExtensionInfo(rawKey) {
+    const key = String(rawKey || 'html').trim();
+    const lower = key.toLowerCase();
+
+    if (lower === 'html' || lower === 'index.html' || lower.endsWith('.html') || lower.endsWith('.htm')) {
+      return {
+        lang: 'html',
+        label: 'HTML',
+        dot: 'html-dot',
+        displayName: lower === 'html' ? 'index.html' : key,
+        starter: `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>${key}</title>\n</head>\n<body>\n  <h1>صفحة ${key}</h1>\n  <a href="index.html">العودة للرئيسية</a>\n</body>\n</html>`
+      };
+    }
+    if (lower === 'css' || lower === 'style.css' || lower.endsWith('.css')) {
+      return {
+        lang: 'css',
+        label: 'CSS',
+        dot: 'css-dot',
+        displayName: lower === 'css' ? 'style.css' : key,
+        starter: `/* ملف تنسيقات ${key} */\nbody {\n  \n}\n`
+      };
+    }
+    if (lower === 'js' || lower === 'script.js' || lower.endsWith('.js')) {
+      return {
+        lang: 'javascript',
+        label: 'JAVASCRIPT',
+        dot: 'js-dot',
+        displayName: lower === 'js' ? 'script.js' : key,
+        starter: `// ملف جافاسكريبت: ${key}\nconsole.log("${key} loaded successfully!");\n`
+      };
+    }
+    if (lower.endsWith('.json')) {
+      return {
+        lang: 'json',
+        label: 'JSON',
+        dot: 'js-dot',
+        displayName: key,
+        starter: `{\n  "project": "CodeMasr",\n  "status": "active"\n}\n`
+      };
+    }
+    if (lower.endsWith('.py')) {
+      return {
+        lang: 'python',
+        label: 'PYTHON',
+        dot: 'py-dot',
+        displayName: key,
+        starter: `# Python Script: ${key}\ndef main():\n    print("Hello from ${key}")\n\nmain()\n`
+      };
+    }
+    return {
+      lang: 'markdown',
+      label: 'TEXT / MD',
+      dot: 'html-dot',
+      displayName: key,
+      starter: `# ${key}\n\nاكتب ملاحظاتك أو الكود هنا...\n`
+    };
+  }
+
   function getMonacoLang(fileKey) {
-    if (fileKey === 'css') return 'css';
-    if (fileKey === 'js') return 'javascript';
-    return 'html';
+    return getFileExtensionInfo(fileKey).lang;
+  }
+
+  function normalizeFileKey(rawKey) {
+    if (!rawKey) return 'html';
+    const k = rawKey.trim();
+    if (k.toLowerCase() === 'index.html' || k.toLowerCase() === 'html') return 'html';
+    if (k.toLowerCase() === 'style.css' || k.toLowerCase() === 'css') return 'css';
+    if (k.toLowerCase() === 'script.js' || k.toLowerCase() === 'js') return 'js';
+    return k;
   }
 
   function updateCursorStatusFromTextarea(ta) {
@@ -2005,53 +2071,65 @@ if (btn) {
     if (!posEl || !ta) return;
     const textUpToCursor = ta.value.substring(0, ta.selectionStart || 0);
     const lines = textUpToCursor.split('\n');
-    const ln = lines.length;
-    const col = lines[lines.length - 1].length + 1;
-    posEl.textContent = `Ln ${ln}, Col ${col}`;
-  }
-
-function normalizeFileKey(rawKey) {
-    if (!rawKey) return 'html';
-    const k = rawKey.toLowerCase();
-    if (k === 'index.html' || k === 'html') return 'html';
-    if (k === 'style.css' || k === 'css') return 'css';
-    if (k === 'script.js' || k === 'js') return 'js';
-    return rawKey;
+    posEl.textContent = `Ln ${lines.length}, Col ${lines[lines.length - 1].length + 1}`;
   }
 
   function switchPlaygroundFileTab(rawKey) {
     const fileKey = normalizeFileKey(rawKey);
+    if (state.playgroundFiles[fileKey] === undefined) return;
     state.activePlaygroundFile = fileKey;
 
-    document.querySelectorAll('.file-tab[data-file], .vscode-tab[data-file]').forEach((tab) => {
-      const tabKey = normalizeFileKey(tab.getAttribute('data-file'));
-      tab.classList.toggle('active', tabKey === fileKey);
-    });
-
+    const info = getFileExtensionInfo(fileKey);
     const langLabel = document.getElementById('editor-language');
-    if (langLabel) {
-      langLabel.textContent = fileKey === 'js' ? 'JAVASCRIPT' : fileKey.toUpperCase();
-    }
+    if (langLabel) langLabel.textContent = info.label;
 
-    const content = state.playgroundFiles[fileKey] !== undefined ? state.playgroundFiles[fileKey] : '';
+    const studioStatusFile = document.getElementById('studio-status-file');
+    if (studioStatusFile) studioStatusFile.textContent = info.displayName;
+
+    const content = state.playgroundFiles[fileKey] || '';
     if (usingMonaco && monacoEditorInstance && window.monaco) {
       const model = monacoEditorInstance.getModel();
       if (model) {
-        window.monaco.editor.setModelLanguage(model, getMonacoLang(fileKey));
+        window.monaco.editor.setModelLanguage(model, info.lang);
       }
-      monacoEditorInstance.setValue(content);
+      if (monacoEditorInstance.getValue() !== content) {
+        monacoEditorInstance.setValue(content);
+      }
     } else {
       const fallbackEl = document.getElementById('fallback-editor');
       if (fallbackEl) fallbackEl.value = content;
     }
+
+    // تحديث شكل التبويبات في الشاشة العادية والفول سكرين
+    if (typeof window.refreshAllEditorTabs === 'function') {
+      window.refreshAllEditorTabs();
+    }
+
+    // إذا كان الملف المفتوح هو صفحة HTML أخرى (مثل about.html)، اعرضها فوراً في المعاينة
+    if (info.lang === 'html') {
+      const f1 = document.getElementById('preview-frame');
+      const f2 = document.getElementById('vscode-preview-frame');
+      const docStr = buildFullPlaygroundDocument(fileKey);
+      if (f1) f1.srcdoc = docStr;
+      if (f2 && !document.getElementById('vscode-studio-modal')?.hidden) f2.srcdoc = docStr;
+    }
   }
 
-  function buildFullPlaygroundDocument() {
-    const htmlPart = state.playgroundFiles.html || '';
-    const cssPart = state.playgroundFiles.css || '';
-    const jsPart = state.playgroundFiles.js || '';
+  function buildFullPlaygroundDocument(targetHtmlKey) {
+    // تحديد أي ملف HTML سيتم عرضه (الملف النشط إذا كان HTML، وإلا index.html الأساسي)
+    const activeInfo = getFileExtensionInfo(state.activePlaygroundFile);
+    const htmlKeyToRender = targetHtmlKey || (activeInfo.lang === 'html' ? state.activePlaygroundFile : 'html');
+    const htmlPart = state.playgroundFiles[htmlKeyToRender] || state.playgroundFiles.html || '';
 
-    // Bridge script captures console.log/warn/error and window.onerror inside the iframe
+    // تجميع كل ملفات الـ CSS والـ JS الموجودة في المشروع لربطها تلقائياً
+    let allCss = '';
+    let allJs = '';
+    Object.keys(state.playgroundFiles).forEach((k) => {
+      const inf = getFileExtensionInfo(k);
+      if (inf.lang === 'css') allCss += '\n' + (state.playgroundFiles[k] || '');
+      if (inf.lang === 'javascript') allJs += '\n' + (state.playgroundFiles[k] || '');
+    });
+
     const bridgeScript = `
       <script>
         (function(){
@@ -2068,17 +2146,26 @@ function normalizeFileKey(rawKey) {
           console.info = function(){ send('info', arguments); origInfo.apply(console, arguments); };
           console.warn = function(){ send('warn', arguments); origWarn.apply(console, arguments); };
           console.error = function(){ send('error', arguments); origErr.apply(console, arguments); };
-          window.onerror = function(msg, url, lineNo, columnNo) {
+          window.onerror = function(msg, url, lineNo) {
             send('runtime-error', [msg + (lineNo ? ' (Line ' + lineNo + ')' : '')]);
             return false;
           };
-          // التقاط بكرة الفأرة داخل المعاينة وإرسالها للصفحة الرئيسية لتكبير وتصغير المعاينة فقط
           window.addEventListener('wheel', function(e) {
             if (e.ctrlKey) {
               e.preventDefault();
               parent.postMessage({ source: 'codemasr-preview-zoom', deltaY: e.deltaY }, '*');
             }
           }, { passive: false });
+          // دعم التنقل السلس بين صفحات الـ HTML المتعددة التي ينشئها الطالب
+          document.addEventListener('click', function(e) {
+            var link = e.target.closest('a[href]');
+            if (!link) return;
+            var href = link.getAttribute('href') || '';
+            if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:')) {
+              e.preventDefault();
+              parent.postMessage({ source: 'codemasr-navigate-file', targetFile: href }, '*');
+            }
+          });
         })();
       <\/script>
     `;
@@ -2087,14 +2174,14 @@ function normalizeFileKey(rawKey) {
 <html>
 <head>
   <meta charset="UTF-8">
-  <style>${cssPart}</style>
+  <style>${allCss}</style>
   ${bridgeScript}
 </head>
 <body>
   ${htmlPart}
   <script>
     try {
-      ${jsPart}
+      ${allJs}
     } catch (err) {
       parent.postMessage({ source: 'codemasr-preview', level: 'runtime-error', message: err.toString() }, '*');
     }
@@ -2563,26 +2650,205 @@ function normalizeFileKey(rawKey) {
     const studioEditorContainer = document.getElementById('vscode-editor-container');
     const studioTabsBar = document.getElementById('vscode-tabs-bar');
 
+// رسم التبويبات مع زر (+) لإضافة ملف جديد وزر (⬇) لتحميل الملف وزر (×) لحذف الملفات الإضافية
     function renderStudioTabs() {
-      if (!studioTabsBar) return;
-      const files = [
-        { key: 'html', label: 'index.html', dot: 'html-dot' },
-        { key: 'css', label: 'style.css', dot: 'css-dot' },
-        { key: 'js', label: 'script.js', dot: 'js-dot' }
-      ];
-      studioTabsBar.innerHTML = files.map(f => `
-        <button type="button" class="vscode-tab ${state.activePlaygroundFile === f.key ? 'active' : ''}" data-file="${f.key}" style="border:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
-          <span class="file-dot ${f.dot}"></span> ${f.label}
-        </button>
-      `).join('');
+      const pgTabsBar = document.getElementById('playground-file-tabs') || document.querySelector('.file-tabs');
+      const coreKeys = ['html', 'css', 'js'];
+      const allKeys = Object.keys(state.playgroundFiles);
 
-      studioTabsBar.querySelectorAll('.vscode-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          switchPlaygroundFileTab(btn.getAttribute('data-file'));
-          renderStudioTabs();
+      // 1. تحديث تبويبات الفول سكرين (VS Code Studio)
+      if (studioTabsBar) {
+        studioTabsBar.innerHTML = allKeys.map((key) => {
+          const info = getFileExtensionInfo(key);
+          const isCore = coreKeys.includes(key);
+          const isActive = state.activePlaygroundFile === key;
+          return `
+            <div class="vscode-tab ${isActive ? 'active' : ''}" data-file="${escapeHtml(key)}">
+              <span class="file-dot ${info.dot}"></span>
+              <span class="tab-filename">${escapeHtml(info.displayName)}</span>
+              ${!isCore ? `<button type="button" class="tab-close-x" data-delete-file="${escapeHtml(key)}" title="حذف الملف">×</button>` : ''}
+            </div>
+          `;
+        }).join('') + `
+          <button type="button" class="vscode-add-tab-btn" id="studio-plus-file-btn" title="إضافة ملف جديد (+ New File)">+</button>
+          <button type="button" class="vscode-add-tab-btn" id="studio-download-file-btn" title="تحميل الملف الحالي على جهازك">⬇</button>
+        `;
+
+        studioTabsBar.querySelectorAll('.vscode-tab').forEach((tabEl) => {
+          tabEl.addEventListener('click', (e) => {
+            if (e.target.closest('.tab-close-x')) return;
+            switchPlaygroundFileTab(tabEl.getAttribute('data-file'));
+          });
+        });
+
+        studioTabsBar.querySelectorAll('.tab-close-x').forEach((delBtn) => {
+          delBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteCustomFile(delBtn.getAttribute('data-delete-file'));
+          });
+        });
+
+        document.getElementById('studio-plus-file-btn')?.addEventListener('click', promptCreateNewFile);
+        document.getElementById('studio-download-file-btn')?.addEventListener('click', downloadActiveFile);
+      }
+
+      // 2. تحديث تبويبات الـ Playground العادي أيضاً بنفس زر (+)
+      if (pgTabsBar) {
+        pgTabsBar.innerHTML = allKeys.map((key) => {
+          const info = getFileExtensionInfo(key);
+          const isCore = coreKeys.includes(key);
+          const isActive = state.activePlaygroundFile === key;
+          return `
+            <button type="button" class="file-tab ${isActive ? 'active' : ''}" data-file="${escapeHtml(key)}">
+              <span class="file-dot ${info.dot}"></span> ${escapeHtml(info.displayName)}
+              ${!isCore ? `<span class="tab-close-x" data-delete-file="${escapeHtml(key)}" title="حذف">×</span>` : ''}
+            </button>
+          `;
+        }).join('') + `
+          <button type="button" class="pg-plus-tab-btn" id="pg-plus-file-btn" title="إضافة ملف جديد (+)">+</button>
+        `;
+
+        pgTabsBar.querySelectorAll('.file-tab').forEach((tabEl) => {
+          tabEl.addEventListener('click', (e) => {
+            if (e.target.closest('.tab-close-x')) return;
+            switchPlaygroundFileTab(tabEl.getAttribute('data-file'));
+          });
+        });
+
+        pgTabsBar.querySelectorAll('.tab-close-x').forEach((delBtn) => {
+          delBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteCustomFile(delBtn.getAttribute('data-delete-file'));
+          });
+        });
+
+        document.getElementById('pg-plus-file-btn')?.addEventListener('click', promptCreateNewFile);
+      }
+    }
+
+    window.refreshAllEditorTabs = renderStudioTabs;
+
+    // نافذة ذكية لإضافة ملف جديد مع كشف فوري للامتداد أثناء الكتابة
+    function promptCreateNewFile() {
+      const modalHtml = `
+        <div style="direction:rtl; text-align:right; font-family:'Cairo',sans-serif;">
+          <p style="margin:0 0 8px; font-size:12px;">اكتب اسم الملف مع الامتداد (مثل: <code>about.html</code> أو <code>app.js</code> أو <code>theme.css</code>):</p>
+          <input id="new-file-name-input" type="text" placeholder="مثال: contact.html أو helper.js" style="width:100%; padding:10px 12px; border:1px solid var(--purple); border-radius:9px; font:600 13px 'DM Mono',monospace; direction:ltr; text-align:left;" autocomplete="off" />
+          <div id="ext-live-detector" style="margin-top:10px; padding:8px 12px; border-radius:8px; background:var(--purple-soft); color:var(--purple); font-size:11px; font-weight:700;">
+            ✨ اكتب الامتداد وسيتم التعرف على اللغة وتجهيز القالب تلقائياً...
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+            <small style="width:100%; color:var(--muted); font-size:10px;">اختصارات سريعة:</small>
+            <button type="button" class="quick-ext-chip" data-sample="page2.html">+ page2.html</button>
+            <button type="button" class="quick-ext-chip" data-sample="cards.css">+ cards.css</button>
+            <button type="button" class="quick-ext-chip" data-sample="app.js">+ app.js</button>
+            <button type="button" class="quick-ext-chip" data-sample="data.json">+ data.json</button>
+          </div>
+        </div>
+      `;
+
+      openModal('➕', 'Create New File (إضافة ملف جديد)', modalHtml, 'إنشاء وفتح الملف ✦', () => {
+        const input = document.getElementById('new-file-name-input');
+        let rawName = (input ? input.value : '').trim();
+        if (!rawName) {
+          showToast('⚠ من فضلك اكتب اسم الملف أولاً.');
+          return false;
+        }
+        // إذا لم يكتب المستخدم نقطة امتداد، نضيف .html افتراضياً
+        if (!rawName.includes('.')) {
+          rawName += '.html';
+        }
+        const normalized = normalizeFileKey(rawName);
+        if (state.playgroundFiles[normalized] !== undefined) {
+          switchPlaygroundFileTab(normalized);
+          showToast(`📄 تم التبديل إلى الملف الموجود: ${rawName}`);
+          return true;
+        }
+
+        const extInfo = getFileExtensionInfo(normalized);
+        state.playgroundFiles[normalized] = extInfo.starter;
+        saveState();
+        switchPlaygroundFileTab(normalized);
+        showToast(`✓ تم إنشاء ملف ${extInfo.displayName} بلغة ${extInfo.label} بنجاح!`);
+        return true;
+      });
+
+      const nameInput = document.getElementById('new-file-name-input');
+      const detectorBox = document.getElementById('ext-live-detector');
+
+      function updateLiveDetector() {
+        if (!nameInput || !detectorBox) return;
+        const val = nameInput.value.trim();
+        if (!val) {
+          detectorBox.innerHTML = '✨ اكتب الامتداد وسيتم التعرف على اللغة وتجهيز القالب تلقائياً...';
+          return;
+        }
+        const testName = val.includes('.') ? val : val + '.html';
+        const info = getFileExtensionInfo(testName);
+        detectorBox.innerHTML = `✅ تم التعرف التلقائي: <b>${escapeHtml(info.displayName)}</b> — اللغة: <b>${info.label}</b> (سيتم تجهيز الكود الافتراضي تلقائياً)`;
+      }
+
+      if (nameInput) {
+        setTimeout(() => nameInput.focus(), 50);
+        nameInput.addEventListener('input', updateLiveDetector);
+        nameInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('modal-action')?.click();
+          }
+        });
+      }
+
+      document.querySelectorAll('.quick-ext-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          if (nameInput) {
+            nameInput.value = chip.getAttribute('data-sample');
+            updateLiveDetector();
+            nameInput.focus();
+          }
         });
       });
     }
+
+    function deleteCustomFile(fileKey) {
+      if (['html', 'css', 'js'].includes(fileKey)) return;
+      delete state.playgroundFiles[fileKey];
+      saveState();
+      if (state.activePlaygroundFile === fileKey) {
+        switchPlaygroundFileTab('html');
+      } else {
+        renderStudioTabs();
+      }
+      showToast(`🗑️ تم حذف الملف ${fileKey}`);
+    }
+
+    function downloadActiveFile() {
+      const key = state.activePlaygroundFile || 'html';
+      const info = getFileExtensionInfo(key);
+      const content = state.playgroundFiles[key] || '';
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = info.displayName;
+      a.click();
+      showToast(`⬇ جاري تحميل ${info.displayName}...`);
+    }
+
+    // الاستماع لحدث التنقل بين صفحات HTML المتعددة من داخل شاشة المعاينة
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.source === 'codemasr-navigate-file') {
+        const target = normalizeFileKey(e.data.targetFile);
+        if (state.playgroundFiles[target] !== undefined) {
+          switchPlaygroundFileTab(target);
+          showToast(`🔗 تم الانتقال إلى صفحة ${e.data.targetFile}`);
+        } else {
+          showToast(`⚠ الصفحة "${e.data.targetFile}" غير موجودة بعد! اضغط (+) لإنشائها.`);
+        }
+      }
+    });
+
+    // تفعيل التبويبات عند بدء التشغيل
+    renderStudioTabs();
 
     function updateStudioPreview() {
       if (!studioPreview) return;
