@@ -1588,8 +1588,8 @@ if (btn) {
     workbench.innerHTML = `
       <div style="background: var(--purple-soft); border-bottom: 1px solid var(--line); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <div style="font-size: 11px; color: #5c50bc; font-weight: 700;">
-          <span>🎯</span> <span id="in-lesson-prompt">${lesson.challengePrompt}</span>
-        </div>
+<span>🎯</span> <span id="in-lesson-prompt">${escapeHtml(lesson.challengePrompt)}</span>
+</div>
         <div style="display: flex; gap: 8px; align-items: center;">
           <button type="button" id="in-lesson-reset" class="secondary-button" style="padding: 6px 12px; font-size: 10px;">↺ Reset</button>
           <button type="button" id="in-lesson-solution" class="secondary-button" style="padding: 6px 12px; font-size: 10px;">💡 Show Solution</button>
@@ -2009,10 +2009,22 @@ if (btn) {
     posEl.textContent = `Ln ${ln}, Col ${col}`;
   }
 
-  function switchPlaygroundFileTab(fileKey) {
+function normalizeFileKey(rawKey) {
+    if (!rawKey) return 'html';
+    const k = rawKey.toLowerCase();
+    if (k === 'index.html' || k === 'html') return 'html';
+    if (k === 'style.css' || k === 'css') return 'css';
+    if (k === 'script.js' || k === 'js') return 'js';
+    return rawKey;
+  }
+
+  function switchPlaygroundFileTab(rawKey) {
+    const fileKey = normalizeFileKey(rawKey);
     state.activePlaygroundFile = fileKey;
-    document.querySelectorAll('.file-tab[data-file]').forEach((tab) => {
-      tab.classList.toggle('active', tab.getAttribute('data-file') === fileKey);
+
+    document.querySelectorAll('.file-tab[data-file], .vscode-tab[data-file]').forEach((tab) => {
+      const tabKey = normalizeFileKey(tab.getAttribute('data-file'));
+      tab.classList.toggle('active', tabKey === fileKey);
     });
 
     const langLabel = document.getElementById('editor-language');
@@ -2020,7 +2032,7 @@ if (btn) {
       langLabel.textContent = fileKey === 'js' ? 'JAVASCRIPT' : fileKey.toUpperCase();
     }
 
-    const content = state.playgroundFiles[fileKey] || '';
+    const content = state.playgroundFiles[fileKey] !== undefined ? state.playgroundFiles[fileKey] : '';
     if (usingMonaco && monacoEditorInstance && window.monaco) {
       const model = monacoEditorInstance.getModel();
       if (model) {
@@ -2514,14 +2526,37 @@ if (btn) {
         }
       });
     }
-    // فتح استوديو فيجوال كود ملء الشاشة
+// فتح استوديو فيجوال كود ملء الشاشة ونقل المحرر الحي إليه
     const openStudioBtn = document.getElementById('open-studio-btn');
     const studioModal = document.getElementById('vscode-studio-modal');
     const closeStudioBtn = document.getElementById('close-studio-btn');
-    const studioUploadBtn = document.getElementById('studio-upload-img');
-    const assetInput = document.getElementById('asset-file-input');
     const studioPreview = document.getElementById('vscode-preview-frame');
     const studioRunBtn = document.getElementById('studio-run-code');
+    const studioReloadBtn = document.getElementById('studio-reload-preview');
+    const editorHost = document.getElementById('editor-host');
+    const studioEditorContainer = document.getElementById('vscode-editor-container');
+    const studioTabsBar = document.getElementById('vscode-tabs-bar');
+
+    function renderStudioTabs() {
+      if (!studioTabsBar) return;
+      const files = [
+        { key: 'html', label: 'index.html', dot: 'html-dot' },
+        { key: 'css', label: 'style.css', dot: 'css-dot' },
+        { key: 'js', label: 'script.js', dot: 'js-dot' }
+      ];
+      studioTabsBar.innerHTML = files.map(f => `
+        <button type="button" class="vscode-tab ${state.activePlaygroundFile === f.key ? 'active' : ''}" data-file="${f.key}" style="border:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <span class="file-dot ${f.dot}"></span> ${f.label}
+        </button>
+      `).join('');
+
+      studioTabsBar.querySelectorAll('.vscode-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchPlaygroundFileTab(btn.getAttribute('data-file'));
+          renderStudioTabs();
+        });
+      });
+    }
 
     function updateStudioPreview() {
       if (!studioPreview) return;
@@ -2531,56 +2566,47 @@ if (btn) {
     if (openStudioBtn && studioModal) {
       openStudioBtn.addEventListener('click', () => {
         studioModal.hidden = false;
-        renderStudioFileTree();
+        // نقل المحرر الفعلي إلى داخل شاشة الفول سكرين
+        if (editorHost && studioEditorContainer) {
+          studioEditorContainer.appendChild(editorHost);
+          editorHost.style.height = '100%';
+        }
+        renderStudioTabs();
+        switchPlaygroundFileTab(state.activePlaygroundFile || 'html');
         updateStudioPreview();
+        setTimeout(() => {
+          if (monacoEditorInstance) monacoEditorInstance.layout();
+        }, 80);
         showToast('⛶ تم فتح بيئة Visual Studio Code الكاملة');
       });
     }
 
     if (closeStudioBtn && studioModal) {
       closeStudioBtn.addEventListener('click', () => {
+        // إرجاع المحرر إلى مكانه الأصلي في الـ Playground
+        const editorPanelBox = document.getElementById('editor-panel-box');
+        const statusbar = editorPanelBox?.querySelector('.editor-statusbar');
+        if (editorHost && editorPanelBox && statusbar) {
+          editorPanelBox.insertBefore(editorHost, statusbar);
+          editorHost.style.height = '';
+        }
         studioModal.hidden = true;
-        if (monacoEditorInstance) monacoEditorInstance.layout();
+        runPlaygroundCode(false);
+        setTimeout(() => {
+          if (monacoEditorInstance) monacoEditorInstance.layout();
+        }, 80);
       });
     }
 
     if (studioRunBtn) {
       studioRunBtn.addEventListener('click', () => {
         updateStudioPreview();
-        showToast('▶ تم تشغيل الكود في المعاينة');
+        runPlaygroundCode(true);
       });
     }
 
-    if (studioUploadBtn && assetInput) {
-      studioUploadBtn.addEventListener('click', () => assetInput.click());
-      assetInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          const dataUrl = evt.target.result;
-          state.playgroundFiles[file.name] = dataUrl;
-          renderStudioFileTree();
-          showToast(`🖼️ تم رفع "${file.name}" بنجاح! يمكنك استخدامها الآن.`);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function renderStudioFileTree() {
-      const tree = document.getElementById('vscode-file-tree');
-      if (!tree) return;
-      tree.innerHTML = '';
-      Object.keys(state.playgroundFiles).forEach((fname) => {
-        const item = document.createElement('div');
-        item.className = `tree-file-item ${state.activePlaygroundFile === fname ? 'active' : ''}`;
-        item.innerHTML = `<span>📄</span> <span>${escapeHtml(fname)}</span>`;
-        item.addEventListener('click', () => {
-          switchPlaygroundFileTab(fname);
-          renderStudioFileTree();
-        });
-        tree.appendChild(item);
-      });
+    if (studioReloadBtn) {
+      studioReloadBtn.addEventListener('click', updateStudioPreview);
     }
     // تفعيل شريط السحب للتحكم بمساحة الكود والمعاينة
     const resizer = document.getElementById('workbench-resizer');
