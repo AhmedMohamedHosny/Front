@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CODEMASTERY | منصة احتراف البرمجة التفاعلية</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts: Cairo for Arabic & Fira Code for programming -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-icon">&lt;/&gt;</span>
+        <span class="logo-text">CODEMASTERY</span>
+        <span class="badge-track">مسار HTML من الصفر</span>
+      </div>
+      <nav class="main-nav">
+        <button class="nav-btn active" data-tab="learn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span class="t-learn">الدروس والمنهج</span>
+        </button>
+        <button class="nav-btn" data-tab="playground">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+          <span class="t-playground">محرر الأكواد الحر</span>
+        </button>
+        <button class="nav-btn" data-tab="projects">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          <span class="t-projects">المشاريع العملية</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="header-right">
+      <!-- Progress Pill -->
+      <div class="progress-pill">
+        <span class="progress-text"><span id="completed-count">0</span> / 15 درس</span>
+        <div class="progress-mini-bar">
+          <div class="progress-mini-fill" id="header-progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Language & Dialect Switcher -->
+      <div class="dropdown-control">
+        <label for="lang-select" class="sr-only">اللغة</label>
+        <select id="lang-select" class="select-chip">
+          <option value="ar" selected>🇪🇬 مصري (Egyptian Arabic)</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="bilingual">🌐 ثنائي اللغة (Bilingual)</option>
+        </select>
+      </div>
+
+      <!-- Theme Switcher -->
+      <button id="theme-toggle" class="icon-btn" title="تبديل الوضع الليلي / الفاتح">
+        <svg id="theme-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg id="theme-moon" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <!-- Reset Progress -->
+      <button id="reset-progress-btn" class="icon-btn danger" title="إعادة تعيين التقدم">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-layout">
+    
+    <!-- SECTION 1: LEARNING & LESSONS VIEW -->
+    <section id="view-learn" class="view-panel active">
+      <!-- Sidebar: Lessons List -->
+      <aside class="curriculum-sidebar">
+        <div class="sidebar-header">
+          <h2 class="sidebar-title t-curriculum-title">منهج لغة HTML الاحترافي</h2>
+          <span class="badge-stage">15 درس عملي</span>
+        </div>
+        <div class="curriculum-list" id="curriculum-list">
+          <!-- Populated by JavaScript -->
+        </div>
+      </aside>
+
+      <!-- Main Lesson & Workspace Container -->
+      <div class="lesson-content-container">
+        <!-- Top: Lesson Explanations & Theory -->
+        <article class="lesson-theory-card" id="lesson-theory">
+          <!-- Dynamic Content -->
+        </article>
+
+        <!-- Middle: Integrated Coding Workspace -->
+        <section class="coding-workspace" id="coding-workspace">
+          <!-- Workspace Header -->
+          <div class="workspace-header">
+            <div class="editor-tabs">
+              <button class="editor-tab active" data-file="index.html">
+                <span class="tab-icon">📄</span>
+                <span>index.html</span>
+                <span class="unsaved-indicator" id="unsaved-dot"></span>
+              </button>
+            </div>
+            
+            <div class="editor-actions">
+              <button id="btn-format-code" class="action-btn" title="تنسيق الكود (Auto Format)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
+                <span class="t-format">تنسيق</span>
+              </button>
+              <button id="btn-reset-code" class="action-btn" title="إعادة الكود الأصلي">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                <span class="t-reset">إعادة ضبط</span>
+              </button>
+              <button id="btn-run-code" class="action-btn primary pulse" title="تنفيذ الكود (Ctrl + Enter)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span class="t-run">تشغيل (Run)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Split Workbench: Editor vs Preview -->
+          <div class="workbench-split">
+            <!-- Left Panel: Code Editor -->
+            <div class="editor-pane">
+              <div class="editor-wrapper">
+                <div class="line-numbers" id="line-numbers">1</div>
+                <textarea id="code-editor" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="اكتب كود الـ HTML هنا..."></textarea>
+              </div>
+            </div>
+
+            <!-- Right Panel: Live Sandboxed Preview -->
+            <div class="preview-pane">
+              <div class="preview-header">
+                <div class="browser-dots">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                </div>
+                <span class="preview-title">معاينة المتصفح المباشرة (Sandboxed Iframe)</span>
+                <button id="btn-reload-preview" class="icon-btn-sm" title="تحديث المعاينة">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                </button>
+              </div>
+              <div class="iframe-container">
+                <iframe id="preview-iframe" sandbox="allow-scripts" title="معاينة المخرجات"></iframe>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diagnostics & Debugging Assistant Drawer -->
+          <div class="diagnostics-panel" id="diagnostics-panel">
+            <div class="diagnostics-header">
+              <div class="diag-title">
+                <span class="diag-icon" id="diag-icon">🛡️</span>
+                <span id="diag-summary">مساعد كشف الأخطاء وتحليل الكود (HTML Debugger)</span>
+              </div>
+              <button id="btn-toggle-diag" class="icon-btn-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </div>
+            <div class="diagnostics-body" id="diagnostics-body">
+              <div class="diag-clean-state" id="diag-clean">
+                <span class="check-icon">✓</span> الكود سليم! لم يتم العثور على أخطاء في وسوم HTML حتى الآن.
+              </div>
+              <div class="diag-issues-list hidden" id="diag-issues">
+                <!-- Dynamically populated issues -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Bottom: Interactive Challenge / Exercise Engine -->
+        <section class="exercise-section" id="exercise-section">
+          <!-- Exercise content populated dynamically -->
+        </section>
+      </div>
+    </section>
+
+    <!-- SECTION 2: FREE PLAYGROUND -->
+    <section id="view-playground" class="view-panel hidden">
+      <div class="playground-layout">
+        <div class="playground-banner">
+          <div>
+            <h2>مختبر الـ HTML الحر (Code Playground)</h2>
+            <p>جرّب أي فكرة، اكتب صفحات كاملة، اختبر الجداول، النماذج، والوسائط، واحفظ كودك مباشرة على جهازك.</p>
+          </div>
+          <div class="banner-actions">
+            <button id="btn-download-html" class="action-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              تحميل الملف (index.html)
+            </button>
+            <button id="btn-pg-run" class="action-btn primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              تشغيل المعاينة
+            </button>
+          </div>
+        </div>
+        <div class="workbench-split full-height">
+          <div class="editor-pane">
+            <div class="editor-wrapper">
+              <div class="line-numbers" id="pg-line-numbers">1</div>
+              <textarea id="pg-code-editor" spellcheck="false" placeholder="ابدأ بكتابة كود HTML كامل هنا..."></textarea>
+            </div>
+          </div>
+          <div class="preview-pane">
+            <div class="preview-header">
+              <span class="preview-title">المعاينة المباشرة</span>
+            </div>
+            <div class="iframe-container">
+              <iframe id="pg-preview-iframe" sandbox="allow-scripts" title="Playground Preview"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: REAL-WORLD PROJECTS -->
+    <section id="view-projects" class="view-panel hidden">
+      <div class="projects-container">
+        <div class="projects-intro">
+          <h2>مشاريع HTML واقعية لبناء البورتفوليو</h2>
+          <p>طَبَّق اللي اتعلمته في مشاريع حقيقية خطوة بخطوة، من أول سيرة ذاتية لحد منيو مطعم وصفحة هبوط كاملة.</p>
+        </div>
+        <div class="projects-grid" id="projects-grid">
+          <!-- Populated from projects.js -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Scripts -->
+  <script src="curriculum.js"></script>
+  <script src="projects.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
