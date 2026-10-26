@@ -1,241 +1,790 @@
-
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CODEMASTERY | منصة احتراف البرمجة التفاعلية</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Google Fonts: Cairo for Arabic & Fira Code for programming -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-<body>
-  <!-- Top Navigation Header -->
-  <header class="app-header">
-    <div class="header-left">
-      <div class="logo">
-        <span class="logo-icon">&lt;/&gt;</span>
-        <span class="logo-text">CODEMASTERY</span>
-        <span class="badge-track">مسار HTML من الصفر</span>
-      </div>
-      <nav class="main-nav">
-        <button class="nav-btn active" data-tab="learn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-          <span class="t-learn">الدروس والمنهج</span>
-        </button>
-        <button class="nav-btn" data-tab="playground">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-          <span class="t-playground">محرر الأكواد الحر</span>
-        </button>
-        <button class="nav-btn" data-tab="projects">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-          <span class="t-projects">المشاريع العملية</span>
-        </button>
-      </nav>
-    </div>
-
-    <div class="header-right">
-      <!-- Progress Pill -->
-      <div class="progress-pill">
-        <span class="progress-text"><span id="completed-count">0</span> / 15 درس</span>
-        <div class="progress-mini-bar">
-          <div class="progress-mini-fill" id="header-progress-fill" style="width: 0%"></div>
-        </div>
-      </div>
-
-      <!-- Language & Dialect Switcher -->
-      <div class="dropdown-control">
-        <label for="lang-select" class="sr-only">اللغة</label>
-        <select id="lang-select" class="select-chip">
-          <option value="ar" selected>🇪🇬 مصري (Egyptian Arabic)</option>
-          <option value="en">🇬🇧 English</option>
-          <option value="bilingual">🌐 ثنائي اللغة (Bilingual)</option>
-        </select>
-      </div>
-
-      <!-- Theme Switcher -->
-      <button id="theme-toggle" class="icon-btn" title="تبديل الوضع الليلي / الفاتح">
-        <svg id="theme-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        <svg id="theme-moon" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-      </button>
-
-      <!-- Reset Progress -->
-      <button id="reset-progress-btn" class="icon-btn danger" title="إعادة تعيين التقدم">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- Main Container -->
-  <main class="app-layout">
-    
-    <!-- SECTION 1: LEARNING & LESSONS VIEW -->
-    <section id="view-learn" class="view-panel active">
-      <!-- Sidebar: Lessons List -->
-      <aside class="curriculum-sidebar">
-        <div class="sidebar-header">
-          <h2 class="sidebar-title t-curriculum-title">منهج لغة HTML الاحترافي</h2>
-          <span class="badge-stage">15 درس عملي</span>
-        </div>
-        <div class="curriculum-list" id="curriculum-list">
-          <!-- Populated by JavaScript -->
-        </div>
-      </aside>
-
-      <!-- Main Lesson & Workspace Container -->
-      <div class="lesson-content-container">
-        <!-- Top: Lesson Explanations & Theory -->
-        <article class="lesson-theory-card" id="lesson-theory">
-          <!-- Dynamic Content -->
-        </article>
-
-        <!-- Middle: Integrated Coding Workspace -->
-        <section class="coding-workspace" id="coding-workspace">
-          <!-- Workspace Header -->
-          <div class="workspace-header">
-            <div class="editor-tabs">
-              <button class="editor-tab active" data-file="index.html">
-                <span class="tab-icon">📄</span>
-                <span>index.html</span>
-                <span class="unsaved-indicator" id="unsaved-dot"></span>
-              </button>
-            </div>
-            
-            <div class="editor-actions">
-              <button id="btn-format-code" class="action-btn" title="تنسيق الكود (Auto Format)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
-                <span class="t-format">تنسيق</span>
-              </button>
-              <button id="btn-reset-code" class="action-btn" title="إعادة الكود الأصلي">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                <span class="t-reset">إعادة ضبط</span>
-              </button>
-              <button id="btn-run-code" class="action-btn primary pulse" title="تنفيذ الكود (Ctrl + Enter)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span class="t-run">تشغيل (Run)</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Split Workbench: Editor vs Preview -->
-          <div class="workbench-split">
-            <!-- Left Panel: Code Editor -->
-            <div class="editor-pane">
-              <div class="editor-wrapper">
-                <div class="line-numbers" id="line-numbers">1</div>
-                <textarea id="code-editor" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="اكتب كود الـ HTML هنا..."></textarea>
-              </div>
-            </div>
-
-            <!-- Right Panel: Live Sandboxed Preview -->
-            <div class="preview-pane">
-              <div class="preview-header">
-                <div class="browser-dots">
-                  <span class="dot red"></span>
-                  <span class="dot yellow"></span>
-                  <span class="dot green"></span>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="theme-color" content="#0b1020"/>
+        <title>CodeMasr — Learn by Building</title>
+        <link rel="stylesheet" href="style.css"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="app-shell">
+            <aside class="sidebar" id="sidebar">
+                <a class="brand" href="#" aria-label="CodeMasr home">
+                    <span class="brand-mark">
+                        <span>&lt;</span>
+                        <i>/</i>
+                        <span>&gt;</span>
+                    </span>
+                    <span class="brand-name">
+                        code<span>masr</span>
+                        <small>LEARN BY BUILDING</small>
+                    </span>
+                </a>
+                <div class="sidebar-section">
+                    <p class="section-label">WORKSPACE</p>
+                    <button class="nav-item active" data-view="learn">
+                        <span class="nav-icon">⌂</span>
+                        Learning Hub <span class="nav-dot"></span>
+                    </button>
+                    <button class="nav-item" data-view="playground">
+                        <span class="nav-icon">⌘</span>
+                        Code Playground
+                    </button>
+                    <button class="nav-item" data-view="projects">
+                        <span class="nav-icon">▦</span>
+                        Projects
+                    </button>
+                    <button class="nav-item" data-view="progress">
+                        <span class="nav-icon">◷</span>
+                        My Progress
+                    </button>
                 </div>
-                <span class="preview-title">معاينة المتصفح المباشرة (Sandboxed Iframe)</span>
-                <button id="btn-reload-preview" class="icon-btn-sm" title="تحديث المعاينة">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                </button>
-              </div>
-              <div class="iframe-container">
-                <iframe id="preview-iframe" sandbox="allow-scripts" title="معاينة المخرجات"></iframe>
-              </div>
-            </div>
-          </div>
-
-          <!-- Diagnostics & Debugging Assistant Drawer -->
-          <div class="diagnostics-panel" id="diagnostics-panel">
-            <div class="diagnostics-header">
-              <div class="diag-title">
-                <span class="diag-icon" id="diag-icon">🛡️</span>
-                <span id="diag-summary">مساعد كشف الأخطاء وتحليل الكود (HTML Debugger)</span>
-              </div>
-              <button id="btn-toggle-diag" class="icon-btn-sm">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
-            </div>
-            <div class="diagnostics-body" id="diagnostics-body">
-              <div class="diag-clean-state" id="diag-clean">
-                <span class="check-icon">✓</span> الكود سليم! لم يتم العثور على أخطاء في وسوم HTML حتى الآن.
-              </div>
-              <div class="diag-issues-list hidden" id="diag-issues">
-                <!-- Dynamically populated issues -->
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Bottom: Interactive Challenge / Exercise Engine -->
-        <section class="exercise-section" id="exercise-section">
-          <!-- Exercise content populated dynamically -->
-        </section>
-      </div>
-    </section>
-
-    <!-- SECTION 2: FREE PLAYGROUND -->
-    <section id="view-playground" class="view-panel hidden">
-      <div class="playground-layout">
-        <div class="playground-banner">
-          <div>
-            <h2>مختبر الـ HTML الحر (Code Playground)</h2>
-            <p>جرّب أي فكرة، اكتب صفحات كاملة، اختبر الجداول، النماذج، والوسائط، واحفظ كودك مباشرة على جهازك.</p>
-          </div>
-          <div class="banner-actions">
-            <button id="btn-download-html" class="action-btn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              تحميل الملف (index.html)
-            </button>
-            <button id="btn-pg-run" class="action-btn primary">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              تشغيل المعاينة
-            </button>
-          </div>
+                <div class="sidebar-section courses-section">
+                    <p class="section-label">YOUR LEARNING PATH</p>
+                    <button class="course-link selected" data-course="html">
+                        <span class="course-badge html-badge">5</span>
+                        <span>
+                            <b>HTML Essentials</b>
+                            <small>Structure the web</small>
+                        </span>
+                        <span class="course-check">✓</span>
+                    </button>
+                    <button class="course-link" data-course="css">
+                        <span class="course-badge css-badge">✳</span>
+                        <span>
+                            <b>CSS Foundations</b>
+                            <small>Make it beautiful</small>
+                        </span>
+                        <span class="course-progress">0%</span>
+                    </button>
+                    <button class="course-link" data-course="js">
+                        <span class="course-badge js-badge">JS</span>
+                        <span>
+                            <b>JavaScript Basics</b>
+                            <small>Make it interactive</small>
+                        </span>
+                        <span class="course-progress">0%</span>
+                    </button>
+                    <button class="course-link" data-course="python">
+                        <span class="course-badge py-badge">Py</span>
+                        <span>
+                            <b>Python Starter</b>
+                            <small>Think like a developer</small>
+                        </span>
+                        <span class="course-lock">↗</span>
+                    </button>
+                </div>
+                <div class="sidebar-bottom">
+                    <div class="streak-card">
+                        <div class="streak-icon">✦</div>
+                        <div>
+                            <b id="streak-count">1 day streak</b>
+                            <small>Small steps add up.</small>
+                        </div>
+                        <span class="streak-spark">✧</span>
+                    </div>
+                    <div class="profile-row">
+                        <div class="avatar">CM</div>
+                        <div class="profile-copy">
+                            <b>Guest Developer</b>
+                            <small>Beginner · Level 1</small>
+                        </div>
+                        <button class="icon-button" id="profile-menu" aria-label="Profile options">•••</button>
+                    </div>
+                </div>
+            </aside>
+            <main class="main-area">
+                <header class="topbar">
+                    <button class="mobile-menu icon-button" id="mobile-menu" aria-label="Open menu">☰</button>
+                    <div class="breadcrumb">
+                        <span>Workspace</span>
+                        <span class="crumb-slash">/</span>
+                        <b id="breadcrumb-current">Learning Hub</b>
+                    </div>
+                    <div class="topbar-actions">
+                        <div class="search-box">
+                            <span>⌕</span>
+                            <input id="global-search" type="search" placeholder="Search lessons, topics..." aria-label="Search lessons"/>
+                            <kbd>⌘ K</kbd>
+                        </div>
+                        <button class="icon-button theme-toggle" id="theme-toggle" aria-label="Toggle theme">☼</button>
+                        <button class="help-button" id="help-button">
+                            ? <span>Help</span>
+                        </button>
+                    </div>
+                </header>
+                <section class="view active-view" id="learn-view">
+                    <div class="welcome-row">
+                        <div>
+                            <div class="eyebrow">
+                                <span class="live-dot"></span>
+                                YOUR DEVELOPER JOURNEY STARTS HERE
+                            </div>
+                            <h1>
+                                Build your first thing.<br>
+                                <span>Then build something bigger.</span>
+                            </h1>
+                            <p class="hero-description">Learn to code with clear lessons, hands-on challenges, and a real browser-based playground.</p>
+                            <div class="hero-actions">
+                                <button class="primary-button" id="continue-learning">
+                                    Continue learning <span>→</span>
+                                </button>
+                                <button class="secondary-button" id="explore-path">Explore learning path</button>
+                            </div>
+                        </div>
+                        <div class="hero-art" aria-label="Code illustration">
+                            <div class="art-orbit orbit-one"></div>
+                            <div class="art-orbit orbit-two"></div>
+                            <div class="art-window">
+                                <div class="art-window-top">
+                                    <i></i>
+                                    <i></i>
+                                    <i></i>
+                                    <span>hello-world.html</span>
+                                </div>
+                                <div class="art-code">
+                                    <p>
+                                        <span class="line-no">01</span>
+                                        <span class="pink">&lt;h1 &gt;</span>
+                                    </p>
+                                    <p>
+                                        <span class="line-no">02</span>
+                                        &nbsp;&nbsp;<span class="green">Hello, world!</span>
+                                    </p>
+                                    <p>
+                                        <span class="line-no">03</span>
+                                        <span class="pink">&lt;/h1 &gt;</span>
+                                    </p>
+                                    <p>
+                                        <span class="line-no">04</span>
+                                        <span class="purple">&lt;button</span>
+                                        <span class="blue">id</span>
+                                        =<span class="yellow">"start"</span>
+                                        <span class="purple">&gt;</span>
+                                    </p>
+                                    <p>
+                                        <span class="line-no">05</span>
+                                        &nbsp;&nbsp;Let's build <span class="pink">✦</span>
+                                    </p>
+                                    <p>
+                                        <span class="line-no">06</span>
+                                        <span class="purple">&lt;/button &gt;</span>
+                                    </p>
+                                </div>
+                                <div class="art-status">
+                                    <span>● All systems go</span>
+                                    <span>HTML · CSS · JS</span>
+                                </div>
+                            </div>
+                            <div class="floating-chip chip-one">
+                                ✦ <span>Build real projects</span>
+                            </div>
+                            <div class="floating-chip chip-two">
+                                <span class="chip-pulse"></span>
+                                Live preview
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <article class="stat-card">
+                            <div class="stat-top">
+                                <span>LEARNING PROGRESS</span>
+                                <span class="stat-icon purple-icon">↗</span>
+                            </div>
+                            <div class="stat-number">
+                                <b id="overall-progress">8%</b>
+                                <span class="muted">overall</span>
+                            </div>
+                            <div class="progress-track">
+                                <span id="overall-bar" style="width:8%"></span>
+                            </div>
+                            <small>Every completed lesson counts.</small>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-top">
+                                <span>LESSONS COMPLETED</span>
+                                <span class="stat-icon green-icon">✓</span>
+                            </div>
+                            <div class="stat-number">
+                                <b id="completed-count">1</b>
+                                <span class="muted">of 24 lessons</span>
+                            </div>
+                            <div class="mini-bars">
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                            </div>
+                            <small>Keep your momentum going.</small>
+                        </article>
+                        <article class="stat-card focus-card">
+                            <div class="stat-top">
+                                <span>YOUR NEXT MILESTONE</span>
+                                <span class="stat-icon orange-icon">✦</span>
+                            </div>
+                            <div class="milestone">
+                                <div class="milestone-icon">⌘</div>
+                                <div>
+                                    <b>Build a personal page</b>
+                                    <small>HTML · 15 min</small>
+                                </div>
+                            </div>
+                            <button class="text-button" id="start-milestone">
+                                Start challenge <span>→</span>
+                            </button>
+                        </article>
+                    </div>
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">PICK UP WHERE YOU LEFT OFF</p>
+                            <h2>Your learning path</h2>
+                        </div>
+                        <button class="text-button" id="view-all-courses">
+                            View all courses <span>→</span>
+                        </button>
+                    </div>
+                    <div class="course-grid">
+                        <article class="learning-card featured-course">
+                            <div class="card-topline">
+                                <span class="tag tag-html">HTML</span>
+                                <span class="course-level">BEGINNER</span>
+                            </div>
+                            <div class="course-illustration html-illustration">
+                                <span>&lt;/ &gt;</span>
+                                <i class="spark spark-a">✦</i>
+                                <i class="spark spark-b">✧</i>
+                            </div>
+                            <h3>HTML Essentials</h3>
+                            <p>Give every website its structure. Learn tags, links, images, forms, and semantic HTML.</p>
+                            <div class="card-progress-label">
+                                <span>Course progress</span>
+                                <b id="html-progress-label">20%</b>
+                            </div>
+                            <div class="progress-track">
+                                <span id="html-progress-bar" style="width:20%"></span>
+                            </div>
+                            <button class="card-button" data-open-course="html">
+                                Resume course <span>→</span>
+                            </button>
+                        </article>
+                        <article class="learning-card">
+                            <div class="card-topline">
+                                <span class="tag tag-css">CSS</span>
+                                <span class="course-level">BEGINNER</span>
+                            </div>
+                            <div class="course-illustration css-illustration">
+                                <span>✳</span>
+                                <i class="spark spark-a">✦</i>
+                                <i class="spark spark-b">✧</i>
+                            </div>
+                            <h3>CSS Foundations</h3>
+                            <p>Style your pages with color, spacing, responsive layouts, and modern design systems.</p>
+                            <div class="card-progress-label">
+                                <span>Course progress</span>
+                                <b>0%</b>
+                            </div>
+                            <div class="progress-track">
+                                <span style="width:0%"></span>
+                            </div>
+                            <button class="card-button" data-open-course="css">
+                                Start learning <span>→</span>
+                            </button>
+                        </article>
+                        <article class="learning-card">
+                            <div class="card-topline">
+                                <span class="tag tag-js">JAVASCRIPT</span>
+                                <span class="course-level">BEGINNER</span>
+                            </div>
+                            <div class="course-illustration js-illustration">
+                                <span>JS</span>
+                                <i class="spark spark-a">✦</i>
+                                <i class="spark spark-b">✧</i>
+                            </div>
+                            <h3>JavaScript Basics</h3>
+                            <p>Bring your ideas to life with variables, functions, events, and interactive interfaces.</p>
+                            <div class="card-progress-label">
+                                <span>Course progress</span>
+                                <b>0%</b>
+                            </div>
+                            <div class="progress-track">
+                                <span style="width:0%"></span>
+                            </div>
+                            <button class="card-button" data-open-course="js">
+                                Start learning <span>→</span>
+                            </button>
+                        </article>
+                    </div>
+                    <div class="bottom-grid">
+                        <section class="panel lesson-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="eyebrow">MADE FOR PRACTICE</p>
+                                    <h2>Today's lesson</h2>
+                                </div>
+                                <span class="tag tag-soft">15 MIN</span>
+                            </div>
+                            <div class="today-lesson">
+                                <div class="lesson-number">01</div>
+                                <div class="lesson-copy">
+                                    <h3>Meet HTML</h3>
+                                    <p>Understand how a browser turns HTML into a page.</p>
+                                    <div class="lesson-meta">
+                                        <span>◉ 4 sections</span>
+                                        <span>✎ 1 exercise</span>
+                                    </div>
+                                </div>
+                                <button class="round-arrow" id="open-todays-lesson">→</button>
+                            </div>
+                            <div class="lesson-divider"></div>
+                            <div class="daily-tip">
+                                <span class="tip-icon">✦</span>
+                                <div>
+                                    <b>Developer tip</b>
+                                    <p>Don't just read code. Change one thing, run it, and observe what happens.</p>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="panel activity-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="eyebrow">MAKE IT YOURS</p>
+                                    <h2>Quick start</h2>
+                                </div>
+                                <span class="activity-icon">⌘</span>
+                            </div>
+                            <button class="quick-action" id="quick-playground">
+                                <span class="quick-icon purple-icon">⌘</span>
+                                <span>
+                                    <b>Open code playground</b>
+                                    <small>Write, run, and debug in your browser</small>
+                                </span>
+                                <span class="quick-arrow">↗</span>
+                            </button>
+                            <button class="quick-action" id="quick-projects">
+                                <span class="quick-icon orange-icon">▦</span>
+                                <span>
+                                    <b>Try a mini project</b>
+                                    <small>Build something you can show off</small>
+                                </span>
+                                <span class="quick-arrow">↗</span>
+                            </button>
+                            <button class="quick-action" id="quick-progress">
+                                <span class="quick-icon green-icon">◷</span>
+                                <span>
+                                    <b>Check your progress</b>
+                                    <small>See what you've accomplished</small>
+                                </span>
+                                <span class="quick-arrow">↗</span>
+                            </button>
+                        </section>
+                    </div>
+                    <footer class="footer">
+                        <span>© 2026 CodeMasr Learning Studio</span>
+                        <span>
+                            Built for curious minds <b>✦</b>
+                        </span>
+                        <span>
+                            <button id="footer-feedback">Send feedback</button>
+                        </span>
+                    </footer>
+                </section>
+                <section class="view" id="playground-view">
+                    <div class="page-title-row">
+                        <div>
+                            <div class="eyebrow">
+                                <span class="live-dot"></span>
+                                YOUR CREATIVE WORKSPACE
+                            </div>
+                            <h1>Code Playground</h1>
+                            <p>Write code, run it, and see your changes instantly. No setup required.</p>
+                        </div>
+                        <div class="page-title-actions">
+                            <button class="secondary-button" id="reset-code">Reset code</button>
+                            <button class="primary-button" id="run-code">
+                                ▶ Run code <kbd>Ctrl ↵</kbd>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="playground-layout">
+                        <div class="editor-panel">
+                            <div class="editor-toolbar">
+                                <div class="file-tabs">
+                                    <button class="file-tab active" data-file="html">
+                                        <span class="file-dot html-dot"></span>
+                                        index.html
+                                    </button>
+                                    <button class="file-tab" data-file="css">
+                                        <span class="file-dot css-dot"></span>
+                                        style.css
+                                    </button>
+                                    <button class="file-tab" data-file="js">
+                                        <span class="file-dot js-dot"></span>
+                                        script.js
+                                    </button>
+                                </div>
+                                <div class="editor-tools">
+                                    <span class="save-state" id="save-state">● Saved locally</span>
+                                    <button class="icon-button small-icon" id="format-code" title="Format code">⤢</button>
+                                </div>
+                            </div>
+                            <div class="editor-host" id="editor-host">
+                                <div class="editor-loading" id="editor-loading">Preparing your editor…</div>
+                                <div id="monaco-editor"></div>
+                                <textarea id="fallback-editor" spellcheck="false" aria-label="Code editor" hidden></textarea>
+                            </div>
+                            <div class="editor-statusbar">
+                                <span id="editor-language">HTML</span>
+                                <span id="cursor-position">Ln 1, Col 1</span>
+                                <span>UTF-8</span>
+                                <span>Spaces: 2</span>
+                                <span class="status-ready">● Ready</span>
+                            </div>
+                        </div>
+                        <div class="preview-panel">
+                            <div class="preview-toolbar">
+                                <div class="preview-title">
+                                    <span class="browser-icon">◫</span>
+                                    <b>Live Preview</b>
+                                    <span class="preview-live">LIVE</span>
+                                </div>
+                                <div class="preview-tools">
+                                    <button class="icon-button small-icon" id="refresh-preview" title="Refresh preview">↻</button>
+                                    <button class="icon-button small-icon" id="open-preview" title="Open preview in new tab">↗</button>
+                                </div>
+                            </div>
+                            <div class="preview-address">
+                                <span>⌕</span>
+                                <span>localhost:3000 / preview</span>
+                                <span class="secure-mark">●</span>
+                            </div>
+                            <iframe id="preview-frame" title="Live code preview" sandbox="allow-scripts allow-forms allow-modals"></iframe>
+                            <div class="console-panel">
+                                <div class="console-heading">
+                                    <div>
+                                        <span class="console-prompt">›_</span>
+                                        <b>Console & diagnostics</b>
+                                        <span id="console-count" class="console-count">0</span>
+                                    </div>
+                                    <button class="text-button" id="clear-console">
+                                        Clear <span>×</span>
+                                    </button>
+                                </div>
+                                <div id="console-output" class="console-output">
+                                    <div class="console-empty">
+                                        <span>✓</span>
+                                        No errors. Your console is clear.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="editor-hint">
+                        <span>✦</span>
+                        <span>
+                            <b>Quick tip:</b>
+                            Edit your HTML, CSS, or JavaScript, then select <b>Run code</b>
+                            to refresh the preview. Your work is saved in this browser.
+                        </span>
+                        <button id="dismiss-hint" aria-label="Dismiss tip">×</button>
+                    </div>
+                </section>
+                <section class="view" id="projects-view">
+                    <div class="page-title-row">
+                        <div>
+                            <div class="eyebrow">LEARN BY MAKING</div>
+                            <h1>Mini Projects</h1>
+                            <p>Small, practical builds that turn lessons into real skills.</p>
+                        </div>
+                        <button class="primary-button" id="projects-start-coding">
+                            Open playground <span>→</span>
+                        </button>
+                    </div>
+                    <div class="project-grid">
+                        <article class="project-card">
+                            <div class="project-preview project-preview-profile">
+                                <div class="mini-browser-dots">● ● ●</div>
+                                <div class="mini-profile-avatar">JD</div>
+                                <b>Jordan's Space</b>
+                                <span>Frontend Developer</span>
+                                <div class="mini-profile-line"></div>
+                                <div class="mini-profile-line short"></div>
+                                <div class="mini-profile-buttons">
+                                    <i></i>
+                                    <i></i>
+                                </div>
+                            </div>
+                            <div class="project-card-body">
+                                <div class="project-tags">
+                                    <span class="tag tag-html">HTML</span>
+                                    <span class="tag tag-css">CSS</span>
+                                </div>
+                                <h3>Personal Profile Page</h3>
+                                <p>Create a clean personal page with a short bio, links, and a contact button.</p>
+                                <div class="project-card-bottom">
+                                    <span>◷ 20–30 min</span>
+                                    <button class="text-button project-launch" data-project="profile">Build project →</button>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="project-card">
+                            <div class="project-preview project-preview-counter">
+                                <div class="mini-browser-dots">● ● ●</div>
+                                <span class="counter-label">YOUR COUNT</span>
+                                <strong id="project-counter-value">05</strong>
+                                <div class="counter-actions">
+                                    <i>−</i>
+                                    <i>+</i>
+                                </div>
+                            </div>
+                            <div class="project-card-body">
+                                <div class="project-tags">
+                                    <span class="tag tag-js">JAVASCRIPT</span>
+                                </div>
+                                <h3>Interactive Counter</h3>
+                                <p>Use buttons and JavaScript events to create a counter that updates instantly.</p>
+                                <div class="project-card-bottom">
+                                    <span>◷ 25–35 min</span>
+                                    <button class="text-button project-launch" data-project="counter">Build project →</button>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="project-card">
+                            <div class="project-preview project-preview-card">
+                                <div class="mini-browser-dots">● ● ●</div>
+                                <div class="mini-product-image">✦</div>
+                                <div class="mini-product-copy">
+                                    <b>Focus Bottle</b>
+                                    <span>Designed for your day.</span>
+                                    <i></i>
+                                </div>
+                            </div>
+                            <div class="project-card-body">
+                                <div class="project-tags">
+                                    <span class="tag tag-html">HTML</span>
+                                    <span class="tag tag-css">CSS</span>
+                                </div>
+                                <h3>Product Card</h3>
+                                <p>Practice layout, spacing, typography, and visual hierarchy with a product card.</p>
+                                <div class="project-card-bottom">
+                                    <span>◷ 30 min</span>
+                                    <button class="text-button project-launch" data-project="product">Build project →</button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+                <section class="view" id="progress-view">
+                    <div class="page-title-row">
+                        <div>
+                            <div class="eyebrow">YOUR JOURNEY, YOUR PACE</div>
+                            <h1>My Progress</h1>
+                            <p>Progress is built one lesson and one experiment at a time.</p>
+                        </div>
+                        <button class="secondary-button" id="progress-reset">Reset learning progress</button>
+                    </div>
+                    <div class="progress-summary-grid">
+                        <article class="stat-card">
+                            <div class="stat-top">
+                                <span>LESSONS COMPLETED</span>
+                                <span class="stat-icon green-icon">✓</span>
+                            </div>
+                            <div class="stat-number">
+                                <b id="progress-lessons">1</b>
+                                <span class="muted">of 24</span>
+                            </div>
+                            <div class="progress-track">
+                                <span id="progress-lessons-bar" style="width:4%"></span>
+                            </div>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-top">
+                                <span>PROJECTS STARTED</span>
+                                <span class="stat-icon purple-icon">▦</span>
+                            </div>
+                            <div class="stat-number">
+                                <b id="projects-started-count">0</b>
+                                <span class="muted">projects</span>
+                            </div>
+                            <small>Every project teaches a new skill.</small>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-top">
+                                <span>PLAYGROUND RUNS</span>
+                                <span class="stat-icon orange-icon">▶</span>
+                            </div>
+                            <div class="stat-number">
+                                <b id="run-count">0</b>
+                                <span class="muted">runs</span>
+                            </div>
+                            <small>Experiment freely. Learn safely.</small>
+                        </article>
+                    </div>
+                    <section class="panel progress-path-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">YOUR ROADMAP</p>
+                                <h2>Learning path</h2>
+                            </div>
+                            <span class="tag tag-soft">4 TRACKS</span>
+                        </div>
+                        <div id="progress-course-list"></div>
+                    </section>
+                    <section class="panel achievements-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">CELEBRATE THE SMALL WINS</p>
+                                <h2>Achievements</h2>
+                            </div>
+                        </div>
+                        <div class="achievement-list">
+                            <div class="achievement unlocked">
+                                <span>✦</span>
+                                <div>
+                                    <b>First Steps</b>
+                                    <small>Opened your learning journey</small>
+                                </div>
+                                <i>Unlocked</i>
+                            </div>
+                            <div class="achievement" id="achievement-run">
+                                <span>▶</span>
+                                <div>
+                                    <b>Ship It</b>
+                                    <small>Run your first code snippet</small>
+                                </div>
+                                <i>Locked</i>
+                            </div>
+                            <div class="achievement" id="achievement-lesson">
+                                <span>✓</span>
+                                <div>
+                                    <b>Lesson Finisher</b>
+                                    <small>Complete your first lesson</small>
+                                </div>
+                                <i>Locked</i>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+                <section class="view" id="lesson-view">
+                    <div class="lesson-back-row">
+                        <button class="text-button" id="lesson-back">← Back to Learning Hub</button>
+                        <span class="tag tag-html" id="lesson-course-tag">HTML ESSENTIALS</span>
+                    </div>
+                    <div class="lesson-layout">
+                        <article class="lesson-content">
+                            <div class="eyebrow">LESSON 01 · YOUR FIRST STEP</div>
+                            <h1 id="lesson-title">Meet HTML</h1>
+                            <p class="lesson-lead" id="lesson-lead">HTML gives a webpage its structure, like the frame of a house.</p>
+                            <div class="lesson-callout">
+                                <span>✦</span>
+                                <p>
+                                    <b>Learning goal</b>
+                                    <br>
+                                    <span id="lesson-goal">Understand what HTML does and create your first heading.</span>
+                                </p>
+                            </div>
+                            <h2 id="lesson-section-title">What is HTML?</h2>
+                            <p id="lesson-explanation">HTML stands for HyperText Markup Language. It uses elements called tags to describe content to the browser. A heading, paragraph, link, or image can each be represented by an HTML element.</p>
+                            <div class="lesson-code">
+                                <div>
+                                    <span>EXAMPLE</span>
+                                    <button id="copy-lesson-code">Copy code</button>
+                                </div>
+                                <pre id="lesson-code">
+                                    <code>&lt;h1 &gt;Hello, world!&lt;/h1 &gt;
+&lt;p &gt;I am learning to code.&lt;/p &gt;</code>
+                                </pre>
+                            </div>
+                            <h2>Try it yourself</h2>
+                            <p>Change the text, run the example, and see the result in your preview.</p>
+                            <div class="lesson-actions">
+                                <button class="secondary-button" id="lesson-practice">Practice in playground ↗</button>
+                                <button class="primary-button" id="complete-lesson">Mark lesson complete ✓</button>
+                            </div>
+                        </article>
+                        <aside class="lesson-sidebar panel">
+                            <p class="eyebrow">IN THIS TRACK</p>
+                            <h3>HTML Essentials</h3>
+                            <div class="lesson-list" id="lesson-list">
+                                <button class="lesson-list-item active" data-lesson="0">
+                                    <span>01</span>
+                                    <span>
+                                        <b>Meet HTML</b>
+                                        <small>15 min</small>
+                                    </span>
+                                    <i>○</i>
+                                </button>
+                                <button class="lesson-list-item" data-lesson="1">
+                                    <span>02</span>
+                                    <span>
+                                        <b>Elements & tags</b>
+                                        <small>12 min</small>
+                                    </span>
+                                    <i>○</i>
+                                </button>
+                                <button class="lesson-list-item" data-lesson="2">
+                                    <span>03</span>
+                                    <span>
+                                        <b>Links & images</b>
+                                        <small>18 min</small>
+                                    </span>
+                                    <i>○</i>
+                                </button>
+                                <button class="lesson-list-item" data-lesson="3">
+                                    <span>04</span>
+                                    <span>
+                                        <b>Lists & forms</b>
+                                        <small>20 min</small>
+                                    </span>
+                                    <i>○</i>
+                                </button>
+                                <button class="lesson-list-item" data-lesson="4">
+                                    <span>05</span>
+                                    <span>
+                                        <b>Build a mini page</b>
+                                        <small>25 min</small>
+                                    </span>
+                                    <i>○</i>
+                                </button>
+                            </div>
+                            <div class="lesson-track-progress">
+                                <div>
+                                    <span>Track progress</span>
+                                    <b id="lesson-track-percent">20%</b>
+                                </div>
+                                <div class="progress-track">
+                                    <span id="lesson-track-bar" style="width:20%"></span>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </section>
+            </main>
         </div>
-        <div class="workbench-split full-height">
-          <div class="editor-pane">
-            <div class="editor-wrapper">
-              <div class="line-numbers" id="pg-line-numbers">1</div>
-              <textarea id="pg-code-editor" spellcheck="false" placeholder="ابدأ بكتابة كود HTML كامل هنا..."></textarea>
+        <div class="toast-container" id="toast-container" aria-live="polite"></div>
+        <div class="modal-backdrop" id="modal-backdrop" hidden>
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                <button class="modal-close" id="modal-close" aria-label="Close dialog">×</button>
+                <div class="modal-symbol" id="modal-symbol">✦</div>
+                <h2 id="modal-title">Need a hand?</h2>
+                <div id="modal-body">
+                    <p>Pick a topic to get started.</p>
+                </div>
+                <button class="primary-button modal-action" id="modal-action">Got it</button>
             </div>
-          </div>
-          <div class="preview-pane">
-            <div class="preview-header">
-              <span class="preview-title">المعاينة المباشرة</span>
-            </div>
-            <div class="iframe-container">
-              <iframe id="pg-preview-iframe" sandbox="allow-scripts" title="Playground Preview"></iframe>
-            </div>
-          </div>
         </div>
-      </div>
-    </section>
-
-    <!-- SECTION 3: REAL-WORLD PROJECTS -->
-    <section id="view-projects" class="view-panel hidden">
-      <div class="projects-container">
-        <div class="projects-intro">
-          <h2>مشاريع HTML واقعية لبناء البورتفوليو</h2>
-          <p>طَبَّق اللي اتعلمته في مشاريع حقيقية خطوة بخطوة، من أول سيرة ذاتية لحد منيو مطعم وصفحة هبوط كاملة.</p>
-        </div>
-        <div class="projects-grid" id="projects-grid">
-          <!-- Populated from projects.js -->
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Toast Notification Container -->
-  <div id="toast" class="toast hidden"></div>
-
-  <!-- Scripts -->
-  <script src="curriculum.js"></script>
-  <script src="projects.js"></script>
-  <script src="app.js"></script>
-</body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js" crossorigin="anonymous"></script>
+        <script src="script.js"></script>
+    </body>
 </html>
