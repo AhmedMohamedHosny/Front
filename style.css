@@ -154,3 +154,257 @@
 #vscode-preview-frame { flex: 1; border: 0; background: #fff; }
 
 .vscode-statusbar { height: 22px; background: #007acc; color: #fff; display: flex; align-items: center; padding: 0 12px; gap: 16px; font-size: 11px; }
+/* ==========================================================================
+   1. أزرار التحكم في التكبير والتصغير المستقل لكل شاشة
+   ========================================================================== */
+.pane-zoom-ctrls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+.zoom-btn {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.zoom-btn:hover {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+.zoom-level {
+  font-size: 9px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text);
+  min-width: 32px;
+  text-align: center;
+}
+.iframe-viewport-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  background: #ffffff;
+  display: flex;
+}
+#preview-frame, #vscode-preview-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+  border: 0;
+  transform-origin: top left;
+  transition: transform 0.15s ease-out;
+}
+
+/* ==========================================================================
+   2. شريط السحب الفاصل بالماوس
+   ========================================================================== */
+.playground-layout.resizable {
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  min-height: 620px;
+}
+.playground-layout.resizable .editor-panel {
+  flex: 1 1 50%;
+  min-width: 250px;
+}
+.playground-layout.resizable .preview-panel {
+  flex: 1 1 50%;
+  min-width: 250px;
+}
+.workbench-resizer {
+  width: 10px;
+  background: var(--line);
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: background 0.2s;
+  z-index: 10;
+}
+.workbench-resizer:hover, .workbench-resizer.is-dragging {
+  background: var(--purple);
+}
+.workbench-resizer:hover .resizer-handle {
+  color: #fff;
+}
+.resizer-handle {
+  font-size: 13px;
+  color: #9da0b2;
+}
+
+/* ==========================================================================
+   3. نافذة الفول سكرين ووضع الكود فقط / المعاينة فقط
+   ========================================================================== */
+.vscode-studio-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #141624;
+  color: #d1d5db;
+  display: flex;
+  flex-direction: column;
+}
+.vscode-studio-overlay[hidden] { display: none !important; }
+
+.vscode-studio-topbar {
+  height: 44px;
+  background: #1e2030;
+  border-bottom: 1px solid #2d3047;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.vscode-brand { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.vscode-tag { background: #6c5ce7; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+
+.studio-view-modes {
+  display: flex;
+  background: #141624;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #2d3047;
+  gap: 4px;
+}
+.studio-mode-btn {
+  background: transparent;
+  border: 0;
+  color: #9a9daf;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.studio-mode-btn:hover { color: #fff; }
+.studio-mode-btn.active {
+  background: #6c5ce7;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.4);
+}
+
+.vscode-top-actions { display: flex; align-items: center; gap: 10px; }
+.vscode-action-btn.primary { background: #18a878; color: #fff; border: 0; padding: 6px 14px; border-radius: 6px; font-weight: 800; cursor: pointer; }
+.vscode-close-btn { background: #d54f59; color: #fff; border: 0; padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+
+.vscode-studio-body { flex: 1; display: flex; overflow: hidden; }
+.vscode-workbench-split { flex: 1; display: flex; }
+.vscode-editor-pane { flex: 1 1 50%; min-width: 0; display: flex; flex-direction: column; background: #161827; }
+.vscode-tabs-header { height: 36px; background: #1e2030; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-bottom: 1px solid #2a2d42; }
+.vscode-tab { padding: 8px 14px; background: #161827; color: #6c5ce7; border-top: 2px solid #6c5ce7; font-size: 12px; font-family: 'DM Mono', monospace; }
+.vscode-editor-container { flex: 1; position: relative; }
+
+.vscode-splitter { width: 8px; background: #1e2030; cursor: col-resize; display: flex; align-items: center; justify-content: center; user-select: none; }
+.vscode-splitter:hover, .vscode-splitter.is-dragging { background: #6c5ce7; }
+
+.vscode-preview-pane { flex: 1 1 50%; min-width: 0; display: flex; flex-direction: column; background: #fff; }
+.vscode-preview-bar { height: 36px; background: #1e2030; color: #ccc; display: flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 11px; }
+
+/* أوضاع الإخفاء التام للكود أو المعاينة */
+.hide-pane { display: none !important; }
+.maximize-pane { flex: 1 1 100% !important; }
+
+/* ==========================================================================
+   4. شريط التوقيع المنور العالمي (Neon Glowing Signature Bar)
+   ========================================================================== */
+.vscode-glowing-footer {
+  height: 32px;
+  background: linear-gradient(90deg, #0e101d, #17152b 50%, #0e101d);
+  border-top: 1px solid rgba(108, 92, 231, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  font-size: 11px;
+  box-shadow: 0 -4px 20px rgba(108, 92, 231, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.vscode-glowing-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #00f2fe, #4facfe, #6c5ce7, #ff0844, transparent);
+  animation: neon-flow 4s linear infinite;
+}
+
+@keyframes neon-flow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.neon-status-left, .neon-status-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #7d829e;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+}
+
+.neon-pulsing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00f2fe;
+  box-shadow: 0 0 8px #00f2fe, 0 0 14px #00f2fe;
+  animation: pulse-glow 1.8s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.neon-signature {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: 0.5px;
+}
+
+.neon-credit {
+  color: #b3b7d1;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.neon-author-name {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-shadow: 
+    0 0 5px rgba(255, 255, 255, 0.9),
+    0 0 12px #6c5ce7,
+    0 0 24px #4facfe,
+    0 0 35px #00f2fe;
+}
+
+.neon-sparkle {
+  color: #00f2fe;
+  font-size: 11px;
+  text-shadow: 0 0 8px #00f2fe;
+  animation: spin-pulse 3s infinite;
+}
+
+@keyframes spin-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.25); opacity: 1; filter: drop-shadow(0 0 8px #4facfe); }
+}
