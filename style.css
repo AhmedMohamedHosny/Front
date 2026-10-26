@@ -408,3 +408,214 @@
   0%, 100% { transform: scale(1); opacity: 0.9; }
   50% { transform: scale(1.25); opacity: 1; filter: drop-shadow(0 0 8px #4facfe); }
 }
+/* ==========================================================================
+   5 ثيمات احترافية متكاملة لبيئة VS Code Studio مع Animations وتوهج نيون
+   ========================================================================== */
+
+/* المتغيرات الافتراضية (Cyberpunk Neon) */
+.vscode-studio-overlay,
+.vscode-studio-overlay[data-studio-theme="cyberpunk-neon"] {
+  --st-bg-main: #0b0c1b;
+  --st-bg-bar: #121329;
+  --st-bg-tab: #181a36;
+  --st-border: #2a2d5c;
+  --st-accent: #00f2fe;
+  --st-accent-2: #ff0844;
+  --st-text: #e2e8f0;
+  --st-laser: linear-gradient(90deg, transparent, #00f2fe, #ff0844, #6c5ce7, transparent);
+}
+
+/* 2. ثيم Dracula Pro */
+.vscode-studio-overlay[data-studio-theme="dracula-pro"] {
+  --st-bg-main: #282a36;
+  --st-bg-bar: #1e1f29;
+  --st-bg-tab: #21222c;
+  --st-border: #44475a;
+  --st-accent: #bd93f9;
+  --st-accent-2: #ff79c6;
+  --st-text: #f8f8f2;
+  --st-laser: linear-gradient(90deg, transparent, #bd93f9, #ff79c6, #50fa7b, transparent);
+}
+
+/* 3. ثيم Synthwave '84 */
+.vscode-studio-overlay[data-studio-theme="synthwave-84"] {
+  --st-bg-main: #1a1025;
+  --st-bg-bar: #12091c;
+  --st-bg-tab: #241734;
+  --st-border: #49296b;
+  --st-accent: #ff7edb;
+  --st-accent-2: #36f9f6;
+  --st-text: #fff5f9;
+  --st-laser: linear-gradient(90deg, transparent, #ff7edb, #fede5d, #36f9f6, transparent);
+}
+
+/* 4. ثيم Emerald Matrix */
+.vscode-studio-overlay[data-studio-theme="emerald-matrix"] {
+  --st-bg-main: #06110c;
+  --st-bg-bar: #040b08;
+  --st-bg-tab: #0a1c14;
+  --st-border: #133926;
+  --st-accent: #00ff9d;
+  --st-accent-2: #10b981;
+  --st-text: #d1fae5;
+  --st-laser: linear-gradient(90deg, transparent, #00ff9d, #10b981, #34d399, transparent);
+}
+
+/* 5. ثيم Aurora Light */
+.vscode-studio-overlay[data-studio-theme="aurora-light"] {
+  --st-bg-main: #f8fafc;
+  --st-bg-bar: #ffffff;
+  --st-bg-tab: #f1f5f9;
+  --st-border: #e2e8f0;
+  --st-accent: #6c5ce7;
+  --st-accent-2: #ec4899;
+  --st-text: #1e293b;
+  --st-laser: linear-gradient(90deg, transparent, #6c5ce7, #ec4899, #3b82f6, transparent);
+}
+
+/* تطبيق المتغيرات والـ Animations السلسة على عناصر الاستوديو */
+.vscode-studio-overlay {
+  background: var(--st-bg-main) !important;
+  color: var(--st-text) !important;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+.vscode-studio-topbar,
+.vscode-tabs-header,
+.vscode-preview-bar {
+  background: var(--st-bg-bar) !important;
+  border-color: var(--st-border) !important;
+  color: var(--st-text) !important;
+  transition: all 0.35s ease;
+}
+
+.vscode-studio-topbar {
+  position: relative;
+  overflow: hidden;
+}
+
+/* خيط ليزر متحرك أعلى شريط الاستوديو */
+.vscode-studio-topbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--st-laser);
+  background-size: 200% 100%;
+  animation: studio-laser-sweep 3.5s linear infinite;
+}
+
+@keyframes studio-laser-sweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.vscode-editor-pane,
+#vscode-editor-container,
+#vscode-editor-container #editor-host,
+#vscode-editor-container #monaco-editor,
+#vscode-editor-container .monaco-editor,
+#vscode-editor-container .monaco-editor-background,
+#vscode-editor-container .margin {
+  background-color: var(--st-bg-main) !important;
+  transition: background-color 0.3s ease;
+}
+
+.vscode-tab {
+  background: var(--st-bg-tab) !important;
+  color: var(--st-text) !important;
+  opacity: 0.7;
+  transition: all 0.25s ease;
+}
+
+.vscode-tab.active {
+  background: var(--st-bg-main) !important;
+  color: var(--st-accent) !important;
+  border-top: 2px solid var(--st-accent) !important;
+  opacity: 1;
+  box-shadow: 0 -4px 12px rgba(0, 242, 254, 0.12);
+}
+
+.vscode-splitter {
+  background: var(--st-bg-bar) !important;
+  border-left: 1px solid var(--st-border);
+  border-right: 1px solid var(--st-border);
+  color: var(--st-accent);
+  transition: all 0.25s ease;
+}
+
+.vscode-splitter:hover,
+.vscode-splitter.is-dragging {
+  background: var(--st-accent) !important;
+  color: #000 !important;
+  box-shadow: 0 0 18px var(--st-accent);
+}
+
+/* تصميم زر اختيار الثيم المتوهج */
+.studio-theme-picker-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--st-bg-tab);
+  border: 1px solid var(--st-accent);
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(108, 92, 231, 0.25);
+  transition: all 0.3s ease;
+}
+
+.studio-theme-picker-wrap:hover {
+  box-shadow: 0 0 18px var(--st-accent);
+  transform: translateY(-1px);
+}
+
+.theme-palette-icon {
+  font-size: 13px;
+  animation: float-icon 2.5s ease-in-out infinite;
+}
+
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px) rotate(8deg); }
+}
+
+.studio-theme-select {
+  background: transparent;
+  border: 0;
+  color: var(--st-text);
+  font-weight: 800;
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+}
+
+.studio-theme-select option {
+  background: #181a29;
+  color: #ffffff;
+  padding: 8px;
+}
+
+/* تحديث الشريط السفلي المضيء ليتلون مع الثيم المختار */
+.vscode-glowing-footer {
+  background: var(--st-bg-bar) !important;
+  border-top: 1px solid var(--st-border) !important;
+}
+
+.vscode-glowing-footer::before {
+  background: var(--st-laser) !important;
+  height: 2px !important;
+}
+
+.neon-pulsing-dot {
+  background: var(--st-accent) !important;
+  box-shadow: 0 0 8px var(--st-accent), 0 0 16px var(--st-accent) !important;
+}
+
+.neon-author-name {
+  text-shadow:
+    0 0 5px rgba(255, 255, 255, 0.8),
+    0 0 12px var(--st-accent),
+    0 0 24px var(--st-accent-2) !important;
+}
