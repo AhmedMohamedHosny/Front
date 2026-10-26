@@ -1954,6 +1954,7 @@ if (btn) {
             }
           });
           monacoEditorInstance = window.monaco.editor.create(document.getElementById('monaco-editor'), {
+            mouseWheelZoom: true, // تفعيل تكبير وتصغير الخط ببكرة الماوس مع Ctrl مثل VS Code تماماً
             value: state.playgroundFiles[state.activePlaygroundFile] || '',
             language: getMonacoLang(state.activePlaygroundFile),
             theme: state.darkMode ? 'vs-dark' : 'vs',
@@ -2071,6 +2072,13 @@ function normalizeFileKey(rawKey) {
             send('runtime-error', [msg + (lineNo ? ' (Line ' + lineNo + ')' : '')]);
             return false;
           };
+          // التقاط بكرة الفأرة داخل المعاينة وإرسالها للصفحة الرئيسية لتكبير وتصغير المعاينة فقط
+          window.addEventListener('wheel', function(e) {
+            if (e.ctrlKey) {
+              e.preventDefault();
+              parent.postMessage({ source: 'codemasr-preview-zoom', deltaY: e.deltaY }, '*');
+            }
+          }, { passive: false });
         })();
       <\/script>
     `;
@@ -2429,33 +2437,51 @@ function normalizeFileKey(rawKey) {
       }
     }
 
-    // زووم الكود (أزرار)
-    document.getElementById('code-zoom-in')?.addEventListener('click', () => setCodeZoom(currentCodeFontSize + 2));
-    document.getElementById('code-zoom-out')?.addEventListener('click', () => setCodeZoom(currentCodeFontSize - 2));
-    document.getElementById('studio-code-zoom-in')?.addEventListener('click', () => setCodeZoom(currentCodeFontSize + 2));
-    document.getElementById('studio-code-zoom-out')?.addEventListener('click', () => setCodeZoom(currentCodeFontSize - 2));
+// =========================================================================
+    // تكبير وتصغير مستقل بنسبة 100% عبر بكرة الفأرة (Ctrl + Mouse Wheel)
+    // =========================================================================
 
-    // زووم المعاينة (أزرار)
-    document.getElementById('prev-zoom-in')?.addEventListener('click', () => setPreviewZoom(currentPreviewZoom + 10));
-    document.getElementById('prev-zoom-out')?.addEventListener('click', () => setPreviewZoom(currentPreviewZoom - 10));
-    document.getElementById('prev-zoom-reset')?.addEventListener('click', () => setPreviewZoom(100));
-    document.getElementById('studio-prev-zoom-in')?.addEventListener('click', () => setPreviewZoom(currentPreviewZoom + 10));
-    document.getElementById('studio-prev-zoom-out')?.addEventListener('click', () => setPreviewZoom(currentPreviewZoom - 10));
+    // 1. تكبير وتصغير خط الكود ببكرة الفأرة (سواء في الشاشة العادية أو الفول سكرين)
+    const codeContainers = [
+      'editor-panel-box',
+      'editor-host',
+      'monaco-editor',
+      'studio-editor-pane',
+      'vscode-editor-container',
+      'fallback-editor'
+    ];
+    codeContainers.forEach((id) => {
+      document.getElementById(id)?.addEventListener('wheel', (e) => {
+        if (e.ctrlKey) {
+          e.preventDefault();
+          setCodeZoom(currentCodeFontSize + (e.deltaY < 0 ? 1 : -1));
+        }
+      }, { passive: false });
+    });
 
-    // زووم مستقل عند الوقوف على أي شاشة وعمل (Ctrl + بكرة الماوس)
-    document.getElementById('editor-panel-box')?.addEventListener('wheel', (e) => {
-      if (e.ctrlKey) {
-        e.preventDefault();
-        setCodeZoom(currentCodeFontSize + (e.deltaY < 0 ? 1 : -1));
+    // 2. تكبير وتصغير شاشة المعاينة ببكرة الفأرة من الحاوية الخارجية
+    const previewContainers = [
+      'preview-panel-box',
+      'preview-viewport-wrapper',
+      'studio-preview-pane',
+      'vscode-preview-pane',
+      'preview-panel'
+    ];
+    previewContainers.forEach((id) => {
+      document.getElementById(id)?.addEventListener('wheel', (e) => {
+        if (e.ctrlKey) {
+          e.preventDefault();
+          setPreviewZoom(currentPreviewZoom + (e.deltaY < 0 ? 10 : -10));
+        }
+      }, { passive: false });
+    });
+
+    // 3. التقاط بكرة الفأرة عندما تكون واقفة داخل صفحة المعاينة (iframe) نفسها
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.source === 'codemasr-preview-zoom') {
+        setPreviewZoom(currentPreviewZoom + (event.data.deltaY < 0 ? 10 : -10));
       }
-    }, { passive: false });
-
-    document.getElementById('preview-viewport-wrapper')?.addEventListener('wheel', (e) => {
-      if (e.ctrlKey) {
-        e.preventDefault();
-        setPreviewZoom(currentPreviewZoom + (e.deltaY < 0 ? 10 : -10));
-      }
-    }, { passive: false });
+    });
 
     // =========================================================================
     // 2. حرية أوضاع العرض في الفول سكرين (كود فقط / شاشتين / معاينة فقط)
