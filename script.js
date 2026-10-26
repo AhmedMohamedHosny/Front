@@ -46,102 +46,1541 @@
       badgeText: '5',
       badgeClass: 'html-badge',
 lessons: [
-        {
-          id: 'html-1',
-          num: '01',
-          title: 'هيكل المستند الأساسي (Doctype, html, head, body)',
-          duration: '15 min',
-          eyebrow: 'HTML 01 · البنية التحتية القياسية',
-          lead: 'كل صفحة ويب تتكون من هيكل إلزامي يفصل بين بيانات المتصفح ومحركات البحث وبين المحتوى المرئي للمستخدم.',
-          goal: 'فهم معنى <!DOCTYPE html>، وتوزيع وسوم html و head و title و body بشكل قياسي.',
-          sectionTitle: 'التشريح المعماري لصفحة الويب',
-          explanation: 'يبدأ المستند بتعريف النوع <!DOCTYPE html> لإعلام المتصفح بتطبيق معايير HTML5 الحديثة.<br>ينقسم المستند بعد ذلك إلى قسمين منفصلين تماماً:<br>1. منطقة الرأس (<head>): تحتوي على معلومات المتصفح ومحركات البحث (العنوان والترميز وملفات التنسيق) ولا يظهر أي محتوى منها داخل الصفحة.<br>2. منطقة الجسم (<body>): تضم كل ما يراه المستخدم ويتفاعل معه بصرياً من نصوص وصور وأزرار.',
-          exampleCode: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n  <head>\n    <meta charset="UTF-8">\n    <title>أول صفحة ويب</title>\n  </head>\n  <body>\n    <h1>مرحباً بك في عالم تطوير الويب</h1>\n    <p>هذا النص يظهر داخل منطقة الـ body المرئية.</p>\n  </body>\n</html>',
-          starterCode: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n  <head>\n    <title>تحدي الهيكل الأساسي</title>\n  </head>\n  <body>\n    <h1>أول صفحة ويب متكاملة</h1>\n    <p>تم بناء الهيكل بنجاح.</p>\n  </body>\n</html>',
-          solutionCode: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n  <head>\n    <title>تحدي الهيكل الأساسي</title>\n  </head>\n  <body>\n    <h1>أول صفحة ويب متكاملة</h1>\n    <p>تم بناء الهيكل بنجاح.</p>\n  </body>\n</html>',
-          challengePrompt: 'تحدي الدرس: ابنِ هيكلاً قياسياً يحتوي على <!DOCTYPE html> وعنصر <html> وعنصر <head> بداخله <title> وعنصر <body> بداخله <h1> و <p>.',
-          validate: function (doc) {
-            const h1 = doc.querySelector('h1');
-            const p = doc.querySelector('p');
-            if (!h1 || !h1.textContent.trim()) return { passed: false, msgAr: 'أضف عنواناً رئيسياً <h1> يحتوي على نص.', msgEn: 'Include an <h1> heading with text.' };
-            if (!p || !p.textContent.trim()) return { passed: false, msgAr: 'أضف فقرة <p> تحتوي على نص توضيحي.', msgEn: 'Include a <p> paragraph with text.' };
-            return { passed: true, msgAr: 'أحسنت! تم بناء الهيكل المعماري للمستند بدقة.', msgEn: 'Document structure verified successfully!' };
-          }
-        },
-        {
-          id: 'html-2',
-          num: '02',
-          title: 'عناوين الصفحات (العناوين من h1 إلى h6 والفروق الدلالية والـ SEO)',
-          duration: '15 min',
-          eyebrow: 'HTML 02 · التسلسل الهرمي للمحتوى',
-          lead: 'العناوين ليست لمجرد تكبير الخط، بل تمثل شجرة العناوين التي تفهرسها محركات البحث وقارئات الشاشة.',
-          goal: 'تنظيم الصفحة بتسلسل منطقي يبدأ بـ h1 واحد فقط للأقسام الكبرى يليه h2 ثم h3.',
-          sectionTitle: 'الفروق الدلالية وأهمية العناوين في معايير SEO',
-          explanation: 'توفر لغة HTML ستة مستويات من العناوين:<br>• <h1>: عنوان الصفحة الرئيسي الأوحد (Main Title)، ويُمنع تكراره أكثر من مرة في الصفحة للحفاظ على قوة ترتيبك في محركات البحث.<br>• <h2>: يمثل الأقسام والقطاعات الكبرى.<br>• <h3> إلى <h6>: عناوين فرعية متدرجة داخل كل قطاع.<br>قاعدة مهمة: لا تستخدم العناوين لمجرد تكبير الخط، فحجم الخط يتم ضبطه بواسطة CSS عبر font-size.',
-          exampleCode: '<h1>دليل هندسة البرمجيات</h1>\n<h2>المرحلة الأولى: هندسة الواجهات</h2>\n<h3>الدرس الأول: العناوين والفقرات</h3>\n<h2>المرحلة الثانية: النظم السحابية</h2>\n<h3>الدرس الأول: قواعد البيانات</h3>',
-          starterCode: '<h1>منصة التعلم المتكاملة</h1>\n<h2>مسار تطوير الويب</h2>\n<h3>أساسيات لغة HTML</h3>\n<h2>مسار النظم السحابية</h2>\n<h3>بناء قواعد البيانات</h3>',
-          solutionCode: '<h1>منصة التعلم المتكاملة</h1>\n<h2>مسار تطوير الويب</h2>\n<h3>أساسيات لغة HTML</h3>\n<h2>مسار النظم السحابية</h2>\n<h3>بناء قواعد البيانات</h3>',
-          challengePrompt: 'تحدي الدرس: أنشئ عنواناً رئيسياً <h1> واحداً فقط، وعنوانين فرعيين <h2>، وعنوانين <h3> متفرعين تحت كل منهما.',
-          validate: function (doc) {
-            const h1s = doc.querySelectorAll('h1');
-            const h2s = doc.querySelectorAll('h2');
-            const h3s = doc.querySelectorAll('h3');
-            if (h1s.length !== 1) return { passed: false, msgAr: 'يجب أن تحتوي الصفحة على وسم <h1> واحد فقط لضمان سلامة الـ SEO.', msgEn: 'Strictly one <h1> is allowed.' };
-            if (h2s.length < 2) return { passed: false, msgAr: 'أضف عنوانين فرعيين <h2> على الأقل.', msgEn: 'Include at least two <h2> subheadings.' };
-            if (h3s.length < 2) return { passed: false, msgAr: 'أضف عنوانين <h3> لتوضيح التدرج الهرمي.', msgEn: 'Include at least two <h3> headings.' };
-            return { passed: true, msgAr: 'تسلسل هرمي ممتاز ومطابق لمعايير الـ W3C العالمية!', msgEn: 'Perfect semantic hierarchy!' };
-          }
-        },
-        {
-          id: 'html-3',
-          num: '03',
-          title: 'الفقرات والفواصل والنصوص المنسقة (p, br, hr, pre)',
-          duration: '15 min',
-          eyebrow: 'HTML 03 · التعامل مع الكتل النصية',
-          lead: 'الفرق بين وسم الفقرة p والوسوم ذاتية الإغلاق br و hr، ولماذا يحافظ وسم pre على المسافات والأسطر.',
-          goal: 'استخدام p للفقرات، br لكسر السطر الداخلي، hr للفواصل، و pre للأكواد.',
-          sectionTitle: 'الفرق بين كسر السطر والفواصل والفقرات',
-          explanation: '• <p>: فقرة نصية مستقلة يترك المتصفح قبلها وبعدها هامشاً عمودياً تلقائياً.<br>• <br>: وسم ذاتي الإغلاق (Void Tag) لكسر السطر داخل نفس الفقرة بدون ترك فراغات عمودية ضخمة.<br>• <hr>: فاصل موضوعي دلالي بين فكرتين مختلفتين، ويظهر كخط أفقي.<br>• <pre>: يعطل دمج المسافات التلقائي للمتصفح ويعرض النص بمسافاته وأبعاده تماماً كما كُتب في المحرر وبخط أحادي العرض (Monospace).',
-          exampleCode: '<p>السطر الأول داخل الفقرة.<br>السطر الثاني داخل نفس الفقرة بعد الفاصل br.</p>\n<hr>\n<pre>\n  دالة برمجية:\n  total = 50 + 50;\n  print(total);\n</pre>',
-          starterCode: '<p>هندسة البرمجيات تبدأ بالتطبيق المستمر.<br>التدريب اليومي يصنع الفارق.</p>\n<hr>\n<pre>\n    *\n   ***\n  *****\n</pre>',
-          solutionCode: '<p>هندسة البرمجيات تبدأ بالتطبيق المستمر.<br>التدريب اليومي يصنع الفارق.</p>\n<hr>\n<pre>\n    *\n   ***\n  *****\n</pre>',
-          challengePrompt: 'تحدي الدرس: أدرج فقرة <p> تحوي فاصل سطر <br>، ثم فاصلاً موضوعياً <hr>، ثم عنصراً منسقاً مسبقاً <pre>.',
-          validate: function (doc) {
-            const p = doc.querySelector('p');
-            const br = doc.querySelector('p br, br');
-            const hr = doc.querySelector('hr');
-            const pre = doc.querySelector('pre');
-            if (!p || !br) return { passed: false, msgAr: 'تأكد من وجود فقرة <p> وبداخلها وسم كسر السطر <br>.', msgEn: 'Include <p> with <br> inside.' };
-            if (!hr) return { passed: false, msgAr: 'أضف خطاً فاصلاً موضوعياً <hr>.', msgEn: 'Add an <hr> element.' };
-            if (!pre || !pre.textContent.trim()) return { passed: false, msgAr: 'أضف كتلة نصوص منسقة مسبقاً <pre> تحوي نصاً أو رسماً بمسافات.', msgEn: 'Add a <pre> block with content.' };
-            return { passed: true, msgAr: 'ممتاز! فهمت دور كل وسم وفروقات المسافات في المتصفح.', msgEn: 'Great understanding of text layout!' };
-          }
-        },
-        {
-          id: 'html-4',
-          num: '04',
-          title: 'تنسيقات النصوص الدلالية (b مقابل strong، و i مقابل em، و sub و sup)',
-          duration: '18 min',
-          eyebrow: 'HTML 04 · دلالات التوكيد والترميز العلمي',
-          lead: 'الفرق الدقيق بين التنسيق البصري الشكلي والتنسيق الدلالي لقارئات الشاشة، وطريقة كتابة المعادلات والصيغ الكيميائية.',
-          goal: 'استخدام strong للأهمية الحرجة و em للتوكيد الصوتي، وكتابة معادلات باستخدام sub و sup.',
-          sectionTitle: 'الفرق بين الدلالة البرمجية والشكل البصري',
-          explanation: '• <b> مقابل <strong>: الوسم <b> يجعل الخط عريضاً فقط للشكل، بينما <strong> يخبر محركات البحث وقارئات الشاشة بأن هذا النص بالغ الخطورة والأهمية (مثل التحذيرات).<br>• <i> مقابل <em>: الوسم <i> يميل الخط شكلياً، بينما <em> يعبر عن نبرة صوتية مؤكدة وتغير في النطق عند القراءة الآلية.<br>• <mark>: تمييز الكلمات باللون الأصفر مثل قلم الهايلايتر.<br>• <sub> و <sup>: الحروف المنخفضة للصيغ الكيميائية مثل H<sub>2</sub>O، والحروف المرتفعة للأسس الرياضية مثل X<sup>2</sup>.',
-          exampleCode: '<p>تحذير أمني: <strong>لا تشارك كلمة المرور</strong> مع أي طرف خارجي.</p>\n<p>الصيغة الكيميائية: H<sub>2</sub>O | الأس الرياضي: 10<sup>3</sup> = 1000</p>\n<p>السعر بعد الخصم: <mark>150 ج.م</mark></p>',
-          starterCode: '<p>تحذير: <strong>البيانات حساسة للغاية</strong></p>\n<p>مركب كيميائي: H<sub>2</sub>O</p>\n<p>معادلة رياضية: X<sup>2</sup> + Y<sup>2</sup></p>\n<p>قيمة مميزة: <mark>خصم 50%</mark></p>',
-          solutionCode: '<p>تحذير: <strong>البيانات حساسة للغاية</strong></p>\n<p>مركب كيميائي: H<sub>2</sub>O</p>\n<p>معادلة رياضية: X<sup>2</sup> + Y<sup>2</sup></p>\n<p>قيمة مميزة: <mark>خصم 50%</mark></p>',
-          challengePrompt: 'تحدي الدرس: أدرج نصاً يحوي <strong> للتوكيد، وعنصراً كيميائياً أو رياضياً باستخدام <sub> أو <sup>، وتحديداً عبر <mark>.',
-          validate: function (doc) {
-            const strong = doc.querySelector('strong');
-            const subOrSup = doc.querySelector('sub, sup');
-            const mark = doc.querySelector('mark');
-            if (!strong) return { passed: false, msgAr: 'أضف وسم <strong> لتوضيح نص مهم دلالياً.', msgEn: 'Include a <strong> tag.' };
-            if (!subOrSup) return { passed: false, msgAr: 'أضف عنصراً يحمل <sub> للصيغ السفلية أو <sup> للأسس العلوية.', msgEn: 'Include <sub> or <sup>.' };
-            if (!mark) return { passed: false, msgAr: 'أضف نصاً محدداً بوسم التمييز <mark>.', msgEn: 'Include a <mark> tag.' };
-            return { passed: true, msgAr: 'رائع جداً! تم تطبيق الفروق الدلالية والترميز العلمي بنجاح.', msgEn: 'Semantic text formatting verified!' };
-          }
-        }
-      ]
+  {
+    id: 'html-1',
+    num: '01',
+    title: 'هيكل المستند الأساسي (Doctype, html, head, body)',
+    duration: '15 min',
+    eyebrow: 'HTML 01 · البنية التحتية القياسية',
+    lead: 'كل صفحة ويب تقوم على هيكل إلزامي ثابت؛ فهمه من البداية يوفر عليك ساعات من البحث عن أخطاء غامضة لاحقاً.',
+    goal: 'فهم دور كل من Doctype و html و head و title و meta charset و body، والتفرقة بين الوسوم المزدوجة والذاتية الإغلاق، ومعنى الخاصية Attribute.',
+    sectionTitle: 'تشريح صفحة الويب من الداخل',
+    explanation: [
+      'HTML اختصار Hyper Text Markup Language، وهي لغة وسوم (Tags) تصف هيكل الصفحة ومعنى كل جزء فيها. هي ليست لغة برمجة؛ فالتنسيق مهمة CSS والتفاعل مهمة JavaScript.',
+      '🔹 &lt;!DOCTYPE html&gt; : ليس وسماً حقيقياً بل تعليمة للمتصفح بالعمل بمعايير HTML5. حذفه يدخل المتصفح في Quirks Mode فتظهر الصفحة بتنسيقات غير متوقعة. حالة الأحرف لا تفرق (doctype = DOCTYPE).',
+      '🔹 &lt;html&gt; : الجذر الذي يحتوي كل شيء. أضف له lang لتحديد لغة الصفحة (تستفيد منها جوجل وقارئات الشاشة ومترجم المتصفح)، و dir لتحديد اتجاه الكتابة: rtl للعربية و ltr للإنجليزية.',
+      '🔹 &lt;head&gt; : معلومات عن الصفحة (العنوان، الترميز، ملفات التنسيق...) ولا يظهر منها أي شيء داخل الصفحة نفسها.',
+      '🔹 &lt;body&gt; : كل ما يراه المستخدم ويتفاعل معه من نصوص وصور وأزرار. مسموح بعنصر body واحد فقط في الصفحة.',
+      '🔹 &lt;title&gt; : عنوان التبويب في المتصفح، وعنوان النتيجة في جوجل، واسم الصفحة عند حفظها في المفضلة.',
+      '🔹 &lt;meta charset="UTF-8"&gt; : يحدد ترميز الحروف. بدونه قد تتحول العربية إلى رموز غريبة مثل ؟؟؟. ضعه كأول عنصر داخل head.',
+      '⚖️ الفرق بين title و h1: الأول داخل head ويظهر في التبويب ونتائج البحث، أما الثاني داخل body ويظهر في الصفحة نفسها. يُفضل أن يتقاربا في المعنى لكنهما ليسا نفس الشيء.',
+      '⚖️ الوسم المزدوج مقابل الذاتي الإغلاق: وسوم مثل &lt;p&gt;...&lt;/p&gt; لها فتح وإغلاق وتحيط بمحتوى. أما وسوم Void مثل &lt;br&gt; و &lt;hr&gt; و &lt;img&gt; و &lt;meta&gt; فلا محتوى لها ولا تحتاج وسم إغلاق.',
+      '🔹 الخاصية (Attribute): معلومة إضافية تُكتب داخل وسم الفتح على شكل name="value" مثل lang="ar". اكتب القيمة دائماً بين علامتي اقتباس.',
+      '⚠️ قاعدة التداخل: تُغلق الوسوم بعكس ترتيب فتحها. الصحيح: &lt;p&gt;&lt;strong&gt;نص&lt;/strong&gt;&lt;/p&gt; والخطأ: &lt;p&gt;&lt;strong&gt;نص&lt;/p&gt;&lt;/strong&gt;.',
+      '💡 المسافات البادئة (Indentation) لا تؤثر على المتصفح لكنها تجعل الكود مقروءاً؛ ادفع كل عنصر داخلي مسافتين.'
+    ].join('<br>'),
+    exampleCode: `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+    <title>أول صفحة ويب</title>
+  </head>
+  <body>
+    <h1>مرحباً بك في عالم تطوير الويب</h1>
+    <p>هذا النص يظهر داخل منطقة body المرئية.</p>
+  </body>
+</html>`,
+    starterCode: `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <!-- أضف meta charset ووسم title هنا -->
+  </head>
+  <body>
+    <!-- أضف عنوان h1 وفقرة p هنا -->
+  </body>
+</html>`,
+    solutionCode: `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+    <title>صفحتي الأولى</title>
+  </head>
+  <body>
+    <h1>أول صفحة ويب متكاملة</h1>
+    <p>تم بناء الهيكل بنجاح.</p>
+  </body>
+</html>`,
+    challengePrompt: 'تحدي الدرس: ابنِ صفحة كاملة تبدأ بـ Doctype، ثم html بخاصيتي lang و dir، وداخل head ضع meta بخاصية charset ووسم title بنص، وداخل body ضع عنواناً h1 وفقرة p.',
+    validate: function (doc) {
+      const title = doc.querySelector('title');
+      if (!title || !title.textContent.trim()) return { passed: false, msgAr: 'أضف وسم title داخل head واكتب فيه نصاً.', msgEn: 'Add a title element with text inside head.' };
+      if (!doc.querySelector('meta[charset]')) return { passed: false, msgAr: 'أضف meta بخاصية charset داخل head.', msgEn: 'Add a meta element with a charset attribute.' };
+      const h1 = doc.querySelector('h1');
+      if (!h1 || !h1.textContent.trim()) return { passed: false, msgAr: 'أضف عنواناً رئيسياً h1 يحتوي على نص.', msgEn: 'Include an h1 heading with text.' };
+      const p = doc.querySelector('p');
+      if (!p || !p.textContent.trim()) return { passed: false, msgAr: 'أضف فقرة p تحتوي على نص.', msgEn: 'Include a p paragraph with text.' };
+      return { passed: true, msgAr: 'أحسنت! تم بناء الهيكل المعماري للمستند بدقة.', msgEn: 'Document structure verified successfully!' };
+    }
+  },
+  {
+    id: 'html-2',
+    num: '02',
+    title: 'وسوم منطقة head (meta, link, style, script, base)',
+    duration: '18 min',
+    eyebrow: 'HTML 02 · غرفة التحكم الخفية للصفحة',
+    lead: 'كل وسم داخل head يخاطب المتصفح أو محركات البحث أو وسائل التواصل، وليس المستخدم؛ وهو سر الفرق بين صفحة عادية وصفحة احترافية.',
+    goal: 'ضبط الترميز والعرض على الموبايل ووصف جوجل، وربط ملفات CSS و JavaScript، والتفرقة بين link و style وبين async و defer.',
+    sectionTitle: 'ماذا نضع داخل head ولماذا',
+    explanation: [
+      '🔹 &lt;title&gt; : إلزامي في كل صفحة، ويفضل ألا يزيد عن 60 حرفاً ليظهر كاملاً في جوجل.',
+      '🔹 &lt;meta charset="UTF-8"&gt; : ترميز الحروف، ويكون أول عنصر في head.',
+      '🔹 &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt; : بدونه يعرض الموبايل صفحتك كأنها شاشة كمبيوتر مصغرة. إلزامي لأي موقع متجاوب (Responsive).',
+      '🔹 &lt;meta name="description" content="..."&gt; : الوصف الذي يظهر أسفل العنوان في نتائج جوجل (يفضل 150 إلى 160 حرفاً).',
+      '🔹 meta name="author" لاسم الكاتب، و meta name="robots" content="noindex" لمنع أرشفة الصفحة، و meta name="theme-color" للون شريط المتصفح في الموبايل.',
+      '🔹 &lt;link&gt; : وسم ذاتي الإغلاق يربط الصفحة بملف خارجي. rel="stylesheet" لملف CSS، و rel="icon" لأيقونة التبويب (Favicon)، و rel="canonical" لتحديد الرابط الأصلي للصفحة.',
+      '🔹 &lt;style&gt; : يضع كود CSS مباشرة داخل الصفحة.',
+      '🔹 &lt;script&gt; : يضع JavaScript داخل الصفحة أو يربط ملفاً خارجياً عبر src.',
+      '🔹 &lt;base href="..."&gt; : يحدد الرابط الأساسي لكل الروابط النسبية في الصفحة. نادر الاستخدام ويوضع مرة واحدة فقط.',
+      '⚖️ link مقابل style: النتيجة البصرية واحدة، لكن link لملف خارجي يُخزَّن في المتصفح ويُعاد استخدامه في كل الصفحات (الأفضل للمشاريع)، و style مناسب لتنسيق صفحة واحدة أو للتجارب السريعة.',
+      '⚖️ script بدون خصائص يوقف تحليل الصفحة حتى يُحمّل. استخدم defer (ينفذ بعد اكتمال الصفحة وبترتيب الكتابة، وهو الخيار الأفضل غالباً) أو async (ينفذ فور تحميله بلا ترتيب، ويناسب الإحصائيات والإعلانات).',
+      '⚠️ الوسوم في head لا تظهر في الصفحة، فإذا وضعت داخله نصاً عادياً أو h1 فسيُنقل المتصفح الأمر إلى body تلقائياً.'
+    ].join('<br>'),
+    exampleCode: `<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="دورة شاملة لتعلم HTML من الصفر حتى الاحتراف">
+  <meta name="theme-color" content="#0d6efd">
+  <title>دورة HTML الشاملة</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: sans-serif; background: #f5f5f5; }
+  </style>
+  <script src="app.js" defer></script>
+</head>`,
+    starterCode: `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <!-- 1) charset  2) viewport  3) description  4) title  5) link  6) style -->
+  </head>
+  <body>
+    <h1>صفحة بإعدادات احترافية</h1>
+  </body>
+</html>`,
+    solutionCode: `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="صفحة تجريبية لتعلم وسوم head">
+    <title>صفحة بإعدادات احترافية</title>
+    <link rel="icon" href="favicon.ico">
+    <style>
+      body { background: #f5f5f5; }
+    </style>
+  </head>
+  <body>
+    <h1>صفحة بإعدادات احترافية</h1>
+  </body>
+</html>`,
+    challengePrompt: 'تحدي الدرس: داخل head أضف: meta charset، و meta بـ name="viewport"، و meta بـ name="description" بمحتوى نصي، ووسم title، ووسم link بخاصيتي rel و href، ووسم style يحتوي على قاعدة CSS واحدة على الأقل.',
+    validate: function (doc) {
+      if (!doc.querySelector('meta[charset]')) return { passed: false, msgAr: 'أضف meta بخاصية charset.', msgEn: 'Add meta charset.' };
+      const vp = doc.querySelector('meta[name="viewport"]');
+      if (!vp || !(vp.getAttribute('content') || '').includes('width=device-width')) return { passed: false, msgAr: 'أضف meta بـ name viewport ومحتواها يحتوي width=device-width.', msgEn: 'Add a viewport meta with width=device-width.' };
+      const d = doc.querySelector('meta[name="description"]');
+      if (!d || !(d.getAttribute('content') || '').trim()) return { passed: false, msgAr: 'أضف meta بـ name description مع محتوى نصي في content.', msgEn: 'Add a description meta with content.' };
+      const t = doc.querySelector('title');
+      if (!t || !t.textContent.trim()) return { passed: false, msgAr: 'أضف وسم title بنص.', msgEn: 'Add a title with text.' };
+      if (!doc.querySelector('link[rel][href]')) return { passed: false, msgAr: 'أضف وسم link بخاصيتي rel و href.', msgEn: 'Add a link with rel and href.' };
+      const s = doc.querySelector('style');
+      if (!s || !s.textContent.trim()) return { passed: false, msgAr: 'أضف وسم style واكتب بداخله قاعدة CSS.', msgEn: 'Add a style element with CSS.' };
+      return { passed: true, msgAr: 'ممتاز! head الآن مجهز كما في المواقع الاحترافية.', msgEn: 'Professional head section verified!' };
+    }
+  },
+  {
+    id: 'html-3',
+    num: '03',
+    title: 'العناوين من h1 إلى h6 وأهميتها الدلالية والـ SEO',
+    duration: '15 min',
+    eyebrow: 'HTML 03 · التسلسل الهرمي للمحتوى',
+    lead: 'العناوين ليست لتكبير الخط، بل هي شجرة المحتوى التي تفهرسها محركات البحث وتتنقل بها قارئات الشاشة.',
+    goal: 'تنظيم الصفحة بتسلسل منطقي يبدأ بـ h1 واحد ثم h2 ثم h3 دون القفز بين المستويات، ومعرفة متى نستخدم hgroup.',
+    sectionTitle: 'الفروق الدلالية وأهمية العناوين في الـ SEO',
+    explanation: [
+      'توفر HTML ستة مستويات من العناوين، من الأهم h1 إلى الأقل أهمية h6:',
+      '• &lt;h1&gt; : عنوان الصفحة الرئيسي، ويفضل أن يكون واحداً فقط في الصفحة.',
+      '• &lt;h2&gt; : الأقسام الكبرى داخل الصفحة.',
+      '• &lt;h3&gt; : الأقسام الفرعية داخل كل h2، وهكذا حتى h6 (نادراً ما يُحتاج إلى h5 و h6).',
+      '⚖️ h1 مقابل p بخط كبير: قد يبدوان متشابهين بعد CSS، لكن h1 يخبر جوجل وقارئ الشاشة أن هذا عنوان، أما p فمجرد نص. استخدم العنوان لمعناه، وCSS لحجمه.',
+      '⚖️ h1 مقابل strong: strong للتأكيد على كلمات داخل جملة، أما العنوان فيقسم المحتوى إلى أقسام.',
+      '⚠️ لا تقفز بين المستويات (من h2 إلى h4 مباشرة)، فهذا يربك قارئات الشاشة ومحركات البحث. لو أردت عنواناً أصغر شكلاً فاستخدم CSS وليس مستوى أقل.',
+      '💡 تخيل العناوين كفهرس كتاب: h1 اسم الكتاب، h2 الفصول، h3 عناوين الفقرات داخل الفصل.',
+      '🔹 &lt;hgroup&gt; : يجمع عنواناً مع عنوان فرعي أو شعار (مثل h1 ثم p) ليُعتبرا عنواناً واحداً دون أن يشوّش العنوان الفرعي على شجرة العناوين.',
+      '📌 ملاحظة SEO: اكتب الكلمة المفتاحية في h1 بشكل طبيعي، ولا تكرر h1 في كل قسم.'
+    ].join('<br>'),
+    exampleCode: `<h1>دليل هندسة البرمجيات</h1>
+<h2>المرحلة الأولى: هندسة الواجهات</h2>
+<h3>الدرس الأول: العناوين والفقرات</h3>
+<h3>الدرس الثاني: الروابط والصور</h3>
+<h2>المرحلة الثانية: النظم السحابية</h2>
+<h3>الدرس الأول: قواعد البيانات</h3>
+<h4>أنواع قواعد البيانات</h4>
+
+<hgroup>
+  <h1>منصة أطلس</h1>
+  <p>طريقك إلى الاحتراف</p>
+</hgroup>`,
+    starterCode: `<!-- h1 واحد فقط -->
+
+<!-- عنوانان h2 -->
+
+<!-- تحت كل h2 عنوانان h3 -->
+
+<!-- وتحت أحد h3 عنوان h4 -->`,
+    solutionCode: `<h1>منصة التعلم المتكاملة</h1>
+<h2>مسار تطوير الويب</h2>
+<h3>أساسيات HTML</h3>
+<h3>أساسيات CSS</h3>
+<h4>الصندوق Box Model</h4>
+<h2>مسار النظم السحابية</h2>
+<h3>بناء قواعد البيانات</h3>
+<h3>الاستضافة والنشر</h3>`,
+    challengePrompt: 'تحدي الدرس: أنشئ h1 واحداً فقط، وعنوانين h2 على الأقل، وتحتها عنوانين h3 على الأقل، ثم عنوان h4 واحد على الأقل تحت أحد العناوين h3.',
+    validate: function (doc) {
+      if (doc.querySelectorAll('h1').length !== 1) return { passed: false, msgAr: 'يجب أن تحتوي الصفحة على h1 واحد فقط.', msgEn: 'Exactly one h1 is required.' };
+      if (doc.querySelectorAll('h2').length < 2) return { passed: false, msgAr: 'أضف عنوانين h2 على الأقل.', msgEn: 'Add at least two h2.' };
+      if (doc.querySelectorAll('h3').length < 2) return { passed: false, msgAr: 'أضف عنوانين h3 على الأقل.', msgEn: 'Add at least two h3.' };
+      if (doc.querySelectorAll('h4').length < 1) return { passed: false, msgAr: 'أضف عنواناً h4 واحداً على الأقل.', msgEn: 'Add at least one h4.' };
+      const all = Array.from(doc.querySelectorAll('h1,h2,h3,h4,h5,h6')).map(function (h) { return parseInt(h.tagName[1], 10); });
+      for (let i = 1; i < all.length; i++) {
+        if (all[i] - all[i - 1] > 1) return { passed: false, msgAr: 'لا تقفز بين المستويات؛ لا يجوز الانتقال من h' + all[i - 1] + ' إلى h' + all[i] + ' مباشرة.', msgEn: 'Do not skip heading levels.' };
+      }
+      return { passed: true, msgAr: 'تسلسل هرمي ممتاز ومطابق لمعايير W3C!', msgEn: 'Perfect semantic hierarchy!' };
+    }
+  },
+  {
+    id: 'html-4',
+    num: '04',
+    title: 'الفقرات والفواصل والنص المنسق (p, br, hr, pre, wbr)',
+    duration: '18 min',
+    eyebrow: 'HTML 04 · التعامل مع الكتل النصية',
+    lead: 'المتصفح يتجاهل المسافات والأسطر الزائدة في كودك؛ لذلك تحتاج الوسوم الصحيحة للتحكم في شكل النص.',
+    goal: 'استخدام p للفقرات، br لكسر السطر، hr للفصل بين الأفكار، pre للنص المنسق مسبقاً، و wbr لكسر الكلمات الطويلة.',
+    sectionTitle: 'كيف يتعامل المتصفح مع النصوص والمسافات',
+    explanation: [
+      '⚠️ قاعدة مهمة: المتصفح يدمج أي مسافات أو أسطر متتالية في مسافة واحدة. اضغط Enter عشر مرات في الكود وسيظهر النص بمسافة واحدة فقط.',
+      '• &lt;p&gt; : فقرة مستقلة، يترك المتصفح قبلها وبعدها هامشاً رأسياً تلقائياً. هي الوسم الأساسي لأي نص عادي.',
+      '• &lt;br&gt; : وسم ذاتي الإغلاق يكسر السطر داخل نفس الفقرة بلا هامش رأسي. استخدمه في الشعر والعناوين البريدية فقط.',
+      '• &lt;hr&gt; : فاصل موضوعي بين فكرتين مختلفتين، ويظهر خطاً أفقياً افتراضياً (وشكله يتغير بـ CSS).',
+      '• &lt;pre&gt; : يلغي دمج المسافات ويعرض النص كما كُتب تماماً بخط أحادي العرض. مناسب للأكواد والرسوم النصية.',
+      '• &lt;wbr&gt; : يخبر المتصفح أن له أن يكسر الكلمة الطويلة عند هذا المكان لو احتاج، مثل الروابط الطويلة.',
+      '⚖️ p مقابل br: لا تضع br مرتين للحصول على مسافة بين فقرتين! هذا خطأ شائع. الفقرة الجديدة تُكتب بوسم p جديد، والمسافة تضبط بـ margin في CSS.',
+      '⚖️ br مقابل hr: br ينقلك لسطر جديد داخل نفس الفقرة، و hr يعلن انتهاء موضوع وبداية موضوع آخر (له معنى دلالي).',
+      '⚖️ pre مقابل p: لو كتبت نفس النص بوسم p ستختفي المسافات والأسطر، أما في pre فتظهر كما هي.',
+      '💡 لإظهار مسافات متعددة في فقرة عادية يمكنك استخدام الكيان &amp;nbsp; (سنشرحه في الدرس 19)، لكن الأفضل استخدام CSS.'
+    ].join('<br>'),
+    exampleCode: `<p>السطر الأول داخل الفقرة.<br>
+السطر الثاني داخل نفس الفقرة.</p>
+
+<p>هذه فقرة جديدة ومنفصلة تماماً.</p>
+
+<hr>
+
+<pre>
+  دالة برمجية:
+    total = 50 + 50;
+    print(total);
+</pre>
+
+<p>رابط طويل: https://example.com/very<wbr>/long<wbr>/path</p>`,
+    starterCode: `<!-- 1) فقرة p تحتوي على سطرين يفصل بينهما br -->
+
+<!-- 2) فقرة p ثانية -->
+
+<!-- 3) فاصل hr -->
+
+<!-- 4) كتلة pre تحتوي على شكل نصي بمسافات -->`,
+    solutionCode: `<p>هندسة البرمجيات تبدأ بالتطبيق المستمر.<br>
+التدريب اليومي يصنع الفارق.</p>
+<p>هذه فقرة ثانية منفصلة.</p>
+<hr>
+<pre>
+    *
+   ***
+  *****
+</pre>`,
+    challengePrompt: 'تحدي الدرس: اكتب فقرتين p على الأقل، وفي إحداهما وسم br لكسر السطر، ثم فاصل hr، ثم كتلة pre تحتوي على أكثر من سطر.',
+    validate: function (doc) {
+      if (doc.querySelectorAll('p').length < 2) return { passed: false, msgAr: 'اكتب فقرتين p على الأقل.', msgEn: 'Add at least two p elements.' };
+      if (!doc.querySelector('p br')) return { passed: false, msgAr: 'ضع وسم br داخل إحدى الفقرات.', msgEn: 'Place a br inside a paragraph.' };
+      if (!doc.querySelector('hr')) return { passed: false, msgAr: 'أضف فاصلاً hr.', msgEn: 'Add an hr element.' };
+      const pre = doc.querySelector('pre');
+      if (!pre || pre.textContent.trim().split('\n').length < 2) return { passed: false, msgAr: 'أضف pre يحتوي على سطرين أو أكثر.', msgEn: 'Add a pre with multiple lines.' };
+      return { passed: true, msgAr: 'ممتاز! فهمت دور كل وسم وكيف يتعامل المتصفح مع المسافات.', msgEn: 'Great understanding of text layout!' };
+    }
+  },
+  {
+    id: 'html-5',
+    num: '05',
+    title: 'تنسيق النص الدلالي (b/strong, i/em, u/ins, s/del, mark, small, sub, sup)',
+    duration: '22 min',
+    eyebrow: 'HTML 05 · الشكل مقابل المعنى',
+    lead: 'أكثر أزواج الوسوم إرباكاً هي التي تعطي نفس الشكل تماماً؛ في هذا الدرس نعرف متى نستخدم كل واحد ولماذا.',
+    goal: 'التفرقة بين الوسوم الشكلية والدلالية التي تعطي نفس النتيجة البصرية، وكتابة المعادلات بـ sub و sup.',
+    sectionTitle: 'متى يتشابه الشكل ويختلف المعنى؟',
+    explanation: [
+      '🎯 القاعدة الذهبية: الشكل يتغير بـ CSS، أما الوسم فيُختار لمعناه. قارئ الشاشة ومحرك البحث لا يرون الألوان، بل يفهمون الوسوم.',
+      '⚖️ b مقابل strong (كلاهما عريض): strong = أهمية حقيقية وتحذير (لا تشارك كلمة المرور)، و b = لفت النظر لكلمة بلا أهمية خاصة مثل اسم منتج أو كلمة مفتاحية.',
+      '⚖️ i مقابل em (كلاهما مائل): em = تأكيد يغير معنى الجملة ونبرة القراءة (أنا قلت هذا، وليس هو)، و i = كلمة أجنبية أو مصطلح علمي أو أفكار داخلية.',
+      '⚖️ s مقابل del (كلاهما خط في المنتصف): s = معلومة لم تعد صحيحة، و del = حذف فعلي من نص مراجَع، ويقابله ins للإضافة (غالباً مسطر) ويقبلان datetime و cite.',
+      '⚖️ u (خط تحت): معناه الآن نص عليه علامة غير نصية مثل خطأ إملائي. تجنبه كثيراً حتى لا يُظن رابطاً. ويُستبدل غالباً بـ ins أو CSS.',
+      '• &lt;mark&gt; : تمييز كلمة ذات صلة بالسياق مثل نتيجة بحث (خلفية صفراء).',
+      '• &lt;small&gt; : نص جانبي صغير مثل حقوق النشر أو الشروط.',
+      '• &lt;sub&gt; : نص منخفض للصيغ الكيميائية H2O، و &lt;sup&gt; : نص مرتفع للأسس والرموز X2 والهوامش.',
+      '⚠️ لا تستخدم b أو i لمجرد التنسيق بعد أن أصبحت CSS قادرة على ذلك (font-weight و font-style)، إلا إذا كان لها معنى دلالي كما سبق.',
+      '💡 للتأكد: اسأل نفسك: هل لو حذفت التنسيق البصري، هل يتغير معنى الجملة؟ إن تغير فاستخدم الوسم الدلالي (strong, em).'
+    ].join('<br>'),
+    exampleCode: `<p>تحذير: <strong>لا تشارك كلمة المرور</strong> مع أحد.</p>
+<p>اشتريت <b>iPhone</b> من متجر <i>Apple Store</i>.</p>
+<p>الدواء يؤخذ <em>بعد</em> الأكل وليس قبله.</p>
+<p>السعر: <del>500 ج.م</del> <ins>350 ج.م</ins></p>
+<p>نتيجة البحث: كلمة <mark>HTML</mark> وردت 5 مرات.</p>
+<p><small>جميع الأسعار تشمل الضريبة.</small></p>
+<p>الماء H<sub>2</sub>O والمساحة 10 م<sup>2</sup></p>`,
+    starterCode: `<!-- اكتب فقرات تستخدم: -->
+<!-- strong  em  del  ins  mark  small  sub  sup -->
+`,
+    solutionCode: `<p>تحذير: <strong>البيانات حساسة للغاية</strong></p>
+<p>هذا الكلام <em>مؤكد</em> وليس شائعة.</p>
+<p>السعر: <del>500</del> <ins>350</ins></p>
+<p>قيمة مميزة: <mark>خصم 50%</mark></p>
+<p><small>الأسعار تشمل الضريبة</small></p>
+<p>مركب كيميائي: H<sub>2</sub>O</p>
+<p>معادلة: X<sup>2</sup> + Y<sup>2</sup></p>`,
+    challengePrompt: 'تحدي الدرس: اكتب نصاً يستخدم كل هذه الوسوم: strong و em و del و ins و mark و small و sub و sup (ولو في فقرات منفصلة).',
+    validate: function (doc) {
+      const need = ['strong', 'em', 'del', 'ins', 'mark', 'small', 'sub', 'sup'];
+      const miss = need.filter(function (t) { return !doc.querySelector(t); });
+      if (miss.length) return { passed: false, msgAr: 'ينقصك الوسوم: ' + miss.join(' ، '), msgEn: 'Missing tags: ' + miss.join(', ') };
+      return { passed: true, msgAr: 'رائع! أصبحت تفرق بين الشكل والمعنى.', msgEn: 'Semantic text formatting verified!' };
+    }
+  },
+  {
+    id: 'html-6',
+    num: '06',
+    title: 'الكود والاقتباس ووسوم النص المتخصصة (code, kbd, abbr, q, blockquote, time, address)',
+    duration: '25 min',
+    eyebrow: 'HTML 06 · وصف المعنى بدقة',
+    lead: 'وسوم كثيرة تظهر بشكل متشابه تقريباً، لكن لكل منها معنى مختلف يفهمه المتصفح وقارئ الشاشة ومحركات البحث.',
+    goal: 'استخدام الوسم الصحيح لكل من الكود والمدخلات والمخرجات والاختصارات والاقتباسات والتواريخ وبيانات التواصل.',
+    sectionTitle: 'وسوم الكود والاقتباس والمعلومات المتخصصة',
+    explanation: [
+      '💻 مجموعة الكود (كلها بخط أحادي العرض لكن بمعانٍ مختلفة):',
+      '• &lt;code&gt; : كود برمجي داخل السطر. وللكتل الكبيرة اجمعه مع pre هكذا: &lt;pre&gt;&lt;code&gt;...&lt;/code&gt;&lt;/pre&gt;.',
+      '• &lt;kbd&gt; : ما يضغطه المستخدم على لوحة المفاتيح مثل Ctrl + C.',
+      '• &lt;samp&gt; : مخرجات يطبعها برنامج أو رسالة نظام مثل Error 404.',
+      '• &lt;var&gt; : اسم متغير رياضي أو برمجي داخل النص.',
+      '⚖️ الخلاصة: code = الكود نفسه، kbd = ما يكتبه المستخدم، samp = ما يرد به البرنامج، var = اسم المتغير.',
+      '💬 مجموعة الاقتباس:',
+      '• &lt;q&gt; : اقتباس قصير داخل السطر، والمتصفح يضيف علامات التنصيص تلقائياً (لا تكتبها أنت).',
+      '• &lt;blockquote cite="رابط"&gt; : اقتباس طويل يظهر كتلة مستقلة بمسافة جانبية.',
+      '⚖️ q مقابل blockquote: الأول داخل الجملة، والثاني كتلة منفصلة. ولا تستخدم blockquote لمجرد إزاحة النص.',
+      '• &lt;cite&gt; : عنوان العمل المقتبس منه (كتاب أو فيلم أو مقال)، ويظهر مائلاً.',
+      '📌 مجموعة المعلومات:',
+      '• &lt;abbr title="..."&gt; : اختصار، وتظهر عند تمرير الماوس شرحه الكامل في title.',
+      '• &lt;dfn&gt; : أول موضع يُعرَّف فيه مصطلح جديد.',
+      '• &lt;time datetime="2026-10-26"&gt; : تاريخ أو وقت بصيغة تفهمها الآلات حتى لو كتبته بالنص "الاثنين الماضي".',
+      '• &lt;address&gt; : بيانات التواصل مع صاحب الصفحة أو المقال، وليس أي عنوان بريدي عشوائي.',
+      '• &lt;data value="..."&gt; : نص مرتبط بقيمة قابلة للقراءة آلياً (كود منتج مثلاً).',
+      '• &lt;bdi&gt; : يعزل نصاً لا تعرف اتجاهه (مثل اسم مستخدم)، و &lt;bdo dir="rtl"&gt; : يفرض اتجاه الكتابة.',
+      '• &lt;ruby&gt; مع &lt;rt&gt; و &lt;rp&gt; : شرح فوق الحروف، يُستخدم غالباً في اللغات الآسيوية.',
+      '• &lt;span&gt; : حاوية نصية عامة بلا أي معنى؛ تستخدمها فقط عندما لا يوجد وسم دلالي مناسب (نفصلها في الدرس 13).'
+    ].join('<br>'),
+    exampleCode: `<p>لعرض متغير اكتب <code>let age = 20;</code> ثم اضغط <kbd>Ctrl</kbd> + <kbd>S</kbd>.</p>
+<p>ستظهر الرسالة: <samp>Saved successfully</samp></p>
+
+<p>قال المعلم: <q>التكرار يعلم الشطار</q>.</p>
+
+<blockquote cite="https://example.com/book">
+  العلم في الصغر كالنقش على الحجر.
+</blockquote>
+<p>من كتاب <cite>أدب الدنيا والدين</cite></p>
+
+<p>نستخدم <abbr title="HyperText Markup Language">HTML</abbr> لبناء الصفحات.</p>
+<p>بدأ المشروع في <time datetime="2026-10-26">26 أكتوبر 2026</time>.</p>
+
+<address>
+  للتواصل: <a href="mailto:info@example.com">info@example.com</a>
+</address>`,
+    starterCode: `<!-- استخدم: code  kbd  abbr(title)  q  blockquote  time(datetime)  address -->
+`,
+    solutionCode: `<p>اكتب <code>console.log(1)</code> ثم اضغط <kbd>Enter</kbd>.</p>
+<p>نستخدم <abbr title="Cascading Style Sheets">CSS</abbr> للتنسيق.</p>
+<p>قال المعلم: <q>من جد وجد</q>.</p>
+<blockquote cite="https://example.com">
+  العلم نور والجهل ظلام.
+</blockquote>
+<p>تاريخ الإطلاق: <time datetime="2026-10-26">26 أكتوبر 2026</time></p>
+<address>للتواصل: info@example.com</address>`,
+    challengePrompt: 'تحدي الدرس: اكتب محتوى يستخدم: code و kbd و abbr بخاصية title و q و blockquote و time بخاصية datetime و address.',
+    validate: function (doc) {
+      const need = ['code', 'kbd', 'abbr[title]', 'q', 'blockquote', 'time[datetime]', 'address'];
+      const miss = need.filter(function (t) { return !doc.querySelector(t); });
+      if (miss.length) return { passed: false, msgAr: 'ينقصك: ' + miss.join(' ، '), msgEn: 'Missing: ' + miss.join(', ') };
+      return { passed: true, msgAr: 'أحسنت! أصبحت تصف المعنى بدقة وليس الشكل فقط.', msgEn: 'Specialized text semantics verified!' };
+    }
+  },
+  {
+    id: 'html-7',
+    num: '07',
+    title: 'الروابط والتنقل (a, href, target, rel, mailto, tel, anchors)',
+    duration: '22 min',
+    eyebrow: 'HTML 07 · قلب الويب',
+    lead: 'كلمة Hyper في HTML تعني الروابط؛ هي ما يحول الصفحات المنفصلة إلى شبكة واحدة.',
+    goal: 'إنشاء روابط خارجية وداخلية ومراسلة واتصال، وفهم الفرق بين المسار المطلق والنسبي، وأمان target blank.',
+    sectionTitle: 'وسم a وكل خصائصه',
+    explanation: [
+      '🔹 &lt;a href="..."&gt;النص&lt;/a&gt; : الوسم الوحيد الذي يصنع رابطاً. بدون href لا يكون رابطاً فعلياً.',
+      '📍 أنواع قيمة href:',
+      '• رابط مطلق (Absolute) : https://example.com/page.html يشير إلى موقع خارجي.',
+      '• رابط نسبي (Relative) : about.html أو ../images/a.png يشير إلى ملف في نفس مشروعك.',
+      '• رابط داخلي (Anchor) : href="#contact" ينتقل إلى العنصر الذي له id="contact" في نفس الصفحة، و href="#" يعود لأعلى الصفحة.',
+      '• mailto:name@example.com يفتح برنامج البريد، و tel:+201000000000 يفتح الاتصال في الموبايل.',
+      '🔹 target : "_self" (الافتراضي) يفتح في نفس التبويب، و "_blank" يفتح في تبويب جديد.',
+      '🔒 rel="noopener noreferrer" : أضفها دائماً مع _blank حتى لا تستطيع الصفحة الجديدة التحكم في صفحتك الأصلية.',
+      '🔹 download : يجعل الضغط على الرابط يحمّل الملف بدلاً من فتحه.',
+      '🔹 title : نص يظهر عند تمرير الماوس ويفيد في توضيح الوجهة.',
+      '⚖️ a مقابل button: الرابط للانتقال إلى مكان آخر (صفحة أو جزء)، والزر لتنفيذ فعل داخل الصفحة (إرسال نموذج، فتح قائمة). لو غيّرت شكل أحدهما بـ CSS ليشبه الآخر، يبقى المعنى مختلفاً لقارئ الشاشة، فاختر بحسب الوظيفة.',
+      '⚖️ الرابط النسبي مقابل المطلق: النسبي لا ينكسر عند تغيير اسم النطاق، أما المطلق فضروري للمواقع الخارجية.',
+      '💡 اكتب نص رابط واضحاً مثل "حمّل دليل HTML" وتجنب "اضغط هنا"، فهذا أفضل للـ SEO ولقارئات الشاشة.',
+      '💡 يمكن لوسم a أن يحيط بصورة أو بعنصر كتلة كامل (مثل بطاقة).'
+    ].join('<br>'),
+    exampleCode: `<a href="https://developer.mozilla.org" target="_blank" rel="noopener noreferrer">دليل MDN</a>
+<a href="about.html">من نحن</a>
+<a href="#contact">اذهب إلى قسم التواصل</a>
+
+<a href="mailto:info@example.com">راسلنا</a>
+<a href="tel:+201000000000">اتصل بنا</a>
+<a href="files/guide.pdf" download>تحميل الدليل</a>
+
+<h2 id="contact">قسم التواصل</h2>
+<p>أنت الآن في القسم المطلوب.</p>`,
+    starterCode: `<!-- 1) رابط خارجي يفتح في تبويب جديد مع rel -->
+
+<!-- 2) رابط داخلي href يبدأ بـ # -->
+
+<!-- 3) رابط mailto -->
+
+<!-- 4) رابط tel -->
+
+<!-- 5) عنصر له id يطابق الرابط الداخلي -->`,
+    solutionCode: `<p><a href="https://example.com" target="_blank" rel="noopener noreferrer">موقع خارجي</a></p>
+<p><a href="#contact">انتقل إلى التواصل</a></p>
+<p><a href="mailto:info@example.com">راسلنا</a></p>
+<p><a href="tel:+201000000000">اتصل بنا</a></p>
+<h2 id="contact">قسم التواصل</h2>`,
+    challengePrompt: 'تحدي الدرس: أنشئ رابطاً خارجياً بـ target="_blank" مع rel يحتوي noopener، ورابطاً داخلياً يبدأ بـ # ويطابق عنصراً له نفس الـ id، ورابط mailto، ورابط tel.',
+    validate: function (doc) {
+      const ext = doc.querySelector('a[target="_blank"]');
+      if (!ext || !(ext.getAttribute('rel') || '').includes('noopener')) return { passed: false, msgAr: 'أضف رابطاً بـ target="_blank" ومعه rel يحتوي noopener.', msgEn: 'Add a _blank link with rel noopener.' };
+      const inner = Array.from(doc.querySelectorAll('a[href^="#"]')).find(function (a) {
+        const id = a.getAttribute('href').slice(1);
+        return id && doc.getElementById(id);
+      });
+      if (!inner) return { passed: false, msgAr: 'أضف رابطاً داخلياً href يبدأ بـ # وعنصراً له id مطابق له.', msgEn: 'Add an anchor link with a matching id element.' };
+      if (!doc.querySelector('a[href^="mailto:"]')) return { passed: false, msgAr: 'أضف رابط mailto.', msgEn: 'Add a mailto link.' };
+      if (!doc.querySelector('a[href^="tel:"]')) return { passed: false, msgAr: 'أضف رابط tel.', msgEn: 'Add a tel link.' };
+      return { passed: true, msgAr: 'ممتاز! الروابط تعمل وبشكل آمن.', msgEn: 'Links verified!' };
+    }
+  },
+  {
+    id: 'html-8',
+    num: '08',
+    title: 'الصور (img, figure, figcaption, picture, source, map)',
+    duration: '25 min',
+    eyebrow: 'HTML 08 · المحتوى المرئي',
+    lead: 'الصورة في HTML عنصر محتوى يحتاج وصفاً نصياً ويحتاج أبعاداً حتى لا تقفز الصفحة أثناء التحميل.',
+    goal: 'استخدام img بخصائصه الصحيحة، وربط الصورة بتعليقها بـ figure، وتقديم صور مختلفة للأجهزة بـ picture، وفهم map.',
+    sectionTitle: 'الصور وكل ما يتعلق بها',
+    explanation: [
+      '🔹 &lt;img src="..." alt="..."&gt; : وسم ذاتي الإغلاق. src مسار الصورة، و alt وصف نصي يظهر إن فشل التحميل ويقرؤه قارئ الشاشة وتفهرسه جوجل.',
+      '🔹 width و height : حدد أبعاد الصورة (بالبكسل بدون وحدة) ليحجز المتصفح مكانها قبل التحميل فلا يقفز المحتوى.',
+      '🔹 loading="lazy" : يؤخر تحميل الصورة حتى يقترب المستخدم منها، وهو مفيد جداً للصفحات الطويلة.',
+      '⚖️ alt الفارغ مقابل alt المكتوب: الصورة التي تحمل معنى تحتاج وصفاً (alt="شعار الشركة")، أما الصورة الزخرفية فاكتب لها alt="" (فارغ) ليتجاهلها قارئ الشاشة. وحذف الخاصية بالكامل خطأ.',
+      '⚖️ img مقابل background-image في CSS: img للمحتوى الذي له معنى، و CSS للزخرفة التي لو حذفناها لم تتأثر الصفحة.',
+      '🖼️ &lt;figure&gt; و &lt;figcaption&gt; : figure يحيط بمحتوى مستقل (صورة، مخطط، كود)، و figcaption تعليقه. نستخدمهما معاً بدل الاكتفاء بفقرة تحت الصورة.',
+      '📱 &lt;picture&gt; : يقدم للمتصفح عدة مصادر صور ليختار الأنسب. بداخله عدة &lt;source media="(min-width:800px)" srcset="..."&gt; ثم img واحدة إلزامية كخيار أخير.',
+      '🔹 srcset و sizes : على img نفسها لتقديم أكثر من حجم للصورة بحسب كثافة الشاشة وعرضها.',
+      '📌 صيغ الصور: JPG للصور الفوتوغرافية، PNG للشفافية والحدة، WebP حجمه أصغر مع جودة جيدة، SVG للأيقونات والشعارات (لا يتأثر بالتكبير)، GIF للحركات القصيرة.',
+      '🗺️ &lt;map&gt; و &lt;area&gt; : يحددان مناطق داخل صورة يمكن الضغط عليها. نربط الصورة بـ usemap="#اسم" ونسمي map بنفس الاسم، وفي كل area نحدد shape و coords و href.'
+    ].join('<br>'),
+    exampleCode: `<img src="logo.png" alt="شعار منصة أطلس" width="200" height="80" loading="lazy">
+
+<figure>
+  <img src="chart.png" alt="رسم بياني لعدد الطلاب" width="400" height="250">
+  <figcaption>الشكل 1: نمو عدد الطلاب خلال عام 2026</figcaption>
+</figure>
+
+<picture>
+  <source media="(min-width: 800px)" srcset="banner-large.webp">
+  <source media="(min-width: 400px)" srcset="banner-medium.webp">
+  <img src="banner-small.jpg" alt="بانر الموقع" width="400" height="200">
+</picture>
+
+<!-- صورة زخرفية: alt فارغ -->
+<img src="line.png" alt="">`,
+    starterCode: `<!-- 1) img بـ alt و width و height و loading -->
+
+<!-- 2) figure تحتوي img و figcaption -->
+
+<!-- 3) picture تحتوي source و img -->`,
+    solutionCode: `<img src="logo.png" alt="شعار الموقع" width="200" height="80" loading="lazy">
+
+<figure>
+  <img src="chart.png" alt="رسم بياني" width="400" height="250">
+  <figcaption>الشكل 1: توضيح للبيانات</figcaption>
+</figure>
+
+<picture>
+  <source media="(min-width: 800px)" srcset="large.webp">
+  <img src="small.jpg" alt="صورة متجاوبة" width="400" height="200">
+</picture>`,
+    challengePrompt: 'تحدي الدرس: أنشئ img بـ alt غير فارغ و width و height و loading="lazy"، وfigure تحتوي img وfigcaption، وpicture تحتوي source وimg.',
+    validate: function (doc) {
+      const lazy = doc.querySelector('img[loading="lazy"][width][height]');
+      if (!lazy || !(lazy.getAttribute('alt') || '').trim()) return { passed: false, msgAr: 'أضف img تحتوي alt غير فارغ و width و height و loading="lazy".', msgEn: 'Add an img with alt, width, height and loading lazy.' };
+      if (!doc.querySelector('figure img') || !doc.querySelector('figure figcaption')) return { passed: false, msgAr: 'أضف figure تحتوي img و figcaption.', msgEn: 'Add figure with img and figcaption.' };
+      if (!doc.querySelector('picture source') || !doc.querySelector('picture img')) return { passed: false, msgAr: 'أضف picture تحتوي source و img.', msgEn: 'Add picture with source and img.' };
+      return { passed: true, msgAr: 'ممتاز! الصور الآن سريعة ومتاحة للجميع.', msgEn: 'Images verified!' };
+    }
+  },
+  {
+    id: 'html-9',
+    num: '09',
+    title: 'القوائم المرتبة وغير المرتبة (ul, ol, li, menu)',
+    duration: '18 min',
+    eyebrow: 'HTML 09 · تنظيم العناصر',
+    lead: 'القوائم من أكثر الوسوم استخداماً، فهي أساس قوائم التنقل والتصنيفات والخطوات.',
+    goal: 'اختيار نوع القائمة المناسب، واستخدام خصائص type و start و reversed و value، وبناء قوائم متداخلة.',
+    sectionTitle: 'متى نستخدم القائمة المرتبة وغير المرتبة؟',
+    explanation: [
+      '• &lt;ul&gt; (Unordered List) : قائمة غير مرتبة تظهر بنقاط؛ استخدمها عندما لا يهم الترتيب (مميزات، تصنيفات، قوائم تنقل).',
+      '• &lt;ol&gt; (Ordered List) : قائمة مرتبة تظهر بأرقام؛ استخدمها عندما يهم الترتيب (خطوات، ترتيب فائزين).',
+      '• &lt;li&gt; : عنصر داخل القائمة، ولا يجوز أن يكون خارج ul أو ol أو menu.',
+      '⚖️ ul مقابل ol: إن اختلف المعنى بتغيير الترتيب (خطوات تركيب)، فاستخدم ol، وإلا فاستخدم ul.',
+      '🔹 خصائص ol : type="1|a|A|i|I" لنوع الترقيم، start="5" للبدء من رقم معين، reversed لعد تنازلي. وعلى li يمكن استخدام value لتغيير رقم عنصر بعينه.',
+      '🔹 القوائم المتداخلة: ضع ul أو ol جديدة داخل li (وليس خارجها مباشرة داخل القائمة الأم) لإنشاء مستويات.',
+      '⚖️ &lt;menu&gt; : مطابق ل ul في الشكل والسلوك، لكنه مخصص دلالياً لقوائم الأوامر والأدوات التفاعلية. للتنقل استخدم nav مع ul.',
+      '💡 معظم قوائم التنقل في المواقع ما هي إلا ul تحتوي li تحتوي روابط a، وبـ CSS نحذف النقاط ونجعلها أفقية.',
+      '💡 يمكن تغيير شكل النقاط أو الأرقام بـ CSS باستخدام list-style، وهو أفضل من خاصية type القديمة في ul.',
+      '⚠️ لا تضع عناصر غير li مباشرة داخل ul أو ol، فهذا خطأ في الصياغة.'
+    ].join('<br>'),
+    exampleCode: `<h3>مميزات الكورس</h3>
+<ul>
+  <li>شرح مبسط</li>
+  <li>تمارين عملية</li>
+  <li>مشاريع حقيقية</li>
+</ul>
+
+<h3>خطوات إنشاء صفحة</h3>
+<ol>
+  <li>أنشئ ملف index.html</li>
+  <li>اكتب الهيكل الأساسي</li>
+  <li>افتحه في المتصفح</li>
+</ol>
+
+<ol start="5" type="A" reversed>
+  <li>بند</li>
+  <li>بند</li>
+</ol>
+
+<ul>
+  <li>الواجهات
+    <ul>
+      <li>HTML</li>
+      <li>CSS</li>
+    </ul>
+  </li>
+  <li>الخلفية</li>
+</ul>`,
+    starterCode: `<!-- 1) ul بثلاثة عناصر -->
+
+<!-- 2) ol بثلاثة عناصر وعليها start أو reversed أو type -->
+
+<!-- 3) قائمة متداخلة: ul داخل li -->`,
+    solutionCode: `<ul>
+  <li>HTML</li>
+  <li>CSS</li>
+  <li>JavaScript</li>
+</ul>
+
+<ol start="3">
+  <li>الخطوة الثالثة</li>
+  <li>الخطوة الرابعة</li>
+  <li>الخطوة الخامسة</li>
+</ol>
+
+<ul>
+  <li>الواجهات
+    <ul>
+      <li>React</li>
+      <li>Vue</li>
+    </ul>
+  </li>
+  <li>الخلفية</li>
+</ul>`,
+    challengePrompt: 'تحدي الدرس: اكتب ul بثلاثة li على الأقل، وol بثلاثة li على الأقل مع إحدى الخصائص start أو reversed أو type، وقائمة متداخلة (ul أو ol داخل li).',
+    validate: function (doc) {
+      const ul = Array.from(doc.querySelectorAll('ul')).find(function (u) { return u.querySelectorAll(':scope > li').length >= 3; });
+      if (!ul) return { passed: false, msgAr: 'أضف ul تحتوي ثلاثة li على الأقل.', msgEn: 'Add a ul with at least three li.' };
+      const ol = Array.from(doc.querySelectorAll('ol')).find(function (o) { return o.querySelectorAll(':scope > li').length >= 3; });
+      if (!ol) return { passed: false, msgAr: 'أضف ol تحتوي ثلاثة li على الأقل.', msgEn: 'Add an ol with at least three li.' };
+      if (!ol.hasAttribute('start') && !ol.hasAttribute('reversed') && !ol.hasAttribute('type')) return { passed: false, msgAr: 'أضف إلى ol الخاصية start أو reversed أو type.', msgEn: 'Add start, reversed or type to the ol.' };
+      if (!doc.querySelector('li > ul, li > ol')) return { passed: false, msgAr: 'أضف قائمة متداخلة داخل أحد عناصر li.', msgEn: 'Add a nested list inside an li.' };
+      return { passed: true, msgAr: 'ممتاز! بنيت القوائم بشكل صحيح.', msgEn: 'Lists verified!' };
+    }
+  },
+  {
+    id: 'html-10',
+    num: '10',
+    title: 'قوائم الوصف والعناصر التفاعلية (dl, dt, dd, details, summary, dialog)',
+    duration: '20 min',
+    eyebrow: 'HTML 10 · قوائم المصطلحات والتفاعل بدون JavaScript',
+    lead: 'ليس كل ما يتكون من مصطلح وشرح قائمة عادية؛ ويمكنك عمل أكورديون ونافذة منبثقة بـ HTML فقط.',
+    goal: 'استخدام dl للمصطلحات، و details لإخفاء وإظهار المحتوى، و dialog للنوافذ، والتفرقة بينها وبين ul و table.',
+    sectionTitle: 'قوائم الوصف والتفاعل المدمج',
+    explanation: [
+      '📖 قائمة الوصف (Description List):',
+      '• &lt;dl&gt; : الحاوية. • &lt;dt&gt; : المصطلح أو الاسم (Term). • &lt;dd&gt; : الوصف أو القيمة (Description).',
+      '• يمكن أن يكون لمصطلح واحد أكثر من وصف، ولعدة مصطلحات وصف واحد.',
+      '⚖️ dl مقابل ul: ul عناصر منفصلة، و dl أزواج مصطلح ووصف (قاموس، أسئلة وأجوبة، بيانات المنتج).',
+      '⚖️ dl مقابل table: dl لأزواج بسيطة من عمودين، و table لبيانات متعددة الأعمدة.',
+      '▶️ &lt;details&gt; و &lt;summary&gt; : أكورديون جاهز، يظهر summary دائماً وعند الضغط عليه يظهر باقي محتوى details. أضف الخاصية open لتكون مفتوحة افتراضياً.',
+      '🔹 summary يجب أن يكون أول ابن لـ details. ولجعل مجموعة details تعمل كأكورديون (يفتح واحد ويغلق الباقي) أعطِها جميعاً نفس قيمة الخاصية name.',
+      '💬 &lt;dialog&gt; : نافذة حوار أو منبثقة. مخفية افتراضياً وتظهر بوجود الخاصية open، أو عبر JavaScript بـ showModal() لتظهر كنافذة مودال تعتم الخلفية.',
+      '🔹 نموذج بخاصية method="dialog" داخل dialog يغلقها عند الإرسال بلا JavaScript.',
+      '⚖️ details مقابل dialog: details يعرض محتوى إضافياً داخل الصفحة نفسها، و dialog نافذة منفصلة فوق الصفحة تطلب انتباه المستخدم.',
+      '💡 استخدمها لقسم الأسئلة الشائعة FAQ وتفاصيل المنتج والتأكيدات.'
+    ].join('<br>'),
+    exampleCode: `<dl>
+  <dt>HTML</dt>
+  <dd>لغة هيكلة صفحات الويب</dd>
+
+  <dt>CSS</dt>
+  <dd>لغة تنسيق الصفحات</dd>
+  <dd>تتحكم في الألوان والمسافات</dd>
+</dl>
+
+<details open>
+  <summary>ما هو HTML؟</summary>
+  <p>لغة وسوم لبناء هيكل الصفحة.</p>
+</details>
+
+<dialog open>
+  <p>هل تريد حفظ التغييرات؟</p>
+  <form method="dialog">
+    <button>موافق</button>
+  </form>
+</dialog>`,
+    starterCode: `<!-- 1) dl بمصطلحين، لكل مصطلح dd -->
+
+<!-- 2) details مع summary -->
+
+<!-- 3) dialog بالخاصية open -->`,
+    solutionCode: `<dl>
+  <dt>الويب</dt>
+  <dd>شبكة من الصفحات المترابطة</dd>
+  <dt>المتصفح</dt>
+  <dd>برنامج لعرض صفحات الويب</dd>
+</dl>
+
+<details>
+  <summary>هل HTML لغة برمجة؟</summary>
+  <p>لا، هي لغة وسوم.</p>
+</details>
+
+<dialog open>
+  <p>تم الحفظ بنجاح</p>
+</dialog>`,
+    challengePrompt: 'تحدي الدرس: أنشئ dl فيها مصطلحان على الأقل (dt) ولكل منهما dd، وعنصر details يحتوي summary، وعنصر dialog بالخاصية open.',
+    validate: function (doc) {
+      const dl = doc.querySelector('dl');
+      if (!dl || dl.querySelectorAll('dt').length < 2 || dl.querySelectorAll('dd').length < 2) return { passed: false, msgAr: 'أضف dl فيها مصطلحان dt على الأقل ووصفان dd على الأقل.', msgEn: 'Add a dl with two dt and two dd.' };
+      if (!doc.querySelector('details > summary')) return { passed: false, msgAr: 'أضف details بداخلها summary.', msgEn: 'Add details with summary.' };
+      if (!doc.querySelector('dialog[open]')) return { passed: false, msgAr: 'أضف dialog بالخاصية open.', msgEn: 'Add dialog with the open attribute.' };
+      return { passed: true, msgAr: 'رائع! أنشأت عناصر تفاعلية بدون سطر JavaScript.', msgEn: 'Description and interactive elements verified!' };
+    }
+  },
+  {
+    id: 'html-11',
+    num: '11',
+    title: 'الجداول الأساسية (table, tr, th, td, caption)',
+    duration: '18 min',
+    eyebrow: 'HTML 11 · عرض البيانات المنظمة',
+    lead: 'الجدول مخصص لعرض بيانات ذات صفوف وأعمدة، وليس لتصميم الصفحات.',
+    goal: 'بناء جدول سليم من table و tr و th و td و caption، ومعرفة متى يكون الجدول هو الاختيار الصحيح.',
+    sectionTitle: 'تشريح الجدول',
+    explanation: [
+      '• &lt;table&gt; : الحاوية الرئيسية للجدول.',
+      '• &lt;tr&gt; (Table Row) : صف في الجدول، ولا يكتب فيه نص مباشرة بل خلايا.',
+      '• &lt;th&gt; (Table Header) : خلية عنوان، تظهر عريضة ومتوسطة افتراضياً، ويفهمها قارئ الشاشة كعنوان لعمود أو صف.',
+      '• &lt;td&gt; (Table Data) : خلية بيانات عادية.',
+      '• &lt;caption&gt; : عنوان الجدول، ويجب أن يكون أول ابن مباشر لـ table.',
+      '⚖️ th مقابل td: قد تتشابه بعد التنسيق، لكن th تعني أن الخلية عنوان للبيانات المرتبطة بها، وهذا ما يفيد الوصول والـ SEO. لا تستبدلها بـ td مع bold.',
+      '⚖️ table مقابل div/CSS Grid: استخدم table للبيانات الجدولية الحقيقية (أسعار، جداول مواعيد). واستخدم CSS لتخطيط الصفحة. وقديماً كان الناس يصممون الصفحات بالجداول وهذا ممنوع الآن.',
+      '⚖️ table مقابل dl: dl لأزواج بسيطة، و table عندما يكون لكل صف عدة قيم.',
+      '🔹 border="1" خاصية قديمة لإظهار الحدود تُستخدم للتجارب السريعة؛ والأصل استخدام CSS (border, border-collapse).',
+      '⚠️ كل صف يجب أن يحتوي نفس عدد الخلايا (إلا عند استخدام colspan و rowspan في الدرس القادم)، وإلا اختل الشكل.',
+      '💡 ملاحظة: المتصفح يضيف tbody تلقائياً حول الصفوف حتى لو لم تكتبه.'
+    ].join('<br>'),
+    exampleCode: `<table border="1">
+  <caption>جدول درجات الطلاب</caption>
+  <tr>
+    <th>الاسم</th>
+    <th>المادة</th>
+    <th>الدرجة</th>
+  </tr>
+  <tr>
+    <td>أحمد</td>
+    <td>HTML</td>
+    <td>95</td>
+  </tr>
+  <tr>
+    <td>سارة</td>
+    <td>CSS</td>
+    <td>90</td>
+  </tr>
+</table>`,
+    starterCode: `<table border="1">
+  <!-- caption -->
+  <!-- صف عناوين: 3 خلايا th -->
+  <!-- صفان للبيانات: كل صف 3 خلايا td -->
+</table>`,
+    solutionCode: `<table border="1">
+  <caption>أسعار الكورسات</caption>
+  <tr>
+    <th>الكورس</th>
+    <th>المدة</th>
+    <th>السعر</th>
+  </tr>
+  <tr>
+    <td>HTML</td>
+    <td>20 ساعة</td>
+    <td>مجاني</td>
+  </tr>
+  <tr>
+    <td>CSS</td>
+    <td>25 ساعة</td>
+    <td>مجاني</td>
+  </tr>
+</table>`,
+    challengePrompt: 'تحدي الدرس: ابنِ جدولاً يحتوي caption، وصفاً واحداً على الأقل من خلايا th بثلاث خلايا، وصفين على الأقل من خلايا td بنفس عدد الأعمدة.',
+    validate: function (doc) {
+      const t = doc.querySelector('table');
+      if (!t) return { passed: false, msgAr: 'أضف وسم table.', msgEn: 'Add a table.' };
+      const cap = t.querySelector('caption');
+      if (!cap || !cap.textContent.trim()) return { passed: false, msgAr: 'أضف caption بنص داخل الجدول.', msgEn: 'Add a caption with text.' };
+      if (t.querySelectorAll('th').length < 3) return { passed: false, msgAr: 'أضف ثلاث خلايا عناوين th على الأقل.', msgEn: 'Add at least three th cells.' };
+      const dataRows = Array.from(t.querySelectorAll('tr')).filter(function (r) { return r.querySelector('td'); });
+      if (dataRows.length < 2) return { passed: false, msgAr: 'أضف صفين على الأقل من خلايا td.', msgEn: 'Add at least two data rows.' };
+      const cols = dataRows[0].children.length;
+      if (cols < 3 || dataRows.some(function (r) { return r.children.length !== cols; })) return { passed: false, msgAr: 'اجعل كل صفوف البيانات بنفس عدد الخلايا (3 على الأقل).', msgEn: 'Rows must have equal cell counts.' };
+      return { passed: true, msgAr: 'ممتاز! جدول سليم ومنظم.', msgEn: 'Basic table verified!' };
+    }
+  },
+  {
+    id: 'html-12',
+    num: '12',
+    title: 'الجداول المتقدمة (thead, tbody, tfoot, colspan, rowspan, colgroup, scope)',
+    duration: '22 min',
+    eyebrow: 'HTML 12 · هيكلة الجداول الاحترافية',
+    lead: 'تقسيم الجدول إلى رأس وجسم وتذييل ودمج الخلايا يجعل الجدول أوضح للمستخدم وللآلة.',
+    goal: 'استخدام thead و tbody و tfoot، ودمج الخلايا بـ colspan و rowspan، وتنسيق أعمدة كاملة بـ colgroup و col، وربط العناوين بـ scope.',
+    sectionTitle: 'هيكلة الجدول ودمج الخلايا',
+    explanation: [
+      '• &lt;thead&gt; : مجموعة صفوف العناوين. • &lt;tbody&gt; : صفوف البيانات الأساسية. • &lt;tfoot&gt; : صفوف الملخص أو المجاميع. استخدمها لتتمكن من تنسيق كل جزء على حدة وتكرارها عند طباعة جدول طويل.',
+      '⚖️ هل tbody ضروري؟ المتصفح يضيفه تلقائياً، لكن كتابته صريحة أفضل خاصة عند وجود thead و tfoot.',
+      '🔹 colspan="2" : تمتد الخلية عبر عمودين أو أكثر. و rowspan="2" : تمتد عبر صفين أو أكثر. وعند الدمج عليك حذف الخلايا المغطاة من الصفوف الأخرى.',
+      '🔹 &lt;colgroup&gt; و &lt;col&gt; : تجمع الأعمدة لتنسق عموداً كاملاً مرة واحدة (مثل لون خلفية أو عرض) بدلاً من تكرار التنسيق في كل خلية. و col وسم ذاتي الإغلاق، و span لتغطية عدة أعمدة بوسم واحد.',
+      '🔹 scope على th : "col" يعني أن الخلية عنوان للعمود، و "row" يعني عنوان للصف. وهي ضرورية لقارئات الشاشة.',
+      '🔹 headers على td : للجداول المعقدة جداً، تربط الخلية بـ id لعدة خلايا th.',
+      '⚖️ thead مقابل صف th عادي: الاثنان يعطيان نفس الشكل غالباً، لكن thead يخبر المتصفح والآلات بأن هذا العنوان وليس بيانات.',
+      '⚖️ tfoot يُكتب منطقياً في الأسفل في HTML الحديث، ويظهر في الأسفل بالمتصفح.',
+      '💡 للجداول الواسعة في الموبايل ضعها داخل div بخاصية overflow-x: auto في CSS.'
+    ].join('<br>'),
+    exampleCode: `<table border="1">
+  <caption>مبيعات الربع الأول</caption>
+  <colgroup>
+    <col>
+    <col span="2" style="background: #eef">
+  </colgroup>
+  <thead>
+    <tr>
+      <th scope="col">المنتج</th>
+      <th scope="col">يناير</th>
+      <th scope="col">فبراير</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">كتاب</th>
+      <td>100</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <td colspan="3">عرض خاص على كل المنتجات</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <th scope="row">الإجمالي</th>
+      <td colspan="2">220</td>
+    </tr>
+  </tfoot>
+</table>`,
+    starterCode: `<table border="1">
+  <thead>
+    <!-- صف عناوين بخاصية scope -->
+  </thead>
+  <tbody>
+    <!-- صفوف بيانات مع خلية colspan وخلية rowspan -->
+  </tbody>
+  <tfoot>
+    <!-- صف مجموع -->
+  </tfoot>
+</table>`,
+    solutionCode: `<table border="1">
+  <thead>
+    <tr>
+      <th scope="col">اليوم</th>
+      <th scope="col">المحاضرة</th>
+      <th scope="col">القاعة</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row" rowspan="2">السبت</th>
+      <td>HTML</td>
+      <td>A1</td>
+    </tr>
+    <tr>
+      <td>CSS</td>
+      <td>A2</td>
+    </tr>
+    <tr>
+      <td colspan="3">الأحد إجازة</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3">إجمالي المحاضرات: 2</td>
+    </tr>
+  </tfoot>
+</table>`,
+    challengePrompt: 'تحدي الدرس: ابنِ جدولاً فيه thead و tbody و tfoot، وعلى الأقل خلية واحدة بـ colspan وأخرى بـ rowspan، ووسم th بخاصية scope.',
+    validate: function (doc) {
+      const t = doc.querySelector('table');
+      if (!t) return { passed: false, msgAr: 'أضف جدولاً.', msgEn: 'Add a table.' };
+      if (!t.querySelector('thead tr')) return { passed: false, msgAr: 'أضف thead يحتوي صفاً.', msgEn: 'Add thead with a row.' };
+      if (!t.querySelector('tbody tr')) return { passed: false, msgAr: 'أضف tbody يحتوي صفاً.', msgEn: 'Add tbody with a row.' };
+      if (!t.querySelector('tfoot tr')) return { passed: false, msgAr: 'أضف tfoot يحتوي صفاً.', msgEn: 'Add tfoot with a row.' };
+      if (!t.querySelector('[colspan]')) return { passed: false, msgAr: 'استخدم colspan في خلية.', msgEn: 'Use colspan.' };
+      if (!t.querySelector('[rowspan]')) return { passed: false, msgAr: 'استخدم rowspan في خلية.', msgEn: 'Use rowspan.' };
+      if (!t.querySelector('th[scope]')) return { passed: false, msgAr: 'أضف th بخاصية scope.', msgEn: 'Add th with scope.' };
+      return { passed: true, msgAr: 'ممتاز! جدول احترافي ومنظم.', msgEn: 'Advanced table verified!' };
+    }
+  },
+  {
+    id: 'html-13',
+    num: '13',
+    title: 'عناصر الكتلة والعناصر السطرية (div, span, block, inline)',
+    duration: '20 min',
+    eyebrow: 'HTML 13 · سلوك العناصر في الصفحة',
+    lead: 'قبل أن تتعلم CSS يجب أن تفهم أن كل عنصر ينتمي لنوع يحدد طريقة وقوفه في الصفحة.',
+    goal: 'التفرقة بين Block و Inline و Inline-Block، ومعرفة متى نستخدم div و span، وتجنب فوضى الـ div.',
+    sectionTitle: 'كيف يقف كل عنصر في الصفحة',
+    explanation: [
+      '🧱 عناصر الكتلة (Block): تبدأ في سطر جديد وتمتد بعرض الحاوية كاملاً، ويمكن ضبط عرضها وارتفاعها. أمثلة: div, p, h1-h6, ul, ol, li, table, form, header, footer, section, article, nav, main, aside, blockquote, pre, hr, figure.',
+      '📏 العناصر السطرية (Inline): تقف داخل السطر بجانب النص، وتأخذ عرض محتواها فقط، ولا تتأثر بـ width و height. أمثلة: span, a, strong, em, b, i, code, img (سطري بطبيعته)، button وinput (Inline-Block).',
+      '⚖️ Inline-Block : تقف داخل السطر مثل Inline، لكنها تقبل ضبط العرض والارتفاع مثل Block (مثل img و button و input).',
+      '🔹 &lt;div&gt; : حاوية كتلة عامة بلا أي معنى، تُستخدم لتجميع العناصر وتنسيقها وتخطيط الصفحة.',
+      '🔹 &lt;span&gt; : حاوية سطرية عامة بلا معنى، تُستخدم لتنسيق جزء صغير من النص.',
+      '⚖️ div مقابل p: كلاهما كتلة وقد يعطيان نفس الشكل، لكن p يعني فقرة نصية بينما div بلا معنى. لا تضع نصاً عادياً في div إن كان فقرة.',
+      '⚖️ span مقابل strong: قد يبدوان متطابقين بعد CSS (font-weight)، لكن strong له معنى (أهمية)، و span بلا معنى. اختر span فقط عندما لا يوجد وسم دلالي مناسب.',
+      '⚖️ div مقابل section/article: إن كان لمجموعتك موضوع وعنوان فاستخدم section أو article (الدرس 14)، وإلا فاستخدم div للتنسيق فقط.',
+      '⚠️ لا يجوز وضع عنصر Block داخل p لأن المتصفح يغلق الفقرة تلقائياً، ولا وضع a كتلة داخل a أخرى.',
+      '⚠️ فوضى div (Div Soup) : سلسلة div متداخلة بلا معنى تضر بالـ SEO وإمكانية الوصول. استخدم الوسوم الدلالية كلما أمكن.',
+      '🔹 الخاصية class لإعطاء اسم يُستخدم في CSS لعدة عناصر، و id لعنصر فريد (الدرس 19).'
+    ].join('<br>'),
+    exampleCode: `<div class="card">
+  <h3>عنوان البطاقة</h3>
+  <p>هذه فقرة داخل <span class="highlight">البطاقة</span> وبها كلمة مميزة.</p>
+</div>
+
+<!-- block: كل واحد في سطر -->
+<div>الأول</div>
+<div>الثاني</div>
+
+<!-- inline: بجانب بعض -->
+<span>الأول</span>
+<span>الثاني</span>
+
+<!-- نفس التأثير البصري بمعنى مختلف -->
+<span style="font-weight: bold">عريض بلا معنى</span>
+<strong>عريض بمعنى الأهمية</strong>`,
+    starterCode: `<!-- 1) div بكلاس container -->
+<!-- 2) داخلها p -->
+<!-- 3) داخل p ضع span بكلاس أو style -->
+<!-- 4) أضف div ثانية ليظهر الفرق بين block و inline -->`,
+    solutionCode: `<div class="container">
+  <p>نص عادي مع <span class="highlight" style="color: crimson">كلمة ملونة</span> داخل الفقرة.</p>
+</div>
+<div class="footer-box">
+  <span>عنصر 1</span>
+  <span>عنصر 2</span>
+</div>`,
+    challengePrompt: 'تحدي الدرس: أنشئ div بخاصية class تحتوي فقرة p، وداخل الفقرة span بخاصية class أو style، ثم div ثانية تحتوي عنصري span.',
+    validate: function (doc) {
+      const d = doc.querySelector('div[class]');
+      if (!d) return { passed: false, msgAr: 'أضف div بخاصية class.', msgEn: 'Add a div with class.' };
+      if (!d.querySelector('p')) return { passed: false, msgAr: 'ضع فقرة p داخل div.', msgEn: 'Put a p inside the div.' };
+      if (!d.querySelector('p span[class], p span[style]')) return { passed: false, msgAr: 'ضع span بخاصية class أو style داخل الفقرة.', msgEn: 'Add a styled span inside the p.' };
+      const second = Array.from(doc.querySelectorAll('div')).find(function (x) { return x !== d && x.querySelectorAll('span').length >= 2; });
+      if (!second) return { passed: false, msgAr: 'أضف div ثانية تحتوي عنصري span على الأقل.', msgEn: 'Add a second div with two spans.' };
+      return { passed: true, msgAr: 'ممتاز! فهمت الفرق بين Block و Inline.', msgEn: 'Block and inline verified!' };
+    }
+  },
+  {
+    id: 'html-14',
+    num: '14',
+    title: 'وسوم هيكل الصفحة الدلالية (header, nav, main, section, article, aside, footer)',
+    duration: '25 min',
+    eyebrow: 'HTML 14 · العمارة الدلالية للصفحة',
+    lead: 'بدلاً من عشرات div بلا معنى، تقدم HTML5 وسوماً تصف دور كل جزء في الصفحة.',
+    goal: 'بناء صفحة بأقسامها الدلالية الصحيحة، والتفرقة بين section و article و div و aside.',
+    sectionTitle: 'متى نستخدم كل وسم هيكلي؟',
+    explanation: [
+      '• &lt;header&gt; : رأس الصفحة أو رأس قسم (شعار، عنوان، تنقل). ويمكن أن توجد عدة header داخل الصفحة، لكل مقال أو قسم واحد.',
+      '• &lt;nav&gt; : الروابط الرئيسية للتنقل فقط، وليس كل مجموعة روابط. الأفضل أن يحتوي ul.',
+      '• &lt;main&gt; : المحتوى الأساسي الفريد للصفحة. عنصر واحد فقط في الصفحة، ولا يوضع داخل header أو footer أو article.',
+      '• &lt;section&gt; : قسم موضوعي من الصفحة، ويفضل أن يكون له عنوان h2 إلى h6.',
+      '• &lt;article&gt; : محتوى مستقل يصلح للنشر بمفرده لو أُخذ خارج الصفحة (مقال، تدوينة، تعليق، بطاقة منتج).',
+      '• &lt;aside&gt; : محتوى جانبي مرتبط بمحيطه (شريط جانبي، إعلان، معلومة إضافية).',
+      '• &lt;footer&gt; : تذييل الصفحة أو القسم (حقوق النشر، روابط، تواصل).',
+      '⚖️ section مقابل article: لو كان المحتوى مفهوماً بمفرده خارج الصفحة فهو article، وإن كان جزءاً من تتمة موضوع الصفحة فهو section.',
+      '⚖️ section مقابل div: section له معنى وعنوان، و div للتنسيق فقط. إن لم تجد عنواناً للقسم فاستخدم div.',
+      '⚖️ aside مقابل section: aside غير أساسي لو حذفته لم يتضرر المعنى الرئيسي، أما section فمن صلب المحتوى.',
+      '⚖️ header مقابل head: head في أعلى المستند ولا يظهر، و header يظهر للمستخدم داخل body.',
+      '🔹 يمكن تداخلها: article داخله header و section و footer خاصة به.',
+      '🔹 &lt;search&gt; : وسم حديث يغلف منطقة البحث والتصفية في الصفحة.',
+      '💡 الأقسام الدلالية تحسّن الـ SEO وتتيح لمستخدمي قارئات الشاشة القفز بين المناطق.'
+    ].join('<br>'),
+    exampleCode: `<header>
+  <h1>مدونة التقنية</h1>
+  <nav>
+    <ul>
+      <li><a href="#home">الرئيسية</a></li>
+      <li><a href="#blog">المقالات</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h2>ما هي HTML؟</h2>
+    <p>لغة وسوم لبناء الصفحات.</p>
+    <footer>الكاتب: أحمد</footer>
+  </article>
+
+  <section>
+    <h2>مقالات ذات صلة</h2>
+    <p>قائمة المقالات...</p>
+  </section>
+
+  <aside>
+    <h3>إعلان</h3>
+    <p>اشترك في النشرة البريدية</p>
+  </aside>
+</main>
+
+<footer>
+  <p>جميع الحقوق محفوظة 2026</p>
+</footer>`,
+    starterCode: `<!-- header يحتوي h1 و nav فيه ul بروابط -->
+
+<!-- main (واحد فقط) يحتوي article و aside -->
+
+<!-- footer -->`,
+    solutionCode: `<header>
+  <h1>موقعي</h1>
+  <nav>
+    <ul>
+      <li><a href="#home">الرئيسية</a></li>
+      <li><a href="#about">من أنا</a></li>
+    </ul>
+  </nav>
+</header>
+<main>
+  <article>
+    <h2>مقال تجريبي</h2>
+    <p>محتوى المقال.</p>
+  </article>
+  <section>
+    <h2>قسم إضافي</h2>
+    <p>تفاصيل.</p>
+  </section>
+  <aside>
+    <p>معلومة جانبية</p>
+  </aside>
+</main>
+<footer>
+  <p>جميع الحقوق محفوظة</p>
+</footer>`,
+    challengePrompt: 'تحدي الدرس: ابنِ صفحة تحتوي header فيه h1 وnav فيه رابطان على الأقل، وعنصر main واحد فقط يحتوي article بداخله h2، وعنصر aside، وعنصر footer.',
+    validate: function (doc) {
+      const header = doc.querySelector('header');
+      if (!header || !header.querySelector('h1')) return { passed: false, msgAr: 'أضف header يحتوي h1.', msgEn: 'Add header with h1.' };
+      const nav = doc.querySelector('nav');
+      if (!nav || nav.querySelectorAll('a').length < 2) return { passed: false, msgAr: 'أضف nav يحتوي رابطين a على الأقل.', msgEn: 'Add nav with two links.' };
+      if (doc.querySelectorAll('main').length !== 1) return { passed: false, msgAr: 'يجب أن يوجد عنصر main واحد فقط.', msgEn: 'Exactly one main is required.' };
+      const art = doc.querySelector('main article');
+      if (!art || !art.querySelector('h2')) return { passed: false, msgAr: 'أضف داخل main عنصر article يحتوي h2.', msgEn: 'Add article with h2 inside main.' };
+      if (!doc.querySelector('aside')) return { passed: false, msgAr: 'أضف عنصر aside.', msgEn: 'Add aside.' };
+      if (!doc.querySelector('footer')) return { passed: false, msgAr: 'أضف عنصر footer.', msgEn: 'Add footer.' };
+      return { passed: true, msgAr: 'ممتاز! هيكل دلالي كامل يفهمه المتصفح وجوجل.', msgEn: 'Semantic layout verified!' };
+    }
+  },
+  {
+    id: 'html-15',
+    num: '15',
+    title: 'النماذج الجزء الأول (form, label, input وأنواعه النصية)',
+    duration: '25 min',
+    eyebrow: 'HTML 15 · جمع بيانات المستخدم',
+    lead: 'النموذج هو الجسر بين المستخدم والخادم: تسجيل الدخول، البحث، الاشتراك، الدفع، كلها نماذج.',
+    goal: 'فهم form و label و input، والتفرقة بين id و name، و GET و POST، واستخدام أنواع input النصية.',
+    sectionTitle: 'أساسيات بناء النموذج',
+    explanation: [
+      '🔹 &lt;form action="الرابط" method="get|post"&gt; : يحيط بحقول الإدخال. action هو الخادم الذي ستُرسل إليه البيانات، و method هو أسلوب الإرسال.',
+      '⚖️ GET مقابل POST: GET يضع البيانات في الرابط (مناسب للبحث، ويمكن حفظ الرابط ومشاركته)، و POST يخفيها داخل الطلب (مناسب لكلمات المرور والبيانات الكبيرة أو التي تغير شيئاً في الخادم).',
+      '🔹 &lt;label for="id"&gt; : نص يوضح الحقل، والضغط عليه ينقل التركيز للحقل ويفيد قارئ الشاشة. اربطه إما بـ for مطابق لـ id الحقل أو بوضع الحقل داخل label.',
+      '🔹 &lt;input&gt; : وسم ذاتي الإغلاق، وسلوكه كله يتحدد بالخاصية type.',
+      '📍 الأنواع النصية: text (نص عادي)، password (يخفي الأحرف)، email (يتحقق من صيغة البريد ويظهر لوحة مفاتيح مناسبة للموبايل)، tel (لوحة أرقام الهاتف)، url (رابط)، number (أرقام مع أسهم)، search (حقل بحث).',
+      '⚖️ id مقابل name: id لتعريف العنصر لـ label و CSS و JavaScript ويجب أن يكون فريداً. و name هو اسم الحقل الذي يصل به إلى الخادم؛ بدون name لن تُرسل قيمة الحقل أبداً.',
+      '⚖️ placeholder مقابل label: placeholder تلميح يختفي بالكتابة، فلا يغني عن label أبداً.',
+      '⚖️ value مقابل placeholder: value قيمة فعلية تُرسل، و placeholder للتلميح فقط.',
+      '🔹 خصائص مفيدة: required (إلزامي)، autofocus (تركيز تلقائي)، autocomplete="off|on|email|username|new-password"، maxlength و minlength.',
+      '🔹 &lt;button type="submit"&gt; : لإرسال النموذج. والنوع الافتراضي لـ button داخل form هو submit.',
+      '⚖️ input type="submit" مقابل button: نفس النتيجة، لكن button يقبل وسوماً بداخله (أيقونة مثلاً) و input لا يقبل. استخدم button.'
+    ].join('<br>'),
+    exampleCode: `<form action="/register" method="post">
+  <label for="username">اسم المستخدم</label>
+  <input type="text" id="username" name="username" placeholder="مثال: ahmed123" required>
+
+  <label for="email">البريد الإلكتروني</label>
+  <input type="email" id="email" name="email" required>
+
+  <label for="pass">كلمة المرور</label>
+  <input type="password" id="pass" name="password" minlength="8" required>
+
+  <label for="age">العمر</label>
+  <input type="number" id="age" name="age" min="10" max="100">
+
+  <button type="submit">إنشاء حساب</button>
+</form>`,
+    starterCode: `<!-- form بـ action و method -->
+  <!-- label + input نصي (name و id) -->
+  <!-- label + input بريد -->
+  <!-- label + input كلمة مرور -->
+  <!-- زر إرسال -->
+<!-- نهاية form -->`,
+    solutionCode: `<form action="/login" method="post">
+  <label for="u">اسم المستخدم</label>
+  <input type="text" id="u" name="username" placeholder="اسمك" required>
+
+  <label for="e">البريد الإلكتروني</label>
+  <input type="email" id="e" name="email">
+
+  <label for="p">كلمة المرور</label>
+  <input type="password" id="p" name="password" required>
+
+  <button type="submit">دخول</button>
+</form>`,
+    challengePrompt: 'تحدي الدرس: أنشئ form بالخاصيتين action و method، وبداخلها ثلاثة حقول (text و email و password) كل منها له name و id وlabel مرتبط به بـ for، وزر type="submit".',
+    validate: function (doc) {
+      const f = doc.querySelector('form[action][method]');
+      if (!f) return { passed: false, msgAr: 'أضف form بخاصيتي action و method.', msgEn: 'Add form with action and method.' };
+      const types = ['text', 'email', 'password'];
+      for (let i = 0; i < types.length; i++) {
+        const inp = f.querySelector('input[type="' + types[i] + '"][name][id]');
+        if (!inp) return { passed: false, msgAr: 'أضف حقل ' + types[i] + ' له name و id.', msgEn: 'Add ' + types[i] + ' input with name and id.' };
+        if (!f.querySelector('label[for="' + inp.id + '"]')) return { passed: false, msgAr: 'اربط حقل ' + types[i] + ' بـ label بخاصية for تطابق id.', msgEn: 'Link a label to the ' + types[i] + ' input.' };
+      }
+      if (!f.querySelector('button[type="submit"]')) return { passed: false, msgAr: 'أضف زر button بـ type="submit".', msgEn: 'Add a submit button.' };
+      return { passed: true, msgAr: 'ممتاز! نموذج سليم ومرتبط وجاهز للإرسال.', msgEn: 'Form basics verified!' };
+    }
+  },
+  {
+    id: 'html-16',
+    num: '16',
+    title: 'النماذج الجزء الثاني (checkbox, radio, range, date, file, fieldset, progress, meter)',
+    duration: '25 min',
+    eyebrow: 'HTML 16 · أنواع الإدخال المتقدمة',
+    lead: 'ليس كل إدخال نصاً؛ HTML تقدم أدوات جاهزة للاختيارات والتواريخ والملفات والألوان وشرائط التقدم.',
+    goal: 'اختيار نوع input المناسب لكل حالة، وتجميع الحقول بـ fieldset، والتفرقة بين progress و meter.',
+    sectionTitle: 'أنواع input الأخرى وعناصر النماذج المساعدة',
+    explanation: [
+      '☑️ checkbox : اختيار متعدد (يمكن تفعيل أكثر من خيار). وخاصية checked لتفعيله افتراضياً.',
+      '🔘 radio : اختيار واحد فقط من مجموعة. تنتمي الأزرار لنفس المجموعة إذا كان لها نفس قيمة name، وتختلف value لكل زر.',
+      '⚖️ checkbox مقابل radio: لو أردت اختياراً واحداً من عدة خيارات (النوع) فاستخدم radio، ولو أردت اختيار أكثر من واحد (الاهتمامات) فاستخدم checkbox.',
+      '🎚️ range : شريط تمرير مع min و max و step. و number : حقل رقم يكتب فيه المستخدم. اختر range عندما تكون القيمة التقريبية كافية (مثل مستوى الصوت).',
+      '🎨 color : منتقي ألوان. 📅 date و time و datetime-local و month و week : منتقيات تاريخ ووقت حسب النوع.',
+      '📎 file : رفع ملفات، وخصائص accept="image/*" لتحديد أنواع الملفات، و multiple لعدة ملفات (ويلزم في النموذج enctype="multipart/form-data" مع POST).',
+      '🕶️ hidden : حقل مخفي يرسل قيمة بدون إظهارها (مثل رقم المنتج). ولا يُعتمد عليه للأسرار لأن المستخدم يستطيع رؤيته.',
+      '🔹 input type="reset" و type="button" و type="submit" و type="image" : أزرار؛ والأفضل استخدام وسم button بدلاً منها.',
+      '📋 &lt;datalist&gt; : قائمة اقتراحات تُربط بحقل نصي عبر list="id"، ويكتب المستخدم قيمة حرة أو يختار من الاقتراحات.',
+      '🗂️ &lt;fieldset&gt; و &lt;legend&gt; : تجمع الحقول المتعلقة في إطار بعنوان، وتخدم قارئ الشاشة خاصة لمجموعات radio.',
+      '⚖️ &lt;progress&gt; مقابل &lt;meter&gt;: progress يعرض تقدم مهمة (تحميل، خطوة 3 من 5) من الصفر للنهاية. و meter يعرض قياساً ضمن مدى معروف (مساحة التخزين المستخدمة، درجة اختبار) ويقبل low و high و optimum وتتغير ألوانه بحسبها.',
+      '🔹 &lt;output for="..."&gt; : يعرض ناتج عملية حسابية أو قيمة من حقل آخر.'
+    ].join('<br>'),
+    exampleCode: `<form>
+  <fieldset>
+    <legend>اختر الجنس</legend>
+    <label><input type="radio" name="gender" value="m"> ذكر</label>
+    <label><input type="radio" name="gender" value="f"> أنثى</label>
+  </fieldset>
+
+  <fieldset>
+    <legend>اهتماماتك</legend>
+    <label><input type="checkbox" name="int" value="html" checked> HTML</label>
+    <label><input type="checkbox" name="int" value="css"> CSS</label>
+  </fieldset>
+
+  <label for="vol">مستوى الصوت</label>
+  <input type="range" id="vol" name="vol" min="0" max="100" step="5" value="50">
+
+  <label for="bd">تاريخ الميلاد</label>
+  <input type="date" id="bd" name="bd">
+
+  <label for="cv">ارفع سيرتك الذاتية</label>
+  <input type="file" id="cv" name="cv" accept=".pdf">
+
+  <label for="city">المدينة</label>
+  <input list="cities" id="city" name="city">
+  <datalist id="cities">
+    <option value="القاهرة">
+    <option value="الإسكندرية">
+  </datalist>
+
+  <progress value="70" max="100">70%</progress>
+  <meter value="0.3" min="0" max="1" low="0.4" high="0.8">30%</meter>
+</form>`,
+    starterCode: `<form>
+  <!-- fieldset + legend + radio بنفس name -->
+  <!-- checkbox -->
+  <!-- range بـ min و max -->
+  <!-- date -->
+  <!-- progress و meter -->
+</form>`,
+    solutionCode: `<form>
+  <fieldset>
+    <legend>اختر مستواك</legend>
+    <label><input type="radio" name="level" value="beginner"> مبتدئ</label>
+    <label><input type="radio" name="level" value="pro"> محترف</label>
+  </fieldset>
+
+  <label><input type="checkbox" name="terms" value="yes"> أوافق على الشروط</label>
+
+  <label for="vol">الصوت</label>
+  <input type="range" id="vol" name="vol" min="0" max="10">
+
+  <label for="d">التاريخ</label>
+  <input type="date" id="d" name="d">
+
+  <progress value="40" max="100">40%</progress>
+  <meter value="0.6" min="0" max="1">60%</meter>
+</form>`,
+    challengePrompt: 'تحدي الدرس: أنشئ fieldset بـ legend تحتوي زري radio على الأقل بنفس الـ name، وcheckbox، وrange بـ min و max، وinput من نوع date، وprogress بـ value و max، وmeter بـ value.',
+    validate: function (doc) {
+      const fs = doc.querySelector('fieldset');
+      if (!fs || !fs.querySelector('legend')) return { passed: false, msgAr: 'أضف fieldset تحتوي legend.', msgEn: 'Add fieldset with legend.' };
+      const radios = Array.from(doc.querySelectorAll('input[type="radio"][name]'));
+      const sameName = radios.some(function (r) { return radios.filter(function (x) { return x.name === r.name; }).length >= 2; });
+      if (!sameName) return { passed: false, msgAr: 'أضف زري radio على الأقل بنفس قيمة name.', msgEn: 'Add two radios with the same name.' };
+      if (!doc.querySelector('input[type="checkbox"]')) return { passed: false, msgAr: 'أضف checkbox.', msgEn: 'Add a checkbox.' };
+      if (!doc.querySelector('input[type="range"][min][max]')) return { passed: false, msgAr: 'أضف range بـ min و max.', msgEn: 'Add range with min and max.' };
+      if (!doc.querySelector('input[type="date"]')) return { passed: false, msgAr: 'أضف input من نوع date.', msgEn: 'Add a date input.' };
+      if (!doc.querySelector('progress[value][max]')) return { passed: false, msgAr: 'أضف progress بـ value و max.', msgEn: 'Add progress with value and max.' };
+      if (!doc.querySelector('meter[value]')) return { passed: false, msgAr: 'أضف meter بـ value.', msgEn: 'Add meter with value.' };
+      return { passed: true, msgAr: 'ممتاز! استخدمت الأداة المناسبة لكل نوع بيانات.', msgEn: 'Advanced inputs verified!' };
+    }
+  },
+  {
+    id: 'html-17',
+    num: '17',
+    title: 'النماذج الجزء الثالث (select, textarea, button, والتحقق من المدخلات)',
+    duration: '25 min',
+    eyebrow: 'HTML 17 · القوائم المنسدلة والتحقق',
+    lead: 'نكمل النماذج بالقوائم المنسدلة والنصوص الطويلة وأزرار التحكم، وبقواعد تمنع إرسال بيانات خاطئة.',
+    goal: 'استخدام select و textarea و button، وتطبيق خصائص التحقق required و pattern و min و max، والتفرقة بين disabled و readonly.',
+    sectionTitle: 'القوائم والنصوص الطويلة والتحقق التلقائي',
+    explanation: [
+      '🔹 &lt;select&gt; : قائمة منسدلة، وبداخلها &lt;option value="..."&gt; لكل خيار. الخاصية selected على option تحدد الخيار الافتراضي، و multiple على select تسمح بتحديد أكثر من خيار.',
+      '🔹 &lt;optgroup label="..."&gt; : يجمع عدة option تحت عنوان.',
+      '⚖️ select مقابل radio: select يوفر مساحة عندما تكون الخيارات كثيرة (دول، مدن)، و radio أفضل عندما تكون الخيارات 2 إلى 4 لأنها ظاهرة كلها.',
+      '🔹 &lt;textarea rows="4" cols="30" maxlength="200"&gt; : حقل نص متعدد الأسطر، ويكتب النص الافتراضي بين وسمي الفتح والإغلاق (وليس في value).',
+      '⚖️ input type="text" مقابل textarea: الأول سطر واحد، والثاني لعدة أسطر (رسالة أو وصف).',
+      '🔹 &lt;button&gt; ثلاثة أنواع: type="submit" يرسل النموذج، و type="reset" يعيد القيم الابتدائية، و type="button" بلا سلوك افتراضي ويُستخدم مع JavaScript. نوصي بتحديد type دائماً.',
+      '✅ التحقق التلقائي (Validation) بالمتصفح بلا JavaScript:',
+      '• required : الحقل إلزامي. • minlength و maxlength : حدود طول النص. • min و max : حدود الأرقام والتواريخ. • pattern="[0-9]{11}" : تعبير نمطي يجب أن تتطابق القيمة معه، ويفضل إضافة title لتوضيح الصيغة.',
+      '• type="email" و "url" : يتحققان من الصيغة تلقائياً. • novalidate على form : يعطل التحقق.',
+      '⚖️ disabled مقابل readonly: disabled يعطل الحقل بالكامل ويظهر باهتاً ولا تُرسل قيمته، و readonly يمنع التعديل فقط ويرسل القيمة، ويمكن التركيز عليه.',
+      '🔹 form على العنصر : تخصص عناصر خارج النموذج للارتباط به عبر form="id".',
+      '⚠️ لا تعتمد على التحقق من جهة المتصفح فقط؛ يجب التحقق في الخادم أيضاً لأنه يمكن تجاوزه.'
+    ].join('<br>'),
+    exampleCode: `<form action="/send" method="post">
+  <label for="country">الدولة</label>
+  <select id="country" name="country" required>
+    <option value="">اختر...</option>
+    <optgroup label="الشرق الأوسط">
+      <option value="eg" selected>مصر</option>
+      <option value="sa">السعودية</option>
+    </optgroup>
+  </select>
+
+  <label for="phone">رقم الهاتف</label>
+  <input type="text" id="phone" name="phone" pattern="[0-9]{11}" title="أدخل 11 رقماً" required>
+
+  <label for="code">كود ثابت</label>
+  <input type="text" id="code" name="code" value="A-100" readonly>
+
+  <input type="text" name="locked" value="لا يمكن تعديلي" disabled>
+
+  <label for="msg">رسالتك</label>
+  <textarea id="msg" name="msg" rows="4" maxlength="200" required></textarea>
+
+  <button type="submit">إرسال</button>
+  <button type="reset">مسح</button>
+</form>`,
+    starterCode: `<form action="/send" method="post">
+  <!-- select مع optgroup وثلاثة option -->
+  <!-- input بـ required و pattern -->
+  <!-- input بـ readonly وآخر بـ disabled -->
+  <!-- textarea بـ rows و maxlength -->
+  <!-- زر submit وزر reset -->
+</form>`,
+    solutionCode: `<form action="/send" method="post">
+  <label for="c">المدينة</label>
+  <select id="c" name="city">
+    <optgroup label="مصر">
+      <option value="cairo">القاهرة</option>
+      <option value="alex">الإسكندرية</option>
+      <option value="giza">الجيزة</option>
+    </optgroup>
+  </select>
+
+  <input type="text" name="phone" pattern="[0-9]{11}" title="11 رقماً" required>
+  <input type="text" name="code" value="X1" readonly>
+  <input type="text" name="locked" value="مغلق" disabled>
+
+  <textarea name="msg" rows="4" maxlength="150"></textarea>
+
+  <button type="submit">إرسال</button>
+  <button type="reset">مسح</button>
+</form>`,
+    challengePrompt: 'تحدي الدرس: أنشئ select يحتوي optgroup وثلاثة option على الأقل، وinput بـ required و pattern، وinput بـ readonly، وinput بـ disabled، وtextarea بـ rows و maxlength، وزرين من نوع submit و reset.',
+    validate: function (doc) {
+      const sel = doc.querySelector('select');
+      if (!sel || !sel.querySelector('optgroup') || sel.querySelectorAll('option').length < 3) return { passed: false, msgAr: 'أضف select فيه optgroup وثلاثة option على الأقل.', msgEn: 'Add select with optgroup and three options.' };
+      if (!doc.querySelector('input[required][pattern]')) return { passed: false, msgAr: 'أضف input بالخاصيتين required و pattern.', msgEn: 'Add input with required and pattern.' };
+      if (!doc.querySelector('input[readonly]')) return { passed: false, msgAr: 'أضف input بخاصية readonly.', msgEn: 'Add a readonly input.' };
+      if (!doc.querySelector('input[disabled]')) return { passed: false, msgAr: 'أضف input بخاصية disabled.', msgEn: 'Add a disabled input.' };
+      if (!doc.querySelector('textarea[rows][maxlength]')) return { passed: false, msgAr: 'أضف textarea بـ rows و maxlength.', msgEn: 'Add textarea with rows and maxlength.' };
+      if (!doc.querySelector('button[type="submit"]') || !doc.querySelector('button[type="reset"]')) return { passed: false, msgAr: 'أضف زري button من نوع submit و reset.', msgEn: 'Add submit and reset buttons.' };
+      return { passed: true, msgAr: 'ممتاز! نموذج كامل بتحقق ذكي.', msgEn: 'Form controls and validation verified!' };
+    }
+  },
+  {
+    id: 'html-18',
+    num: '18',
+    title: 'الوسائط والمحتوى المضمّن (audio, video, source, track, iframe, embed, object, canvas, svg)',
+    duration: '25 min',
+    eyebrow: 'HTML 18 · الصوت والفيديو والمحتوى الخارجي',
+    lead: 'يمكن لـ HTML تشغيل الصوت والفيديو وتضمين مواقع أخرى ورسم الأشكال بدون أي إضافات.',
+    goal: 'تشغيل الوسائط بخصائصها، وتوفير صيغ بديلة وترجمات، وتضمين صفحات خارجية بأمان، والتفرقة بين canvas و svg.',
+    sectionTitle: 'تشغيل وتضمين المحتوى',
+    explanation: [
+      '🎬 &lt;video src="..." controls&gt; : يشغل الفيديو. الخصائص: controls (أزرار التحكم)، poster (صورة قبل التشغيل)، autoplay (تشغيل تلقائي، ولا يعمل غالباً إلا مع muted)، loop (تكرار)، muted (صامت)، preload="none|metadata|auto"، width و height.',
+      '🎵 &lt;audio controls&gt; : نفس الفكرة للصوت بدون صورة.',
+      '🔹 &lt;source src="..." type="video/mp4"&gt; : يضيف أكثر من صيغة (mp4 و webm مثلاً) داخل video أو audio، فيختار المتصفح أول صيغة يدعمها. وعند عدم دعم أي صيغة يظهر النص المكتوب داخل الوسم.',
+      '⚖️ src على video مقابل source: لو كانت صيغة واحدة فاكتب src مباشرة، ولو أردت عدة بدائل فاستخدم source.',
+      '🔹 &lt;track kind="subtitles" src="ar.vtt" srclang="ar" label="العربية" default&gt; : ترجمة أو وصف أو فصول للفيديو.',
+      '🌐 &lt;iframe src="..." title="..." loading="lazy"&gt; : يضمن صفحة أخرى داخل صفحتك (خريطة، فيديو يوتيوب). أضف title دائماً لإمكانية الوصول، و sandbox لتقييد الصلاحيات للأمان، و allow لتحديد الصلاحيات مثل fullscreen.',
+      '⚠️ بعض المواقع تمنع تضمينها داخل iframe، فلن تظهر.',
+      '⚖️ &lt;embed&gt; مقابل &lt;object&gt;: كلاهما لتضمين محتوى خارجي مثل PDF أو فلاش قديم. embed وسم ذاتي الإغلاق بسيط، و object أكثر مرونة ويقبل محتوى بديلاً بداخله. وفي الواقع الحديث يفضل iframe لتضمين PDF.',
+      '🎨 &lt;canvas id="c" width="300" height="150"&gt; : لوحة رسم تُرسم بـ JavaScript بالبكسل (ألعاب، رسوم بيانية متحركة).',
+      '⚖️ canvas مقابل svg: canvas نقاط ثابتة بلا عناصر داخلية (أسرع للرسوم الكثيرة والألعاب) ولا يتحسن عند التكبير. و svg وسوم XML داخل HTML، كل شكل عنصر يمكن تنسيقه والتفاعل معه، ولا يفقد جودته عند التكبير (الأفضل للأيقونات والشعارات).',
+      '🔹 داخل svg : circle و rect و line و path و text و g.',
+      '💡 للفيديوهات على المواقع الكبيرة يُفضل استخدام يوتيوب عبر iframe لتخفيف عبء الخادم.'
+    ].join('<br>'),
+    exampleCode: `<video controls width="400" poster="cover.jpg" muted>
+  <source src="lesson.webm" type="video/webm">
+  <source src="lesson.mp4" type="video/mp4">
+  <track kind="subtitles" src="ar.vtt" srclang="ar" label="العربية" default>
+  متصفحك لا يدعم الفيديو.
+</video>
+
+<audio controls>
+  <source src="audio.mp3" type="audio/mpeg">
+  متصفحك لا يدعم الصوت.
+</audio>
+
+<iframe src="https://example.com" title="موقع تجريبي" width="400" height="250" loading="lazy"></iframe>
+
+<canvas id="board" width="200" height="100"></canvas>
+
+<svg width="120" height="120" viewBox="0 0 120 120">
+  <circle cx="60" cy="60" r="50" fill="gold" stroke="black" stroke-width="3"></circle>
+  <text x="60" y="66" text-anchor="middle">HTML</text>
+</svg>`,
+    starterCode: `<!-- 1) video بـ controls و source و track -->
+
+<!-- 2) audio بـ controls و source -->
+
+<!-- 3) iframe بـ title -->
+
+<!-- 4) canvas بـ id -->
+
+<!-- 5) svg فيه circle -->`,
+    solutionCode: `<video controls width="300">
+  <source src="a.mp4" type="video/mp4">
+  <track kind="subtitles" src="ar.vtt" srclang="ar" label="العربية">
+</video>
+
+<audio controls>
+  <source src="a.mp3" type="audio/mpeg">
+</audio>
+
+<iframe src="https://example.com" title="مثال" width="300" height="200"></iframe>
+
+<canvas id="c" width="200" height="100"></canvas>
+
+<svg width="100" height="100">
+  <circle cx="50" cy="50" r="40" fill="tomato"></circle>
+</svg>`,
+    challengePrompt: 'تحدي الدرس: أضف video بخاصية controls يحتوي source و track، وaudio بخاصية controls يحتوي source، وiframe بـ title و src، وcanvas بـ id، وsvg بداخله circle.',
+    validate: function (doc) {
+      const v = doc.querySelector('video[controls]');
+      if (!v || !v.querySelector('source') || !v.querySelector('track')) return { passed: false, msgAr: 'أضف video بخاصية controls يحتوي source و track.', msgEn: 'Add video with controls, source and track.' };
+      const a = doc.querySelector('audio[controls]');
+      if (!a || !a.querySelector('source')) return { passed: false, msgAr: 'أضف audio بخاصية controls يحتوي source.', msgEn: 'Add audio with controls and source.' };
+      const f = doc.querySelector('iframe[src]');
+      if (!f || !(f.getAttribute('title') || '').trim()) return { passed: false, msgAr: 'أضف iframe بـ src و title.', msgEn: 'Add iframe with src and title.' };
+      if (!doc.querySelector('canvas[id]')) return { passed: false, msgAr: 'أضف canvas بخاصية id.', msgEn: 'Add canvas with id.' };
+      if (!doc.querySelector('svg circle')) return { passed: false, msgAr: 'أضف svg يحتوي circle.', msgEn: 'Add svg with a circle.' };
+      return { passed: true, msgAr: 'ممتاز! الوسائط والمحتوى المضمن يعملان بشكل صحيح.', msgEn: 'Media and embedded content verified!' };
+    }
+  },
+  {
+    id: 'html-19',
+    num: '19',
+    title: 'الخصائص العامة والتعليقات والكيانات (id, class, data-*, hidden, comments, entities)',
+    duration: '22 min',
+    eyebrow: 'HTML 19 · ما يشترك فيه كل وسم',
+    lead: 'هناك خصائص تعمل على أي وسم تقريباً، وهناك رموز خاصة تكتبها لعرض حروف يحجزها HTML لنفسه.',
+    goal: 'استخدام الخصائص العامة بشكل صحيح، وكتابة التعليقات، وعرض الرموز الخاصة بالكيانات HTML Entities.',
+    sectionTitle: 'الخصائص العامة والتعليقات والكيانات',
+    explanation: [
+      '🌐 الخصائص العامة (Global Attributes) تعمل على كل العناصر:',
+      '• id : معرف فريد في الصفحة (لا يتكرر)، للروابط الداخلية و label و JavaScript. • class : اسم أو عدة أسماء مفصولة بمسافة، ويمكن تكرارها لعناصر كثيرة.',
+      '⚖️ id مقابل class: id لعنصر واحد فقط بالصفحة، و class لمجموعة عناصر تشترك في نفس التنسيق. ولا تنس أن id يمكن أن يستخدم كرابط (#id).',
+      '• style : تنسيق مباشر على العنصر (يفضل الابتعاد عنه واستخدام CSS الخارجي). • title : نص يظهر عند تمرير الماوس.',
+      '• lang : لغة العنصر إن اختلفت عن الصفحة. • dir : اتجاه النص rtl أو ltr أو auto.',
+      '• hidden : يخفي العنصر ولا يظهر ولا يقرؤه قارئ الشاشة. ⚖️ hidden مقابل display:none في CSS: النتيجة متشابهة، لكن hidden خاصية HTML يمكن التحكم بها من الكود دون تعديل CSS.',
+      '• tabindex : ترتيب التنقل بزر Tab. 0 يجعل العنصر قابلاً للتركيز، و -1 قابلاً للتركيز برمجياً فقط. تجنب القيم الموجبة.',
+      '• contenteditable="true" : يجعل المحتوى قابلاً للتعديل مباشرة. • draggable : يجعل العنصر قابلاً للسحب. • spellcheck : التدقيق الإملائي.',
+      '• data-* : بيانات مخصصة تخزنها بنفسك مثل data-price="50" ثم تقرأها بـ JavaScript.',
+      '• aria-label و role : تحسين الوصول لقارئات الشاشة عند الحاجة، وقاعدة ARIA: لو وُجد وسم HTML دلالي بالمعنى المطلوب فاستخدمه ولا تستخدم ARIA.',
+      '💬 التعليقات: &lt;!-- نص التعليق --&gt; تظهر في الكود فقط ولا تظهر في الصفحة، وتفيد في الشرح أو في تعطيل جزء من الكود مؤقتاً. لا تكتب فيها أسراراً لأن أي مستخدم يستطيع قراءتها.',
+      '🔤 الكيانات (Entities) : لأن &lt; و &gt; محجوزة للوسوم، نعرضها بكيان: &amp;lt; لـ < و &amp;gt; لـ > و &amp;amp; لـ & و &amp;quot; لـ علامة الاقتباس.',
+      '• رموز شائعة: &amp;nbsp; مسافة لا تنكسر، &amp;copy; لـ ©، &amp;reg; لـ ®، &amp;euro; لـ €، &amp;hearts; لـ ♥، ويمكنك استخدام الرقم مثل &amp;#169;.',
+      '⚖️ المسافة العادية مقابل nbsp: المسافات المتعددة تُدمج في مسافة واحدة، أما nbsp فلا تُدمج ولا يُكسر السطر عندها.'
+    ].join('<br>'),
+    exampleCode: `<!-- هذا تعليق لن يظهر في الصفحة -->
+
+<p id="intro" class="text highlight" title="مقدمة" data-lesson="19">
+  نص بخصائص عامة.
+</p>
+
+<p hidden>هذه الفقرة مخفية تماماً</p>
+
+<p contenteditable="true">اضغط هنا لتعديل هذا النص</p>
+
+<p>لعرض وسم h1 اكتب: &lt;h1&gt;</p>
+<p>حقوق النشر &copy; 2026 &mdash; جميع الحقوق محفوظة</p>
+<p>الأسعار&nbsp;&nbsp;&nbsp;تبدأ من 50 &euro;</p>`,
+    starterCode: `<!-- 1) عنصر بـ id و class و title و data-xxx -->
+
+<!-- 2) عنصر hidden -->
+
+<!-- 3) عنصر contenteditable -->
+
+<!-- 4) فقرة تعرض الرمز © وعلامة < ككيان -->`,
+    solutionCode: `<!-- تعليق توضيحي -->
+<p id="note" class="important" title="تنبيه" data-level="1">فقرة بخصائص عامة.</p>
+<p hidden>نص مخفي</p>
+<p contenteditable="true">نص قابل للتعديل</p>
+<p>&copy; 2026 - الوسم &lt;p&gt; يعني فقرة</p>`,
+    challengePrompt: 'تحدي الدرس: أنشئ عنصراً بخصائص id و class و title و data-xxx، وعنصراً بخاصية hidden، وعنصراً بـ contenteditable، وفقرة تعرض الرمز © وعلامة < باستخدام الكيانات.',
+    validate: function (doc) {
+      const all = Array.from(doc.body.querySelectorAll('*'));
+      const full = all.find(function (e) {
+        return e.id && e.className && e.hasAttribute('title') && Object.keys(e.dataset || {}).length > 0;
+      });
+      if (!full) return { passed: false, msgAr: 'أضف عنصراً واحداً يحمل id و class و title و data-xxx معاً.', msgEn: 'Add an element with id, class, title and data-*.' };
+      if (!doc.querySelector('[hidden]')) return { passed: false, msgAr: 'أضف عنصراً بخاصية hidden.', msgEn: 'Add an element with hidden.' };
+      if (!doc.querySelector('[contenteditable]')) return { passed: false, msgAr: 'أضف عنصراً بخاصية contenteditable.', msgEn: 'Add contenteditable.' };
+      const text = doc.body.textContent;
+      if (text.indexOf('\u00A9') === -1) return { passed: false, msgAr: 'اعرض الرمز © باستخدام كيان copy.', msgEn: 'Show the copyright symbol via entity.' };
+      if (text.indexOf('<') === -1) return { passed: false, msgAr: 'اعرض علامة < باستخدام الكيان lt.', msgEn: 'Show the less-than sign via entity.' };
+      return { passed: true, msgAr: 'ممتاز! أتقنت الخصائص العامة والكيانات.', msgEn: 'Global attributes and entities verified!' };
+    }
+  },
+  {
+    id: 'html-20',
+    num: '20',
+    title: 'مشروع ختامي: الوسوم المتبقية والقديمة وبناء صفحة كاملة (template, noscript, script)',
+    duration: '35 min',
+    eyebrow: 'HTML 20 · من الأجزاء إلى الصفحة الكاملة',
+    lead: 'نختم الكورس بالوسوم المتبقية والوسوم القديمة المحظورة، ثم نجمع كل ما تعلمناه في صفحة واحدة متكاملة.',
+    goal: 'معرفة template و noscript و slot، وتجنب الوسوم المهجورة، وتطبيق قائمة فحص الجودة على صفحة كاملة.',
+    sectionTitle: 'الوسوم المتبقية وقواعد الجودة',
+    explanation: [
+      '🔹 &lt;noscript&gt; : محتوى بديل يظهر فقط إذا كان JavaScript معطلاً. مثال: رسالة تطلب تفعيله.',
+      '🔹 &lt;template&gt; : قالب HTML لا يظهر ولا يُحمَّل محتواه حتى تنسخه بـ JavaScript. يفيد في توليد بطاقات أو صفوف متكررة. و &lt;slot&gt; يعمل مع Web Components كمكان لمحتوى يدخله المستخدم.',
+      '🔹 &lt;script&gt; : لـ JavaScript. و defer لتنفيذه بعد بناء الصفحة، و type="module" لاستخدام import.',
+      '⚖️ noscript مقابل template: noscript يظهر عند غياب JavaScript، و template عكسه تماماً: لا يُستخدم إلا بوجود JavaScript.',
+      '🚫 الوسوم المهجورة (Obsolete) ولا تستخدمها: center و font و big و strike و tt و marquee و blink و frame و frameset و acronym و applet و basefont و dir. وبدائلها: CSS (text-align, font-size, color)، و del بدل strike، و abbr بدل acronym، و ul بدل dir، و iframe بدل frame.',
+      '🚫 وخصائص قديمة مثل bgcolor و align و border على table و width على الصفوف: تُستبدل كلها بـ CSS.',
+      '✅ قائمة فحص صفحتك: (1) Doctype و lang و dir و charset و viewport. (2) title و description فريدان. (3) h1 واحد وتسلسل عناوين منطقي. (4) كل img لها alt وأبعاد. (5) روابط بنص واضح و rel مع _blank. (6) كل حقل له label. (7) استخدمت الوسوم الدلالية بدل div كلما أمكن. (8) الجداول للبيانات فقط. (9) إغلاق كل الوسوم بشكل صحيح وتداخلها سليم.',
+      '🛠️ تحقق من الكود بأداة W3C Markup Validator (validator.w3.org) وبأداة Lighthouse في متصفح Chrome لقياس الوصول و SEO.',
+      '🎯 المشروع: صفحة تعريفية كاملة لموقع تعليمي تجمع الهيكل والتنقل والمحتوى والجدول والنموذج والتذييل.'
+    ].join('<br>'),
+    exampleCode: `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>أكاديمية أطلس</title>
+</head>
+<body>
+  <noscript>برجاء تفعيل JavaScript لتجربة أفضل.</noscript>
+
+  <header>
+    <h1>أكاديمية أطلس</h1>
+    <nav>
+      <ul>
+        <li><a href="#courses">الكورسات</a></li>
+        <li><a href="#contact">تواصل</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="courses">
+      <h2>الكورسات</h2>
+      <img src="html.png" alt="شعار كورس HTML" width="120" height="120">
+      <ol>
+        <li>HTML</li>
+        <li>CSS</li>
+      </ol>
+      <table border="1">
+        <caption>الجدول الزمني</caption>
+        <tr><th scope="col">الكورس</th><th scope="col">المدة</th></tr>
+        <tr><td>HTML</td><td>20 ساعة</td></tr>
+      </table>
+    </section>
+
+    <section id="contact">
+      <h2>تواصل معنا</h2>
+      <form action="/send" method="post">
+        <label for="n">الاسم</label>
+        <input type="text" id="n" name="name" required>
+        <button type="submit">إرسال</button>
+      </form>
+    </section>
+  </main>
+
+  <footer><p>&copy; 2026 أكاديمية أطلس</p></footer>
+</body>
+</html>`,
+    starterCode: `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>مشروعي الختامي</title>
+</head>
+<body>
+  <!-- noscript -->
+  <!-- header فيه h1 و nav فيه ul بروابط -->
+  <!-- main فيه: img بـ alt وقائمة وجدول بـ th ونموذج بـ label -->
+  <!-- footer -->
+</body>
+</html>`,
+    solutionCode: `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>مشروعي الختامي</title>
+</head>
+<body>
+  <noscript>فعّل JavaScript من فضلك.</noscript>
+
+  <header>
+    <h1>موقعي التعليمي</h1>
+    <nav>
+      <ul>
+        <li><a href="#about">من أنا</a></li>
+        <li><a href="#contact">تواصل</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="about">
+      <h2>من أنا</h2>
+      <img src="me.jpg" alt="صورتي الشخصية" width="120" height="120">
+      <ul>
+        <li>HTML</li>
+        <li>CSS</li>
+      </ul>
+      <table border="1">
+        <tr><th>المهارة</th><th>المستوى</th></tr>
+        <tr><td>HTML</td><td>ممتاز</td></tr>
+      </table>
+    </section>
+
+    <section id="contact">
+      <h2>تواصل معي</h2>
+      <form action="/send" method="post">
+        <label for="n">الاسم</label>
+        <input type="text" id="n" name="name" required>
+        <button type="submit">إرسال</button>
+      </form>
+    </section>
+  </main>
+
+  <footer><p>&copy; 2026</p></footer>
+</body>
+</html>`,
+    challengePrompt: 'تحدي الدرس الأخير: ابنِ صفحة كاملة فيها noscript، وheader بداخله h1 واحد وnav بداخله ul بروابط، وmain فيه section على الأقل تحتوي img بـ alt وقائمة (ul أو ol) وجدولاً فيه th ونموذجاً فيه label وinput وbutton، وfooter.',
+    validate: function (doc) {
+      if (!doc.querySelector('noscript')) return { passed: false, msgAr: 'أضف noscript.', msgEn: 'Add noscript.' };
+      if (doc.querySelectorAll('h1').length !== 1) return { passed: false, msgAr: 'يجب أن يوجد h1 واحد فقط.', msgEn: 'Exactly one h1 is needed.' };
+      if (!doc.querySelector('header nav ul a')) return { passed: false, msgAr: 'أضف header فيه nav فيه ul فيه روابط a.', msgEn: 'Add header > nav > ul with links.' };
+      if (doc.querySelectorAll('main').length !== 1) return { passed: false, msgAr: 'أضف main واحدة فقط.', msgEn: 'Add exactly one main.' };
+      if (!doc.querySelector('main section')) return { passed: false, msgAr: 'أضف section داخل main.', msgEn: 'Add a section inside main.' };
+      const img = doc.querySelector('main img[alt]');
+      if (!img || !(img.getAttribute('alt') || '').trim()) return { passed: false, msgAr: 'أضف img بـ alt غير فارغ داخل main.', msgEn: 'Add an img with alt inside main.' };
+      if (!doc.querySelector('main ul li, main ol li')) return { passed: false, msgAr: 'أضف قائمة ul أو ol داخل main.', msgEn: 'Add a list inside main.' };
+      if (!doc.querySelector('main table th')) return { passed: false, msgAr: 'أضف جدولاً فيه th داخل main.', msgEn: 'Add a table with th inside main.' };
+      const f = doc.querySelector('main form');
+      if (!f || !f.querySelector('label') || !f.querySelector('input') || !f.querySelector('button')) return { passed: false, msgAr: 'أضف form فيها label و input و button داخل main.', msgEn: 'Add form with label, input and button.' };
+      if (!doc.querySelector('footer')) return { passed: false, msgAr: 'أضف footer.', msgEn: 'Add footer.' };
+      return { passed: true, msgAr: 'مبروك! أنهيت كورس HTML بصفحة كاملة تطابق المعايير الاحترافية.', msgEn: 'Congratulations! Final project verified.' };
+    }
+  }
+]
     },
     css: {
       id: 'css',
