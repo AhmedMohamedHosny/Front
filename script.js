@@ -1,8 +1,1835 @@
-/* CodeMasr — a focused, beginner-friendly coding studio */
-:root{--bg:#f5f6fb;--surface:#fff;--surface-2:#f8f9fd;--text:#171a2b;--muted:#85899e;--line:#e9ebf3;--purple:#6c5ce7;--purple-2:#8778ff;--purple-soft:#f0edff;--green:#18a878;--green-soft:#e6f8f1;--orange:#f2a64a;--orange-soft:#fff3e3;--blue:#4b8df8;--shadow:0 12px 35px rgba(34,35,74,.055);--radius:18px;--sidebar:250px;font-family:'Manrope',system-ui,sans-serif}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',system-ui,sans-serif;font-size:13px;line-height:1.6}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid rgba(108,92,231,.28);outline-offset:2px}button:disabled{opacity:.55;cursor:not-allowed}.app-shell{min-height:100vh}.sidebar{position:fixed;z-index:20;left:0;top:0;bottom:0;width:var(--sidebar);background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:26px 16px 16px}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--text);padding:0 10px 31px}.brand-mark{display:flex;align-items:center;justify-content:center;width:43px;height:43px;border-radius:14px;background:var(--purple);color:#fff;font-family:'DM Mono',monospace;font-weight:500;font-size:17px;box-shadow:0 7px 18px #6c5ce738}.brand-mark i{font-style:normal;color:#b7afff;margin:0 -1px}.brand-name{font-weight:800;font-size:20px;letter-spacing:-1px;line-height:1.1}.brand-name>span{color:var(--purple)}.brand-name small{display:block;font-size:8px;letter-spacing:1.6px;color:#9b9eb0;font-weight:800;margin-top:5px}.sidebar-section{margin-bottom:27px}.section-label,.eyebrow{font-size:9px;font-weight:800;letter-spacing:1.45px;color:#9a9db0;margin:0 10px 12px}.nav-item{width:100%;display:flex;align-items:center;gap:12px;border:0;background:transparent;color:#73778d;padding:11px 12px;border-radius:11px;text-align:left;font-weight:700;font-size:12px;margin:3px 0;transition:.2s}.nav-item:hover,.course-link:hover{background:var(--surface-2);color:var(--text)}.nav-item.active{background:var(--purple-soft);color:var(--purple)}.nav-icon{font-size:19px;width:19px;text-align:center;font-weight:400}.nav-dot{width:5px;height:5px;background:var(--purple);border-radius:50%;margin-left:auto}.course-link{width:100%;display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:10px 7px;border-radius:11px;text-align:left;color:var(--text);margin:3px 0}.course-link.selected{background:#f8f7ff}.course-link>span:nth-child(2){flex:1;min-width:0}.course-link b,.course-link small{display:block}.course-link b{font-size:11px;font-weight:800}.course-link small{font-size:10px;color:#999caf;margin-top:2px}.course-badge{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:12px;flex-shrink:0}.html-badge{background:#fff0e9;color:#ef704b}.css-badge{background:#eaf2ff;color:#5286f4;font-size:18px}.js-badge{background:#fff5cc;color:#b58a09;font-family:'DM Mono',monospace}.py-badge{background:#e5f7ef;color:#168f6a}.course-check{color:var(--green);font-size:13px}.course-progress,.course-lock{font-size:10px;color:#a5a7b6}.sidebar-bottom{margin-top:auto}.streak-card{display:flex;align-items:center;gap:10px;background:#fbf7ff;border:1px solid #f0eaff;border-radius:13px;padding:12px 10px;margin:0 0 18px}.streak-icon{width:30px;height:30px;display:grid;place-items:center;background:#eee8ff;color:var(--purple);border-radius:9px;font-size:18px}.streak-card b,.streak-card small{display:block}.streak-card b{font-size:10px}.streak-card small{font-size:9px;color:#a09db4;margin-top:2px}.streak-spark{margin-left:auto;color:#c4b7ff}.profile-row{display:flex;align-items:center;gap:9px;padding:14px 5px 0;border-top:1px solid var(--line)}.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#e9e4ff;color:#6555cf;font-weight:800;font-size:10px}.profile-copy{flex:1}.profile-copy b,.profile-copy small{display:block}.profile-copy b{font-size:10px}.profile-copy small{font-size:9px;color:var(--muted);margin-top:2px}.icon-button{border:0;background:transparent;color:#85899e;border-radius:9px;padding:8px;line-height:1}.icon-button:hover{background:var(--surface-2);color:var(--text)}.main-area{margin-left:var(--sidebar);min-height:100vh}.topbar{height:72px;background:rgba(255,255,255,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 38px;position:sticky;top:0;z-index:10}.breadcrumb{display:flex;gap:10px;align-items:center;color:#a0a3b4;font-size:11px}.breadcrumb b{color:#50546b;font-weight:800}.crumb-slash{color:#d1d3df}.topbar-actions{display:flex;align-items:center;gap:13px}.search-box{width:235px;height:36px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:0 9px;color:#9da0b2;background:#fff}.search-box>span{font-size:20px}.search-box input{border:0;outline:none;min-width:0;flex:1;font-size:10px;color:var(--text);background:transparent}.search-box kbd,.page-title-actions kbd{font:9px 'DM Mono',monospace;color:#9c9eb0;background:#f4f5f9;padding:3px 5px;border:1px solid #e8e9f1;border-radius:4px}.theme-toggle{font-size:19px}.help-button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 10px;color:#777b90;font-weight:800;font-size:11px}.help-button:first-letter{color:var(--purple)}.view{display:none;padding:34px 38px 24px;max-width:1600px;margin:0 auto}.view.active-view{display:block;animation:fadeIn .25s ease}@keyframes fadeIn{from{opacity:.3;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}.welcome-row{display:grid;grid-template-columns:1.2fr .8fr;align-items:center;gap:22px;min-height:280px}.eyebrow{margin:0 0 11px;display:flex;align-items:center;gap:8px}.live-dot{width:6px;height:6px;border-radius:50%;background:#2bc995;box-shadow:0 0 0 4px #2bc9951e}.welcome-row h1,.page-title-row h1{font-size:clamp(29px,3vw,41px);letter-spacing:-1.8px;line-height:1.23;margin:0;font-weight:800}.welcome-row h1 span{color:var(--purple)}.hero-description{color:#85899e;font-size:12px;max-width:455px;line-height:1.9;margin:15px 0 21px}.hero-actions,.page-title-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.primary-button,.secondary-button{border-radius:10px;padding:11px 16px;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:13px;transition:transform .18s,box-shadow .18s}.primary-button{border:1px solid var(--purple);background:var(--purple);color:#fff;box-shadow:0 5px 13px #6c5ce72c}.primary-button:hover{background:#5c4bd8;transform:translateY(-1px);box-shadow:0 8px 18px #6c5ce735}.primary-button>span{font-size:15px}.secondary-button{border:1px solid #e4e5ef;background:#fff;color:#6f738a}.secondary-button:hover{border-color:#c9c1ff;color:var(--purple)}.hero-art{height:252px;position:relative;display:grid;place-items:center;overflow:hidden}.art-orbit{position:absolute;border:1px solid #ded9ff;border-radius:50%;transform:rotate(-22deg)}.orbit-one{width:350px;height:160px}.orbit-two{width:290px;height:225px;transform:rotate(28deg);border-color:#e7e4ff}.art-window{position:relative;width:250px;background:#17182b;border-radius:13px;box-shadow:0 20px 45px #36306625;overflow:hidden;transform:rotate(-3deg);z-index:1}.art-window-top{height:33px;border-bottom:1px solid #2e2e45;display:flex;align-items:center;gap:5px;padding:0 11px}.art-window-top i{width:6px;height:6px;border-radius:50%;background:#706d8c}.art-window-top i:first-child{background:#fa8c8c}.art-window-top i:nth-child(2){background:#f6c66d}.art-window-top i:nth-child(3){background:#4dcba0}.art-window-top span{margin-left:auto;color:#a5a4c2;font:8px 'DM Mono',monospace}.art-code{padding:12px 13px 7px;font:10px/1.65 'DM Mono',monospace;color:#deddf7}.art-code p{margin:0}.line-no{display:inline-block;width:23px;color:#656581}.pink{color:#ff8fae}.green{color:#8ee4b7}.purple{color:#b9a3ff}.blue{color:#80c7ff}.yellow{color:#f8d47c}.art-status{display:flex;justify-content:space-between;border-top:1px solid #2e2e45;padding:7px 11px;font:7px 'DM Mono',monospace;color:#9f9dbd}.art-status span:first-child{color:#82e3b5}.floating-chip{position:absolute;z-index:2;display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #eeecf8;box-shadow:0 8px 24px #26224a10;border-radius:9px;padding:8px 11px;font-size:9px;font-weight:800;color:#6c5ce7}.chip-one{left:2%;top:33px}.chip-two{right:0;bottom:33px;color:#6b7189}.chip-pulse{width:6px;height:6px;border-radius:50%;background:#20c58e}.stats-grid{display:grid;grid-template-columns:1fr 1fr 1.05fr;gap:15px;margin:17px 0 36px}.stat-card,.panel,.learning-card,.project-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.stat-card{padding:18px 19px 16px;min-width:0}.stat-top{display:flex;justify-content:space-between;align-items:center;color:#9699ac;font-size:9px;font-weight:800;letter-spacing:.8px}.stat-icon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:13px}.purple-icon{background:var(--purple-soft);color:var(--purple)}.green-icon{background:var(--green-soft);color:var(--green)}.orange-icon{background:var(--orange-soft);color:#df9436}.stat-number{display:flex;align-items:baseline;gap:8px;margin:8px 0 10px}.stat-number b{font-size:27px;letter-spacing:-1px}.muted{color:#9da0b1;font-size:10px}.progress-track{height:5px;background:#f0f0f7;border-radius:20px;overflow:hidden}.progress-track span{display:block;height:100%;background:var(--purple);border-radius:20px;transition:width .4s}.stat-card>small{display:block;font-size:9px;color:#a0a2b2;margin-top:9px}.mini-bars{height:5px;display:flex;gap:4px;margin-top:15px}.mini-bars i{height:5px;flex:1;border-radius:5px;background:#eeeaff}.mini-bars i:first-child{background:var(--purple)}.milestone{display:flex;align-items:center;gap:10px;margin:11px 0 7px}.milestone-icon{width:38px;height:38px;display:grid;place-items:center;background:#fff1df;color:#e29b3b;border-radius:12px;font-size:20px}.milestone b,.milestone small{display:block}.milestone b{font-size:11px}.milestone small{font-size:9px;color:#a0a2b2;margin-top:2px}.text-button{border:0;background:transparent;color:var(--purple);font-size:10px;font-weight:800;padding:5px 0}.text-button span{font-size:14px;margin-left:5px}.section-heading,.panel-heading{display:flex;justify-content:space-between;align-items:center;gap:14px}.section-heading{margin-bottom:17px}.section-heading .eyebrow,.panel-heading .eyebrow{margin:0 0 4px}.section-heading h2,.panel-heading h2{font-size:19px;letter-spacing:-.6px;margin:0;font-weight:800}.course-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.learning-card{padding:17px 17px 15px;transition:transform .2s,box-shadow .2s;min-width:0}.learning-card:hover,.project-card:hover{transform:translateY(-3px);box-shadow:0 15px 35px #34305a10}.card-topline{display:flex;align-items:center;justify-content:space-between}.tag{font-size:8px;font-weight:800;letter-spacing:.65px;padding:5px 8px;border-radius:6px;display:inline-flex;align-items:center}.tag-html{color:#e76c49;background:#fff0e9}.tag-css{color:#4c82eb;background:#eaf2ff}.tag-js{color:#a68108;background:#fff5cc}.course-level{font-size:8px;letter-spacing:.8px;color:#a2a4b4;font-weight:800}.course-illustration{height:104px;margin:13px 0 11px;border-radius:12px;display:grid;place-items:center;position:relative;overflow:hidden}.course-illustration>span{font:800 42px 'DM Mono',monospace;z-index:1}.html-illustration{background:linear-gradient(135deg,#fff2e9,#ffdfd0);color:#ee7d58}.css-illustration{background:linear-gradient(135deg,#edf4ff,#d9e8ff);color:#5389f3}.css-illustration>span{font-size:55px}.js-illustration{background:linear-gradient(135deg,#fff9db,#ffed9f);color:#b58d0c}.js-illustration>span{font-size:31px;background:#f7d950;color:#5b4a05;padding:8px;border-radius:6px}.spark{position:absolute;font-style:normal;color:#fff;font-size:21px}.spark-a{left:22%;top:18%}.spark-b{right:19%;bottom:14%;font-size:29px;opacity:.65}.learning-card h3{font-size:14px;margin:0 0 7px;letter-spacing:-.3px}.learning-card>p{color:#898da1;font-size:10px;line-height:1.8;min-height:54px;margin:0 0 15px}.card-progress-label{display:flex;justify-content:space-between;color:#999caf;font-size:9px;margin-bottom:7px}.card-progress-label b{color:#5f6278}.card-button{width:100%;display:flex;justify-content:space-between;align-items:center;margin-top:15px;padding:10px 12px;border:1px solid #e8e7f5;background:#fbfaff;border-radius:9px;color:#6c5ce7;font-weight:800;font-size:10px}.card-button:hover{background:var(--purple);color:#fff}.card-button span{font-size:14px}.bottom-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:15px;margin-top:23px}.panel{padding:19px}.tag-soft{background:#f2f1ff;color:#8276d8}.today-lesson{display:flex;align-items:center;gap:12px;padding:20px 0 16px}.lesson-number{width:42px;height:46px;display:grid;place-items:center;border-radius:12px;background:#f0edff;color:var(--purple);font:700 17px 'DM Mono',monospace}.lesson-copy{flex:1}.lesson-copy h3{font-size:12px;margin:0 0 3px}.lesson-copy p{font-size:10px;color:#9295a8;margin:0 0 8px}.lesson-meta{display:flex;gap:13px;color:#a2a4b5;font-size:9px}.round-arrow{width:31px;height:31px;border:1px solid #e9e7f8;border-radius:50%;background:#fff;color:var(--purple);font-size:16px}.lesson-divider{height:1px;background:var(--line)}.daily-tip{display:flex;align-items:flex-start;gap:11px;padding-top:15px}.tip-icon{width:26px;height:26px;display:grid;place-items:center;border-radius:8px;background:#fff5df;color:#e3a23e}.daily-tip b{font-size:10px}.daily-tip p{font-size:10px;color:#9295a8;margin:3px 0 0;line-height:1.7}.activity-icon{width:29px;height:29px;display:grid;place-items:center;border-radius:9px;background:#f0edff;color:var(--purple);font-size:18px}.quick-action{width:100%;display:flex;align-items:center;gap:11px;padding:14px 0;border:0;background:transparent;text-align:left;border-bottom:1px solid var(--line)}.quick-action:last-child{border-bottom:0}.quick-icon{width:35px;height:35px;border-radius:10px;display:grid;place-items:center;font-size:17px;flex-shrink:0}.quick-action>span:nth-child(2){flex:1}.quick-action b,.quick-action small{display:block}.quick-action b{font-size:10px}.quick-action small{font-size:9px;color:#999caf;margin-top:3px}.quick-arrow{color:#aaaabd;font-size:15px}.quick-action:hover b,.quick-action:hover .quick-arrow{color:var(--purple)}.footer{display:flex;justify-content:space-between;align-items:center;color:#a5a7b6;font-size:9px;padding:27px 0 3px}.footer b{color:var(--purple)}.footer button{border:0;background:transparent;color:#8e91a5;font-size:9px}.page-title-row{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin:6px 0 25px}.page-title-row h1{font-size:32px}.page-title-row p{color:#9295a8;font-size:11px;margin:8px 0 0}.page-title-actions .primary-button{padding:10px 14px}.playground-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:15px;align-items:stretch}.editor-panel,.preview-panel{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:0;box-shadow:var(--shadow)}.editor-panel{display:flex;flex-direction:column;min-height:610px}.editor-toolbar,.preview-toolbar{height:48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:0 12px;gap:8px}.file-tabs{display:flex;align-items:center;gap:4px;height:100%;min-width:0}.file-tab{height:100%;padding:0 10px;border:0;border-bottom:2px solid transparent;background:transparent;color:#999caf;font-size:10px;white-space:nowrap}.file-tab.active{border-bottom-color:var(--purple);color:#33364c;font-weight:800}.file-dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px}.html-dot{background:#ee7956}.css-dot{background:#5288f1}.js-dot{background:#edc638}.editor-tools{display:flex;align-items:center;gap:6px}.save-state{font-size:8px;color:#20a779;white-space:nowrap}.small-icon{font-size:15px;padding:6px}.editor-host{position:relative;flex:1;min-height:0;height:520px;background:#fff}.editor-loading{position:absolute;inset:0;z-index:2;display:grid;place-items:center;background:#fff;color:#9a9db0;font-size:11px}.editor-host.monaco-ready .editor-loading{display:none}#monaco-editor{position:absolute;inset:0}#fallback-editor{width:100%;height:100%;border:0;resize:none;outline:none;padding:18px 15px;font:12px/1.75 'DM Mono',monospace;color:#26283d;background:#fff;tab-size:2;white-space:pre;overflow:auto}#fallback-editor[hidden]{display:none}.editor-statusbar{height:25px;display:flex;align-items:center;gap:15px;padding:0 12px;background:#f7f7fb;border-top:1px solid var(--line);font-size:8px;color:#999caf}.editor-statusbar .status-ready{margin-left:auto;color:#1fa979}.preview-panel{display:flex;flex-direction:column;min-height:610px}.preview-title{display:flex;align-items:center;gap:8px;font-size:10px}.browser-icon{font-size:17px;color:var(--purple)}.preview-live{font-size:7px;color:#169c70;background:#e7f8f0;border-radius:4px;padding:3px 5px;font-weight:800;letter-spacing:.5px}.preview-tools{display:flex;gap:3px}.preview-address{height:32px;display:flex;align-items:center;gap:9px;margin:9px 12px 0;padding:0 10px;border:1px solid #e9eaf1;border-radius:7px;background:#fafbfe;color:#9b9eb0;font-size:9px}.preview-address>span:first-child{font-size:15px}.secure-mark{margin-left:auto;color:#27bf8b;font-size:8px}#preview-frame{display:block;width:calc(100% - 24px);margin:10px 12px 0;flex:1;min-height:245px;border:1px solid #e9eaf1;border-radius:7px;background:white}.console-panel{margin-top:10px;border-top:1px solid var(--line);min-height:145px;max-height:195px;display:flex;flex-direction:column}.console-heading{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #f0f0f6}.console-heading>div{display:flex;align-items:center;gap:7px}.console-heading b{font-size:9px}.console-prompt{font:700 12px 'DM Mono',monospace;color:var(--purple)}.console-count{min-width:16px;height:16px;display:grid;place-items:center;background:#f0eff8;color:#9295a8;border-radius:5px;font-size:8px}.console-heading .text-button{font-size:9px}.console-output{padding:9px 12px;overflow:auto;font:9px/1.6 'DM Mono',monospace;color:#777b90}.console-empty{display:flex;align-items:center;gap:7px;color:#a1a4b4}.console-empty span{color:var(--green);font-size:13px}.console-entry{padding:4px 6px;border-radius:4px;margin:2px 0;overflow-wrap:anywhere;white-space:pre-wrap}.console-entry.error{background:#fff0f0;color:#d54f59}.console-entry.warn{background:#fff7e7;color:#a8751e}.console-entry.info{color:#687b9a}.console-entry.success{color:#14986e}.editor-hint{margin-top:13px;padding:12px 14px;background:#f0edff;border:1px solid #e6e1ff;border-radius:10px;color:#7771a6;display:flex;align-items:center;gap:9px;font-size:9px}.editor-hint>span:first-child{font-size:16px;color:var(--purple)}.editor-hint b{color:#5f53ca}.editor-hint button{margin-left:auto;border:0;background:transparent;color:#9a91db;font-size:17px}.editor-hint.dismissed{display:none}.mobile-menu{display:none}.editor-loading.failed{color:#d45c68}.project-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.project-card{overflow:hidden;transition:.2s}.project-preview{height:190px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);display:flex;align-items:center;flex-direction:column}.mini-browser-dots{position:absolute;left:13px;top:11px;font-size:7px;letter-spacing:3px;color:#c3c5d1}.project-preview-profile{background:#f0edff;padding-top:45px;color:#28253f}.mini-profile-avatar{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:#c5baff;color:#5f50c7;font-weight:800;font-size:11px;margin-bottom:6px}.project-preview-profile>b{font-size:11px}.project-preview-profile>span{font-size:8px;color:#9992c6}.mini-profile-line{height:5px;width:105px;border-radius:5px;background:#d9d2ff;margin-top:13px}.mini-profile-line.short{width:70px;margin-top:5px}.mini-profile-buttons{display:flex;gap:5px;margin-top:13px}.mini-profile-buttons i{width:42px;height:12px;background:#7a6ce8;border-radius:4px}.mini-profile-buttons i+ i{background:#fff}.project-preview-counter{background:#fff7db;justify-content:center;color:#4e4217}.project-preview-counter .counter-label{font-size:8px;letter-spacing:1.5px;color:#a58e4b}.project-preview-counter strong{font-size:44px;letter-spacing:-2px;margin:0 0 5px}.counter-actions{display:flex;gap:9px}.counter-actions i{font-style:normal;width:28px;height:25px;display:grid;place-items:center;border:1px solid #e6d8a4;border-radius:7px;background:#fffef7;font-size:14px}.project-preview-card{background:#e9f6f0;flex-direction:row;justify-content:center;gap:13px}.mini-product-image{width:76px;height:110px;background:linear-gradient(145deg,#9de1c4,#299c79);border-radius:20px 20px 14px 14px;display:grid;place-items:center;color:#e8fff5;font-size:26px;box-shadow:8px 9px 15px #3a9b7520}.mini-product-copy{display:flex;flex-direction:column;color:#235f4b}.mini-product-copy b{font-size:11px}.mini-product-copy span{font-size:8px;margin-top:4px;color:#6d9d89}.mini-product-copy i{width:60px;height:6px;border-radius:5px;background:#3caa81;margin-top:15px}.project-card-body{padding:17px}.project-tags{display:flex;gap:6px}.project-card h3{font-size:14px;margin:10px 0 5px}.project-card-body>p{font-size:10px;line-height:1.8;color:#8d91a5;min-height:53px;margin:0}.project-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:5px;border-top:1px solid var(--line);margin-top:15px;padding-top:12px}.project-card-bottom>span{font-size:9px;color:#a0a2b2}.project-card-bottom .text-button{white-space:nowrap}.progress-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:18px}.progress-summary-grid .stat-card{min-height:135px}.progress-path-panel,.achievements-panel{margin-bottom:17px}.progress-course-row{display:flex;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--line)}.progress-course-row:last-child{border-bottom:0}.progress-course-icon{width:37px;height:37px;display:grid;place-items:center;border-radius:10px;font-weight:800}.progress-course-copy{flex:1}.progress-course-copy b,.progress-course-copy small{display:block}.progress-course-copy b{font-size:11px}.progress-course-copy small{font-size:9px;color:#9a9daf;margin-top:2px}.progress-course-bar{width:22%;min-width:70px}.progress-course-bar>div{display:flex;justify-content:space-between;font-size:8px;color:#9a9daf;margin-bottom:5px}.progress-course-row>button{border:1px solid #e8e6f6;background:#fff;border-radius:8px;padding:7px 10px;color:var(--purple);font-size:9px;font-weight:800}.achievement-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:17px}.achievement{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:10px;padding:12px 10px;min-width:0;opacity:.55}.achievement.unlocked{opacity:1;background:#fbfaff}.achievement>span{width:30px;height:30px;display:grid;place-items:center;background:#f0edff;border-radius:9px;color:var(--purple);flex-shrink:0}.achievement div{min-width:0;flex:1}.achievement b,.achievement small{display:block}.achievement b{font-size:9px}.achievement small{font-size:8px;color:#9a9daf;margin-top:3px}.achievement>i{font-style:normal;font-size:7px;color:#aaa}.achievement.unlocked>i{color:var(--green)}.lesson-back-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.lesson-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:20px;align-items:start}.lesson-content{background:#fff;border:1px solid var(--line);border-radius:16px;padding:clamp(22px,4vw,42px);box-shadow:var(--shadow)}.lesson-content .eyebrow{margin:0 0 12px}.lesson-content h1{font-size:33px;letter-spacing:-1.4px;line-height:1.25;margin:0 0 10px}.lesson-lead{font-size:14px;color:#82869b;line-height:1.8;margin:0 0 23px}.lesson-callout{display:flex;gap:12px;background:#f5f2ff;border:1px solid #eae5ff;padding:13px 15px;border-radius:10px;color:#766cc2;margin:0 0 25px}.lesson-callout>span{font-size:19px}.lesson-callout p{font-size:10px;line-height:1.7;margin:0}.lesson-callout b{color:#5c50bc}.lesson-content h2{font-size:17px;letter-spacing:-.4px;margin:24px 0 8px}.lesson-content>p:not(.lesson-lead){font-size:11px;color:#777c91;line-height:1.95}.lesson-code{margin-top:15px;border:1px solid #292b42;border-radius:10px;overflow:hidden;background:#191a2c;color:#deddf6}.lesson-code>div{display:flex;justify-content:space-between;align-items:center;padding:9px 13px;border-bottom:1px solid #303147;font-size:8px;letter-spacing:1px;color:#a2a2c3}.lesson-code button{border:0;background:transparent;color:#c4b8ff;font-size:9px}.lesson-code pre{margin:0;padding:15px;overflow:auto;font:11px/1.8 'DM Mono',monospace}.lesson-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.lesson-sidebar{position:sticky;top:90px;padding:18px 13px}.lesson-sidebar>.eyebrow{margin:0 0 5px}.lesson-sidebar h3{font-size:14px;margin:0 0 15px;padding:0 5px}.lesson-list-item{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;border-radius:9px;padding:11px 8px;text-align:left;color:#8e92a6}.lesson-list-item>span:first-child{width:28px;height:28px;display:grid;place-items:center;background:#f5f5fa;border-radius:8px;font:10px 'DM Mono',monospace}.lesson-list-item>span:nth-child(2){flex:1}.lesson-list-item b,.lesson-list-item small{display:block}.lesson-list-item b{font-size:9px;color:#656980}.lesson-list-item small{font-size:8px;margin-top:2px;color:#a5a7b7}.lesson-list-item i{font-style:normal;font-size:13px}.lesson-list-item.active{background:#f3f0ff;color:var(--purple)}.lesson-list-item.active>span:first-child{background:#e3ddff;color:var(--purple)}.lesson-list-item.active b{color:var(--purple)}.lesson-list-item.completed i{color:var(--green)}.lesson-track-progress{margin:15px 5px 3px;border-top:1px solid var(--line);padding-top:15px}.lesson-track-progress>div:first-child{display:flex;justify-content:space-between;font-size:9px;color:#999caf;margin-bottom:8px}.lesson-track-progress b{color:var(--purple)}.toast-container{position:fixed;z-index:80;right:20px;bottom:20px;display:flex;flex-direction:column;gap:8px}.toast{display:flex;align-items:center;gap:10px;max-width:340px;padding:12px 15px;border:1px solid #e8e6f5;border-radius:11px;background:#fff;box-shadow:0 12px 35px #2d28521c;color:#555971;font-size:10px;animation:toastIn .25s ease}.toast>span{color:var(--green);font-size:15px}@keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}.modal-backdrop{position:fixed;z-index:70;inset:0;background:#15152b69;backdrop-filter:blur(5px);display:grid;place-items:center;padding:20px}.modal-backdrop[hidden]{display:none}.modal{width:min(100%,420px);background:#fff;border-radius:19px;padding:29px;position:relative;box-shadow:0 25px 90px #14142d35;animation:fadeIn .2s ease}.modal-close{position:absolute;right:15px;top:12px;border:0;background:transparent;color:#a0a2b2;font-size:24px}.modal-symbol{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;background:var(--purple-soft);color:var(--purple);font-size:21px}.modal h2{font-size:21px;letter-spacing:-.5px;margin:14px 0 8px}.modal p,.modal li{font-size:11px;line-height:1.9;color:#85899e}.modal ul{padding-left:18px}.modal-action{margin-top:12px;width:100%}.search-results{margin-top:10px;display:grid;gap:6px}.search-result{width:100%;text-align:left;border:1px solid var(--line);border-radius:9px;background:#fff;padding:10px;color:#676b82;font-size:10px}.search-result:hover{background:var(--purple-soft);color:var(--purple)}.dark-mode{--bg:#101222;--surface:#191b2e;--surface-2:#202239;--text:#eff0fb;--muted:#969ab5;--line:#2c2e47;--shadow:0 12px 35px rgba(0,0,0,.12)}.dark-mode .sidebar,.dark-mode .topbar,.dark-mode .stat-card,.dark-mode .panel,.dark-mode .learning-card,.dark-mode .project-card,.dark-mode .editor-panel,.dark-mode .preview-panel,.dark-mode .lesson-content,.dark-mode .modal,.dark-mode .search-box,.dark-mode .secondary-button,.dark-mode .help-button{background:var(--surface);border-color:var(--line);color:var(--text)}.dark-mode .brand,.dark-mode .nav-item,.dark-mode .course-link,.dark-mode .course-link b,.dark-mode .learning-card h3,.dark-mode .project-card h3,.dark-mode .section-heading h2,.dark-mode .panel-heading h2,.dark-mode .stat-number b,.dark-mode .milestone b,.dark-mode .lesson-copy h3,.dark-mode .quick-action b,.dark-mode .lesson-content h1,.dark-mode .lesson-content h2,.dark-mode .lesson-sidebar h3{color:var(--text)}.dark-mode .course-link.selected,.dark-mode .nav-item.active{background:#292448}.dark-mode .editor-host,.dark-mode #fallback-editor,.dark-mode .editor-loading{background:#191b2e;color:#eff0fb}.dark-mode .editor-statusbar,.dark-mode .preview-address{background:#202239;border-color:var(--line)}.dark-mode #preview-frame{border-color:var(--line)}.dark-mode .file-tab.active{color:var(--text)}.dark-mode .modal p,.dark-mode .modal li{color:#b0b3c8}.dark-mode .lesson-code{border-color:#383a55}.dark-mode .quick-action,.dark-mode .lesson-divider,.dark-mode .project-card-bottom{border-color:var(--line)}.dark-mode .streak-card,.dark-mode .editor-hint{background:#28233f;border-color:#393154}.dark-mode .secondary-button:hover{color:#c0b7ff}.dark-mode .achievement{border-color:var(--line)}.dark-mode .search-box input{color:var(--text)}
-@media(min-width:1500px){.view{padding-left:48px;padding-right:48px}.welcome-row{min-height:300px}.hero-art{height:280px}.art-window{transform:scale(1.08) rotate(-3deg)}}
-@media(max-width:1200px){:root{--sidebar:225px}.view{padding:28px 25px}.topbar{padding:0 25px}.welcome-row{grid-template-columns:1.1fr .9fr}.hero-art{transform:scale(.92)}.course-grid{gap:11px}.learning-card{padding:14px}.playground-layout{grid-template-columns:1fr}.editor-panel,.preview-panel{min-height:500px}.editor-host{height:430px}.preview-panel{min-height:560px}#preview-frame{min-height:270px}.lesson-layout{grid-template-columns:minmax(0,1fr) 245px}}
-@media(max-width:900px){:root{--sidebar:245px}.sidebar{transform:translateX(-102%);transition:transform .25s;box-shadow:none}.sidebar.mobile-open{transform:translateX(0);box-shadow:15px 0 50px #18172a25}.main-area{margin-left:0}.mobile-menu{display:inline-flex}.topbar{gap:12px;padding:0 20px}.breadcrumb{margin-right:auto}.search-box{width:190px}.view{padding:26px 22px}.welcome-row{grid-template-columns:1fr .8fr}.hero-art{transform:scale(.8);margin-left:-20px;margin-right:-25px}.stats-grid{gap:10px}.stat-card{padding:15px}.course-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.learning-card:last-child{display:none}.bottom-grid{grid-template-columns:1fr 1fr}.project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.project-card:last-child{display:none}.lesson-layout{grid-template-columns:minmax(0,1fr) 220px}.achievement-list{grid-template-columns:1fr}.achievement{max-width:none}}
-@media(max-width:640px){.topbar{height:61px;padding:0 13px}.breadcrumb{font-size:10px;gap:6px}.topbar-actions{gap:5px}.search-box{width:36px;padding:0 8px;border:0;background:transparent}.search-box input,.search-box kbd{display:none}.search-box>span{font-size:21px}.help-button{padding:7px 8px}.help-button span{display:none}.view{padding:23px 14px}.welcome-row{display:block;min-height:0}.welcome-row h1{font-size:31px}.hero-description{font-size:11px}.hero-art{height:210px;margin:4px 0 0;transform:scale(.88)}.stats-grid{grid-template-columns:1fr 1fr;margin:10px 0 28px}.stats-grid .stat-card:last-child{grid-column:1/-1}.stat-card{padding:14px}.stat-number b{font-size:23px}.section-heading h2,.panel-heading h2{font-size:17px}.section-heading{align-items:flex-end}.section-heading .text-button{font-size:9px}.course-grid{grid-template-columns:1fr}.learning-card:last-child{display:block}.course-illustration{height:95px}.learning-card>p{min-height:0}.bottom-grid{grid-template-columns:1fr}.footer{gap:9px;flex-wrap:wrap}.footer span:nth-child(2){display:none}.page-title-row{display:block;margin-bottom:20px}.page-title-row h1{font-size:29px}.page-title-actions{margin-top:16px}.playground-layout{gap:12px}.editor-toolbar{padding:0 5px}.file-tabs{gap:0}.file-tab{font-size:9px;padding:0 7px}.editor-tools{gap:2px}.save-state{display:none}.editor-panel{min-height:480px}.editor-host{height:410px}.preview-panel{min-height:540px}.preview-toolbar{padding:0 9px}.editor-hint{align-items:flex-start;line-height:1.7}.project-grid{grid-template-columns:1fr}.project-card:last-child{display:block}.project-preview{height:180px}.progress-summary-grid{grid-template-columns:1fr}.progress-summary-grid .stat-card{min-height:0}.progress-course-row{gap:8px}.progress-course-bar{width:25%;min-width:58px}.progress-course-row>button{padding:7px}.lesson-back-row{align-items:flex-start;gap:10px}.lesson-content{padding:22px 17px}.lesson-content h1{font-size:28px}.lesson-lead{font-size:12px}.lesson-layout{grid-template-columns:1fr}.lesson-sidebar{position:static;grid-row:1}.lesson-list{display:grid;grid-template-columns:1fr 1fr;gap:3px}.lesson-sidebar h3{margin-bottom:10px}.lesson-actions>*{flex:1}.modal{padding:24px}.search-results{max-height:50vh;overflow:auto}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+"use strict";
+
+/* ==========================================================
+   CODEMASR
+   Learning Platform - Main JavaScript
+   HTML + CSS + JavaScript Playground
+   ========================================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+    CodeMasr.init();
+});
+
+const CodeMasr = (() => {
+
+    /* ======================================================
+       1. CONFIGURATION
+       ====================================================== */
+
+    const STORAGE_KEYS = {
+        html: "codemasr_html",
+        css: "codemasr_css",
+        js: "codemasr_js",
+        completed: "codemasr_completed_lessons",
+        runs: "codemasr_total_runs",
+        theme: "codemasr_theme"
+    };
+
+    const DEFAULT_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Website</title>
+</head>
+<body>
+    <main class="container">
+        <h1>Hello, CodeMasr!</h1>
+        <p>Welcome to your first coding project.</p>
+
+        <button id="helloButton">Click Me</button>
+
+        <p id="message"></p>
+    </main>
+</body>
+</html>`;
+
+    const DEFAULT_CSS = `* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    color: #1f2937;
+    display: grid;
+    place-items: center;
+}
+
+.container {
+    width: min(90%, 600px);
+    padding: 40px;
+    background: white;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+    color: #0d9488;
+}
+
+button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background: #0d9488;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0f766e;
+}
+
+#message {
+    margin-top: 20px;
+    font-weight: bold;
+}`;
+
+    const DEFAULT_JS = `const button = document.getElementById("helloButton");
+const message = document.getElementById("message");
+
+button.addEventListener("click", function () {
+    message.textContent = "Great job! JavaScript is working.";
+    console.log("Button clicked successfully!");
+});`;
+
+    const state = {
+        html: readStorage(STORAGE_KEYS.html, DEFAULT_HTML),
+        css: readStorage(STORAGE_KEYS.css, DEFAULT_CSS),
+        js: readStorage(STORAGE_KEYS.js, DEFAULT_JS),
+        activeFile: "html",
+        completedLessons: readJSON(STORAGE_KEYS.completed, []),
+        totalRuns: Number(
+            readStorage(STORAGE_KEYS.runs, "0")
+        ),
+        editor: null,
+        models: null,
+        monacoReady: false,
+        initialized: false
+    };
+
+    /* ======================================================
+       2. HELPER FUNCTIONS
+       ====================================================== */
+
+    function $(selector, root = document) {
+        return root.querySelector(selector);
+    }
+
+    function $$(selector, root = document) {
+        return Array.from(root.querySelectorAll(selector));
+    }
+
+    function readStorage(key, fallback) {
+        try {
+            const value = localStorage.getItem(key);
+            return value === null ? fallback : value;
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function readJSON(key, fallback) {
+        try {
+            const value = localStorage.getItem(key);
+
+            if (value === null) {
+                return fallback;
+            }
+
+            return JSON.parse(value);
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function saveStorage(key, value) {
+        try {
+            localStorage.setItem(key, value);
+        } catch (error) {
+            console.warn("Could not save data:", error);
+        }
+    }
+
+    function saveAll() {
+        saveStorage(STORAGE_KEYS.html, state.html);
+        saveStorage(STORAGE_KEYS.css, state.css);
+        saveStorage(STORAGE_KEYS.js, state.js);
+
+        saveStorage(
+            STORAGE_KEYS.completed,
+            JSON.stringify(state.completedLessons)
+        );
+
+        saveStorage(
+            STORAGE_KEYS.runs,
+            String(state.totalRuns)
+        );
+    }
+
+    function setText(selector, value) {
+        const element = $(selector);
+
+        if (element) {
+            element.textContent = value;
+        }
+    }
+
+    function escapeHTML(value) {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function showToast(message, type = "info") {
+        let toast = $("#codemasr-toast");
+
+        if (!toast) {
+            toast = document.createElement("div");
+            toast.id = "codemasr-toast";
+
+            Object.assign(toast.style, {
+                position: "fixed",
+                bottom: "24px",
+                right: "24px",
+                zIndex: "99999",
+                maxWidth: "360px",
+                padding: "14px 20px",
+                borderRadius: "10px",
+                color: "#ffffff",
+                background: "#334155",
+                fontFamily: "Arial, sans-serif",
+                fontSize: "14px",
+                boxShadow: "0 8px 30px rgba(0,0,0,.2)",
+                opacity: "0",
+                transform: "translateY(10px)",
+                transition: "opacity .2s, transform .2s"
+            });
+
+            document.body.appendChild(toast);
+        }
+
+        const backgrounds = {
+            success: "#15803d",
+            error: "#b91c1c",
+            info: "#334155",
+            warning: "#b45309"
+        };
+
+        toast.style.background = backgrounds[type] || backgrounds.info;
+        toast.textContent = message;
+        toast.style.opacity = "1";
+        toast.style.transform = "translateY(0)";
+
+        clearTimeout(toast._hideTimer);
+
+        toast._hideTimer = setTimeout(() => {
+            toast.style.opacity = "0";
+            toast.style.transform = "translateY(10px)";
+        }, 3500);
+    }
+
+    /* ======================================================
+       3. EDITOR ELEMENTS
+       ====================================================== */
+
+    function findEditor(file) {
+        const selectors = {
+            html: [
+                "#htmlEditor",
+                "#html-editor",
+                "#htmlCode",
+                "#html-code",
+                'textarea[name="html"]',
+                '[data-editor="html"]',
+                '[data-file="html"]'
+            ],
+            css: [
+                "#cssEditor",
+                "#css-editor",
+                "#cssCode",
+                "#css-code",
+                'textarea[name="css"]',
+                '[data-editor="css"]',
+                '[data-file="css"]'
+            ],
+            js: [
+                "#jsEditor",
+                "#js-editor",
+                "#scriptEditor",
+                "#javascriptEditor",
+                "#jsCode",
+                "#js-code",
+                'textarea[name="js"]',
+                '[data-editor="js"]',
+                '[data-file="js"]'
+            ]
+        };
+
+        for (const selector of selectors[file] || []) {
+            const element = $(selector);
+
+            if (
+                element &&
+                (
+                    element.tagName === "TEXTAREA" ||
+                    element.tagName === "INPUT"
+                )
+            ) {
+                return element;
+            }
+        }
+
+        return null;
+    }
+
+    function findPreview() {
+        return $(
+            "#previewFrame, " +
+            "#preview-frame, " +
+            "#livePreview iframe, " +
+            "#live-preview iframe, " +
+            "#preview iframe, " +
+            "iframe[data-preview]"
+        );
+    }
+
+    function findConsole() {
+        return $(
+            "#consoleOutput, " +
+            "#console-output, " +
+            "#console, " +
+            "#outputConsole, " +
+            "[data-console]"
+        );
+    }
+
+    function findErrorPanel() {
+        return $(
+            "#errorOutput, " +
+            "#error-output, " +
+            "#errorPanel, " +
+            "#errors, " +
+            "[data-errors]"
+        );
+    }
+
+    function getCode(file) {
+        if (
+            state.monacoReady &&
+            state.editor &&
+            state.models
+        ) {
+            return state.models[file].getValue();
+        }
+
+        const editor = findEditor(file);
+
+        if (editor) {
+            return editor.value;
+        }
+
+        return state[file];
+    }
+
+    function syncEditors() {
+        ["html", "css", "js"].forEach(file => {
+            state[file] = getCode(file);
+        });
+    }
+
+    /* ======================================================
+       4. EDITOR INITIALIZATION
+       ====================================================== */
+
+    function initializeEditors() {
+        ["html", "css", "js"].forEach(file => {
+            const editor = findEditor(file);
+
+            if (!editor) {
+                return;
+            }
+
+            editor.value = state[file];
+
+            editor.addEventListener("input", function () {
+                state[file] = editor.value;
+
+                saveAll();
+                updateEditorStats();
+            });
+
+            editor.addEventListener("keydown", function (event) {
+                if (event.key === "Tab") {
+                    event.preventDefault();
+
+                    const start = editor.selectionStart;
+                    const end = editor.selectionEnd;
+
+                    editor.setRangeText(
+                        "    ",
+                        start,
+                        end,
+                        "end"
+                    );
+
+                    editor.dispatchEvent(
+                        new Event("input", { bubbles: true })
+                    );
+                }
+
+                if (
+                    (event.ctrlKey || event.metaKey) &&
+                    event.key === "Enter"
+                ) {
+                    event.preventDefault();
+                    runCode();
+                }
+            });
+        });
+
+        updateEditorStats();
+    }
+
+    function switchFile(file) {
+        if (!["html", "css", "js"].includes(file)) {
+            return;
+        }
+
+        syncEditors();
+        state.activeFile = file;
+
+        const tabs = $$(
+            "[data-file-tab], " +
+            "[data-editor-tab], " +
+            ".file-tab"
+        );
+
+        tabs.forEach(tab => {
+            const tabFile = (
+                tab.dataset.fileTab ||
+                tab.dataset.editorTab ||
+                tab.dataset.file ||
+                ""
+            ).toLowerCase();
+
+            const active = tabFile === file;
+
+            tab.classList.toggle("active", active);
+            tab.setAttribute("aria-selected", String(active));
+        });
+
+        ["html", "css", "js"].forEach(name => {
+            const editor = findEditor(name);
+
+            if (!editor) {
+                return;
+            }
+
+            editor.hidden = name !== file;
+            editor.style.display = name === file ? "" : "none";
+        });
+
+        if (
+            state.monacoReady &&
+            state.models &&
+            state.editor
+        ) {
+            state.editor.setModel(state.models[file]);
+        }
+
+        const editor = findEditor(file);
+
+        if (editor) {
+            editor.focus();
+        }
+
+        updateEditorStats();
+    }
+
+    function updateEditorStats() {
+        const code = getCode(state.activeFile) || "";
+        const lines = code.split("\n").length;
+
+        setText(
+            "#lineCount, #line-count, [data-line-count]",
+            `${lines} lines`
+        );
+
+        setText(
+            "#characterCount, #character-count, [data-character-count]",
+            `${code.length} characters`
+        );
+
+        const names = {
+            html: "index.html",
+            css: "style.css",
+            js: "script.js"
+        };
+
+        setText(
+            "#activeFileName, #active-file-name, [data-active-file]",
+            names[state.activeFile]
+        );
+    }
+
+    /* ======================================================
+       5. OPTIONAL MONACO EDITOR
+       ====================================================== */
+
+    function initializeMonaco() {
+        const container = $(
+            "#monacoEditor, " +
+            "#monaco-editor, " +
+            "[data-monaco-editor]"
+        );
+
+        if (!container) {
+            return;
+        }
+
+        if (window.monaco && window.monaco.editor) {
+            createMonacoEditor(container);
+            return;
+        }
+
+        loadMonaco();
+    }
+
+    function loadMonaco() {
+        if ($("#codemasr-monaco-loader")) {
+            return;
+        }
+
+        const script = document.createElement("script");
+
+        script.id = "codemasr-monaco-loader";
+        script.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js";
+
+        script.onload = function () {
+            if (typeof window.require !== "function") {
+                showToast(
+                    "Monaco Editor could not initialize.",
+                    "warning"
+                );
+                return;
+            }
+
+            window.require.config({
+                paths: {
+                    vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs"
+                }
+            });
+
+            window.require(
+                ["vs/editor/editor.main"],
+                function () {
+                    const container = $(
+                        "#monacoEditor, " +
+                        "#monaco-editor, " +
+                        "[data-monaco-editor]"
+                    );
+
+                    if (container) {
+                        createMonacoEditor(container);
+                    }
+                }
+            );
+        };
+
+        script.onerror = function () {
+            showToast(
+                "Monaco Editor could not load. Check your internet connection.",
+                "warning"
+            );
+        };
+
+        document.head.appendChild(script);
+    }
+
+    function createMonacoEditor(container) {
+        if (
+            !window.monaco ||
+            !window.monaco.editor ||
+            state.editor
+        ) {
+            return;
+        }
+
+        try {
+            const htmlModel = window.monaco.editor.createModel(
+                state.html,
+                "html"
+            );
+
+            const cssModel = window.monaco.editor.createModel(
+                state.css,
+                "css"
+            );
+
+            const jsModel = window.monaco.editor.createModel(
+                state.js,
+                "javascript"
+            );
+
+            state.models = {
+                html: htmlModel,
+                css: cssModel,
+                js: jsModel
+            };
+
+            state.editor = window.monaco.editor.create(container, {
+                model: htmlModel,
+                theme: "vs-dark",
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 14,
+                tabSize: 4,
+                wordWrap: "on",
+                scrollBeyondLastLine: false
+            });
+
+            state.monacoReady = true;
+
+            state.editor.onDidChangeModelContent(function () {
+                syncEditors();
+                saveAll();
+                updateEditorStats();
+            });
+
+            const fallbackEditors = $$(".standard-editor, .fallback-editor");
+
+            fallbackEditors.forEach(editor => {
+                editor.style.display = "none";
+            });
+
+            showToast("Code editor is ready.", "success");
+        } catch (error) {
+            console.error("Monaco initialization error:", error);
+
+            showToast(
+                "The advanced editor could not start.",
+                "warning"
+            );
+        }
+    }
+
+    /* ======================================================
+       6. CONSOLE AND ERROR HANDLING
+       ====================================================== */
+
+    function clearConsole() {
+        const output = findConsole();
+
+        if (output) {
+            output.replaceChildren();
+        }
+
+        const errors = findErrorPanel();
+
+        if (errors) {
+            errors.replaceChildren();
+        }
+    }
+
+    function writeConsole(message, type = "log") {
+        const output = findConsole();
+
+        if (!output) {
+            return;
+        }
+
+        const line = document.createElement("div");
+
+        line.className = `console-line console-${type}`;
+        line.style.padding = "5px 8px";
+        line.style.marginBottom = "3px";
+        line.style.whiteSpace = "pre-wrap";
+        line.style.overflowWrap = "anywhere";
+        line.style.fontFamily = "monospace";
+        line.style.fontSize = "13px";
+
+        const colors = {
+            log: "#cbd5e1",
+            info: "#60a5fa",
+            warn: "#fbbf24",
+            error: "#f87171"
+        };
+
+        line.style.color = colors[type] || colors.log;
+        line.textContent = String(message);
+
+        output.appendChild(line);
+    }
+
+    function explainError(message) {
+        const text = String(message || "");
+        const lower = text.toLowerCase();
+
+        if (
+            lower.includes("is not defined") ||
+            lower.includes("not defined")
+        ) {
+            return {
+                title: "Undefined Variable",
+                explanation:
+                    "A variable or function is being used before it has been declared, or its name is misspelled.",
+                solution:
+                    "Check the spelling and make sure the variable exists before using it."
+            };
+        }
+
+        if (
+            lower.includes("cannot read properties of null") ||
+            lower.includes("cannot read property")
+        ) {
+            return {
+                title: "Element Not Found",
+                explanation:
+                    "Your code is trying to access a property of a null value. This often happens when an HTML element cannot be found.",
+                solution:
+                    "Check the element ID and make sure the element exists before your JavaScript runs."
+            };
+        }
+
+        if (
+            lower.includes("unexpected token") ||
+            lower.includes("unexpected end")
+        ) {
+            return {
+                title: "Syntax Error",
+                explanation:
+                    "JavaScript found code that does not follow the expected syntax.",
+                solution:
+                    "Check brackets, parentheses, quotation marks, and commas."
+            };
+        }
+
+        if (lower.includes("is not a function")) {
+            return {
+                title: "Function Error",
+                explanation:
+                    "Your code is trying to call something that is not a function.",
+                solution:
+                    "Check the variable's value and make sure the function name is correct."
+            };
+        }
+
+        if (lower.includes("failed to fetch")) {
+            return {
+                title: "Network Error",
+                explanation:
+                    "A network request could not be completed.",
+                solution:
+                    "Check the URL, your connection, and whether the server is available."
+            };
+        }
+
+        if (lower.includes("permission denied")) {
+            return {
+                title: "Permission Error",
+                explanation:
+                    "The operation was blocked because the required permission was unavailable.",
+                solution:
+                    "Check browser permissions and the permissions required by your code."
+            };
+        }
+
+        return {
+            title: "JavaScript Error",
+            explanation:
+                "The browser reported a problem while executing your code.",
+            solution:
+                "Read the original error message, check the indicated line, and inspect the variables used there."
+        };
+    }
+
+    function displayError(message, lineNumber = null) {
+        const details = explainError(message);
+        const panel = findErrorPanel();
+
+        writeConsole(
+            "ERROR: " + message +
+            (lineNumber ? " (Line " + lineNumber + ")" : ""),
+            "error"
+        );
+
+        if (!panel) {
+            return;
+        }
+
+        const card = document.createElement("article");
+
+        card.className = "error-card";
+
+        Object.assign(card.style, {
+            padding: "12px",
+            marginBottom: "10px",
+            borderRadius: "8px",
+            border: "1px solid #ef4444",
+            background: "rgba(239, 68, 68, 0.08)"
+        });
+
+        const title = document.createElement("h4");
+        title.textContent = details.title;
+
+        const original = document.createElement("p");
+        original.textContent = "Error: " + message;
+
+        const explanation = document.createElement("p");
+        explanation.textContent =
+            "What happened: " + details.explanation;
+
+        const solution = document.createElement("p");
+        solution.textContent =
+            "Suggested fix: " + details.solution;
+
+        [title, original, explanation, solution].forEach(element => {
+            element.style.margin = "6px 0";
+            card.appendChild(element);
+        });
+
+        if (lineNumber) {
+            const line = document.createElement("p");
+            line.textContent = "Line: " + lineNumber;
+            card.appendChild(line);
+        }
+
+        panel.appendChild(card);
+    }
+
+    /* ======================================================
+       7. BUILD THE PREVIEW
+       ====================================================== */
+
+    function buildPreviewDocument() {
+        const html = state.html;
+        const css = state.css;
+        const js = state.js;
+
+        const bridgeScript = `
+<script>
+(function () {
+    "use strict";
+
+    function stringify(value) {
+        try {
+            if (typeof value === "string") return value;
+            if (value instanceof Error) return value.stack || value.message;
+            return JSON.stringify(value);
+        } catch (error) {
+            return String(value);
+        }
+    }
+
+    function send(type, args) {
+        try {
+            parent.postMessage({
+                source: "codemasr-preview",
+                type: type,
+                message: Array.from(args).map(stringify).join(" ")
+            }, "*");
+        } catch (error) {}
+    }
+
+    ["log", "info", "warn", "error", "debug"].forEach(function (type) {
+        var original = console[type];
+
+        console[type] = function () {
+            send(type, arguments);
+
+            if (original) {
+                original.apply(console, arguments);
+            }
+        };
+    });
+
+    window.addEventListener("error", function (event) {
+        send("error", [
+            event.message || "Unknown runtime error"
+        ]);
+    });
+
+    window.addEventListener("unhandledrejection", function (event) {
+        send("error", [
+            "Unhandled Promise Rejection: " + stringify(event.reason)
+        ]);
+    });
+})();
+<\/script>`;
+
+        const cssTag = `<style>\n${css}\n</style>`;
+        const jsTag = `<script>\n${js}\n<\/script>`;
+
+        let documentHTML = html;
+
+        if (/<head(?:\s[^>]*)?>/i.test(documentHTML)) {
+            documentHTML = documentHTML.replace(
+                /<head(?:\s[^>]*)?>/i,
+                match => match + "\n" + bridgeScript + "\n" + cssTag
+            );
+        } else {
+            documentHTML = bridgeScript + cssTag + documentHTML;
+        }
+
+        if (/<\/body\s*>/i.test(documentHTML)) {
+            documentHTML = documentHTML.replace(
+                /<\/body\s*>/i,
+                jsTag + "\n</body>"
+            );
+        } else {
+            documentHTML += "\n" + jsTag;
+        }
+
+        return documentHTML;
+    }
+
+    function runCode() {
+        syncEditors();
+        saveAll();
+        clearConsole();
+
+        const preview = findPreview();
+
+        if (!preview) {
+            showToast(
+                "Preview iframe not found. Check index.html.",
+                "error"
+            );
+
+            console.error(
+                "CodeMasr: Add an iframe for the preview. " +
+                'Example: <iframe id="previewFrame"></iframe>'
+            );
+
+            return;
+        }
+
+        state.totalRuns += 1;
+
+        saveStorage(
+            STORAGE_KEYS.runs,
+            String(state.totalRuns)
+        );
+
+        updateDashboard();
+
+        preview.setAttribute(
+            "sandbox",
+            "allow-scripts"
+        );
+
+        preview.setAttribute(
+            "title",
+            "Code Playground Preview"
+        );
+
+        preview.srcdoc = buildPreviewDocument();
+
+        setText(
+            "#runStatus, #run-status, [data-run-status]",
+            "Running..."
+        );
+
+        preview.onload = function () {
+            setText(
+                "#runStatus, #run-status, [data-run-status]",
+                "Preview updated"
+            );
+        };
+
+        showToast("Code executed in the preview.", "success");
+    }
+
+    /* ======================================================
+       8. RECEIVE PREVIEW MESSAGES
+       ====================================================== */
+
+    function initializeConsoleBridge() {
+        window.addEventListener("message", function (event) {
+            const data = event.data;
+
+            if (!data || data.source !== "codemasr-preview") {
+                return;
+            }
+
+            const type = data.type || "log";
+            const message = data.message || "";
+
+            writeConsole(message, type);
+
+            if (type === "error") {
+                displayError(message);
+            }
+        });
+    }
+
+    /* ======================================================
+       9. RESET CODE
+       ====================================================== */
+
+    function resetCode() {
+        const confirmed = window.confirm(
+            "Reset all editor files to their original examples?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        state.html = DEFAULT_HTML;
+        state.css = DEFAULT_CSS;
+        state.js = DEFAULT_JS;
+
+        ["html", "css", "js"].forEach(file => {
+            const editor = findEditor(file);
+
+            if (editor) {
+                editor.value = state[file];
+            }
+
+            if (
+                state.monacoReady &&
+                state.models &&
+                state.models[file]
+            ) {
+                state.models[file].setValue(state[file]);
+            }
+        });
+
+        saveAll();
+        clearConsole();
+        updateEditorStats();
+
+        showToast("Code has been reset.", "success");
+        runCode();
+    }
+
+    /* ======================================================
+       10. DOWNLOAD PROJECT
+       ====================================================== */
+
+    function downloadFile(filename, content, mimeType) {
+        const blob = new Blob([content], {
+            type: mimeType || "text/plain;charset=utf-8"
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = filename;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function downloadHTML() {
+        syncEditors();
+
+        downloadFile(
+            "index.html",
+            state.html,
+            "text/html;charset=utf-8"
+        );
+
+        showToast("index.html downloaded.", "success");
+    }
+
+    function downloadCSS() {
+        syncEditors();
+
+        downloadFile(
+            "style.css",
+            state.css,
+            "text/css;charset=utf-8"
+        );
+
+        showToast("style.css downloaded.", "success");
+    }
+
+    function downloadJS() {
+        syncEditors();
+
+        downloadFile(
+            "script.js",
+            state.js,
+            "text/javascript;charset=utf-8"
+        );
+
+        showToast("script.js downloaded.", "success");
+    }
+
+    function downloadProject() {
+        syncEditors();
+
+        const projectHTML = state.html
+            .replace(
+                /<link\b[^>]*href=["'][^"']*style\.css["'][^>]*>/gi,
+                ""
+            )
+            .replace(
+                /<script\b[^>]*src=["'][^"']*script\.js["'][^>]*>\s*<\/script>/gi,
+                ""
+            );
+
+        const css = state.css.replace(/<\/style/gi, "<\\/style");
+        const js = state.js.replace(/<\/script/gi, "<\\/script");
+
+        let combined = projectHTML;
+
+        const styleTag = `<style>\n${css}\n</style>`;
+        const scriptTag = `<script>\n${js}\n<\/script>`;
+
+        if (/<\/head\s*>/i.test(combined)) {
+            combined = combined.replace(
+                /<\/head\s*>/i,
+                styleTag + "\n</head>"
+            );
+        } else {
+            combined = styleTag + combined;
+        }
+
+        if (/<\/body\s*>/i.test(combined)) {
+            combined = combined.replace(
+                /<\/body\s*>/i,
+                scriptTag + "\n</body>"
+            );
+        } else {
+            combined += scriptTag;
+        }
+
+        downloadFile(
+            "codemasr-project.html",
+            combined,
+            "text/html;charset=utf-8"
+        );
+
+        showToast("Project downloaded as an HTML file.", "success");
+    }
+
+    /* ======================================================
+       11. LESSON PROGRESS
+       ====================================================== */
+
+    function getLessonId(element) {
+        return (
+            element.dataset.lessonId ||
+            element.dataset.lesson ||
+            element.getAttribute("data-id") ||
+            element.id ||
+            ""
+        );
+    }
+
+    function markLessonCompleted(lessonId) {
+        if (!lessonId) {
+            showToast("Lesson ID was not found.", "warning");
+            return;
+        }
+
+        if (!state.completedLessons.includes(lessonId)) {
+            state.completedLessons.push(lessonId);
+        }
+
+        saveAll();
+        updateDashboard();
+        updateLessonButtons();
+
+        showToast("Lesson completed!", "success");
+    }
+
+    function updateLessonButtons() {
+        $$(
+            "[data-complete-lesson], " +
+            "[data-lesson-complete], " +
+            ".complete-lesson"
+        ).forEach(button => {
+            const id = getLessonId(button);
+
+            const complete = state.completedLessons.includes(id);
+
+            button.classList.toggle("completed", complete);
+
+            if (complete) {
+                button.setAttribute("aria-pressed", "true");
+            }
+        });
+    }
+
+    function resetProgress() {
+        const confirmed = window.confirm(
+            "Reset your learning progress?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        state.completedLessons = [];
+        saveAll();
+        updateDashboard();
+        updateLessonButtons();
+
+        showToast("Learning progress has been reset.", "success");
+    }
+
+    /* ======================================================
+       12. DASHBOARD STATISTICS
+       ====================================================== */
+
+    function updateDashboard() {
+        const completed = state.completedLessons.length;
+        const runs = state.totalRuns;
+
+        setText(
+            "#completedLessons, #completed-lessons, [data-completed-lessons]",
+            String(completed)
+        );
+
+        setText(
+            "#totalRuns, #total-runs, [data-total-runs]",
+            String(runs)
+        );
+
+        setText(
+            "#completedCount, [data-completed-count]",
+            String(completed)
+        );
+
+        setText(
+            "#runsCount, [data-runs-count]",
+            String(runs)
+        );
+
+        const progressBar = $(
+            "#progressBar, #progress-bar, [data-progress-bar]"
+        );
+
+        const progressText = $(
+            "#progressPercentage, #progress-percentage, [data-progress-percentage]"
+        );
+
+        const totalLessons = Number(
+            document.body.dataset.totalLessons || 5
+        );
+
+        const percentage = Math.min(
+            100,
+            Math.round((completed / Math.max(1, totalLessons)) * 100)
+        );
+
+        if (progressBar) {
+            progressBar.style.width = percentage + "%";
+            progressBar.setAttribute("aria-valuenow", String(percentage));
+        }
+
+        if (progressText) {
+            progressText.textContent = percentage + "%";
+        }
+    }
+
+    /* ======================================================
+       13. NAVIGATION
+       ====================================================== */
+
+    function showSection(sectionName) {
+        if (!sectionName) {
+            return;
+        }
+
+        const sections = $$(
+            "[data-section], section.page-section, .page-section"
+        );
+
+        let found = false;
+
+        sections.forEach(section => {
+            const id = (
+                section.dataset.section ||
+                section.id ||
+                ""
+            ).toLowerCase();
+
+            const matches = id === sectionName.toLowerCase();
+
+            if (matches) {
+                found = true;
+            }
+
+            section.hidden = !matches;
+            section.classList.toggle("active", matches);
+
+            if (section.style.display !== undefined) {
+                section.style.display = matches ? "" : "none";
+            }
+        });
+
+        const navItems = $$(
+            "[data-nav], [data-target], .nav-link"
+        );
+
+        navItems.forEach(item => {
+            const target = (
+                item.dataset.nav ||
+                item.dataset.target ||
+                item.getAttribute("href") ||
+                ""
+            ).replace(/^#/, "").toLowerCase();
+
+            item.classList.toggle(
+                "active",
+                target === sectionName.toLowerCase()
+            );
+        });
+
+        if (!found) {
+            const target = $("#" + CSS.escape(sectionName));
+
+            if (target) {
+                target.hidden = false;
+                target.style.display = "";
+            }
+        }
+
+        if (sectionName.toLowerCase().includes("playground")) {
+            updateEditorStats();
+        }
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
+    function initializeNavigation() {
+        document.addEventListener("click", function (event) {
+            const nav = event.target.closest(
+                "[data-nav], [data-target], [data-section-link]"
+            );
+
+            if (!nav) {
+                return;
+            }
+
+            const sectionName = (
+                nav.dataset.nav ||
+                nav.dataset.target ||
+                nav.dataset.sectionLink ||
+                nav.getAttribute("href") ||
+                ""
+            ).replace(/^#/, "");
+
+            if (!sectionName) {
+                return;
+            }
+
+            const sectionExists = $(
+                `[data-section="${CSS.escape(sectionName)}"]`
+            ) || $("#" + CSS.escape(sectionName));
+
+            if (sectionExists) {
+                event.preventDefault();
+                showSection(sectionName);
+            }
+        });
+    }
+
+    /* ======================================================
+       14. THEME SWITCHER
+       ====================================================== */
+
+    function toggleTheme() {
+        const current = document.documentElement.dataset.theme ||
+            readStorage(STORAGE_KEYS.theme, "light");
+
+        const next = current === "dark" ? "light" : "dark";
+
+        document.documentElement.dataset.theme = next;
+        document.body.classList.toggle("dark-mode", next === "dark");
+
+        saveStorage(STORAGE_KEYS.theme, next);
+
+        const button = $(
+            "#themeToggle, #theme-toggle, [data-theme-toggle]"
+        );
+
+        if (button) {
+            button.textContent =
+                next === "dark" ? "Light Mode" : "Dark Mode";
+        }
+    }
+
+    function initializeTheme() {
+        const theme = readStorage(STORAGE_KEYS.theme, "light");
+
+        document.documentElement.dataset.theme = theme;
+        document.body.classList.toggle("dark-mode", theme === "dark");
+    }
+
+    /* ======================================================
+       15. SEARCH
+       ====================================================== */
+
+    function initializeSearch() {
+        const search = $(
+            "#searchInput, #search-input, [data-search]"
+        );
+
+        if (!search) {
+            return;
+        }
+
+        search.addEventListener("input", function () {
+            const query = search.value.trim().toLowerCase();
+
+            const items = $$(
+                "[data-searchable], .lesson-card, .course-card, .project-card"
+            );
+
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+
+                item.hidden = query !== "" && !text.includes(query);
+            });
+        });
+    }
+
+    /* ======================================================
+       16. PROJECT EXAMPLES
+       ====================================================== */
+
+    const PROJECTS = {
+        profile: {
+            html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+</head>
+<body>
+    <div class="profile">
+        <div class="avatar">CM</div>
+        <h1>My Profile</h1>
+        <p>Computer Engineering Student</p>
+        <p>I am learning HTML, CSS and JavaScript.</p>
+        <button id="followButton">Follow Me</button>
+    </div>
+</body>
+</html>`,
+            css: `body {
+    font-family: Arial, sans-serif;
+    background: #e0f2fe;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+}
+
+.profile {
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 10px 30px #0001;
+}
+
+.avatar {
+    width: 90px;
+    height: 90px;
+    margin: auto;
+    display: grid;
+    place-items: center;
+    background: #0d9488;
+    color: white;
+    border-radius: 50%;
+    font-size: 28px;
+}
+
+button {
+    background: #0d9488;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+}`,
+            js: `const button = document.getElementById("followButton");
+
+button.addEventListener("click", function () {
+    button.textContent = "Following!";
+    console.log("You are now following this profile.");
+});`
+        },
+
+        counter: {
+            html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter App</title>
+</head>
+<body>
+    <div class="counter">
+        <h1>Counter App</h1>
+        <div id="count">0</div>
+        <button id="decrease">-</button>
+        <button id="reset">Reset</button>
+        <button id="increase">+</button>
+    </div>
+</body>
+</html>`,
+            css: `body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #f1f5f9;
+}
+
+.counter {
+    text-align: center;
+    padding: 35px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px #0001;
+}
+
+#count {
+    font-size: 60px;
+    font-weight: bold;
+    margin: 25px;
+}
+
+button {
+    padding: 12px 20px;
+    margin: 4px;
+    border: none;
+    border-radius: 8px;
+    background: #0d9488;
+    color: white;
+    cursor: pointer;
+}`,
+            js: `let count = 0;
+
+const display = document.getElementById("count");
+
+document.getElementById("increase").addEventListener("click", function () {
+    count++;
+    display.textContent = count;
+});
+
+document.getElementById("decrease").addEventListener("click", function () {
+    count--;
+    display.textContent = count;
+});
+
+document.getElementById("reset").addEventListener("click", function () {
+    count = 0;
+    display.textContent = count;
+});`
+        },
+
+        product: {
+            html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Card</title>
+</head>
+<body>
+    <article class="product">
+        <div class="product-image">Product Image</div>
+        <h1>Smart Watch</h1>
+        <p>A modern smartwatch for everyday use.</p>
+        <strong>$49.99</strong>
+        <button id="buyButton">Add to Cart</button>
+        <p id="status"></p>
+    </article>
+</body>
+</html>`,
+            css: `body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #f8fafc;
+}
+
+.product {
+    width: 280px;
+    padding: 20px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 8px 30px #0001;
+}
+
+.product-image {
+    height: 150px;
+    background: #ccfbf1;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+}
+
+strong {
+    display: block;
+    margin: 15px 0;
+    font-size: 24px;
+    color: #0d9488;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #0d9488;
+    color: white;
+    cursor: pointer;
+}`,
+            js: `const buyButton = document.getElementById("buyButton");
+const status = document.getElementById("status");
+
+buyButton.addEventListener("click", function () {
+    status.textContent = "Product added to cart!";
+    console.log("Product added to cart.");
+});`
+        }
+    };
+
+    function loadProject(name) {
+        const project = PROJECTS[name];
+
+        if (!project) {
+            showToast("Project not found.", "error");
+            return;
+        }
+
+        const confirmed = window.confirm(
+            "Load this project? Your current editor content will be replaced."
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        state.html = project.html;
+        state.css = project.css;
+        state.js = project.js;
+
+        ["html", "css", "js"].forEach(file => {
+            const editor = findEditor(file);
+
+            if (editor) {
+                editor.value = state[file];
+            }
+
+            if (
+                state.monacoReady &&
+                state.models &&
+                state.models[file]
+            ) {
+                state.models[file].setValue(state[file]);
+            }
+        });
+
+        switchFile("html");
+        saveAll();
+        updateEditorStats();
+
+        showSection("playground");
+
+        showToast("Project loaded successfully.", "success");
+    }
+
+    /* ======================================================
+       17. EVENT DELEGATION
+       ====================================================== */
+
+    function initializeButtons() {
+        document.addEventListener("click", function (event) {
+            const button = event.target.closest("button, [role='button']");
+
+            if (!button) {
+                return;
+            }
+
+            if (button.matches("[data-run-code], #runCode, #run-code, .run-code")) {
+                event.preventDefault();
+                runCode();
+                return;
+            }
+
+            if (button.matches("[data-reset-code], #resetCode, #reset-code")) {
+                event.preventDefault();
+                resetCode();
+                return;
+            }
+
+            if (button.matches("[data-download-html]")) {
+                event.preventDefault();
+                downloadHTML();
+                return;
+            }
+
+            if (button.matches("[data-download-css]")) {
+                event.preventDefault();
+                downloadCSS();
+                return;
+            }
+
+            if (button.matches("[data-download-js]")) {
+                event.preventDefault();
+                downloadJS();
+                return;
+            }
+
+            if (button.matches("[data-download-project], #downloadProject")) {
+                event.preventDefault();
+                downloadProject();
+                return;
+            }
+
+            if (button.matches("[data-clear-console], #clearConsole, #clear-console")) {
+                event.preventDefault();
+                clearConsole();
+                return;
+            }
+
+            if (button.matches("[data-theme-toggle], #themeToggle, #theme-toggle")) {
+                event.preventDefault();
+                toggleTheme();
+                return;
+            }
+
+            if (button.matches("[data-reset-progress]")) {
+                event.preventDefault();
+                resetProgress();
+                return;
+            }
+
+            if (button.matches("[data-complete-lesson], [data-lesson-complete], .complete-lesson")) {
+                event.preventDefault();
+
+                markLessonCompleted(getLessonId(button));
+                return;
+            }
+
+            if (button.matches("[data-load-project]")) {
+                event.preventDefault();
+
+                loadProject(button.dataset.loadProject);
+                return;
+            }
+
+            if (button.matches("[data-file-tab], [data-editor-tab], .file-tab")) {
+                event.preventDefault();
+
+                const file = (
+                    button.dataset.fileTab ||
+                    button.dataset.editorTab ||
+                    button.dataset.file ||
+                    ""
+                ).toLowerCase();
+
+                switchFile(file);
+            }
+        });
+    }
+
+    /* ======================================================
+       18. GLOBAL ERROR HANDLING
+       ====================================================== */
+
+    function initializeGlobalErrors() {
+        window.addEventListener("error", function (event) {
+            if (
+                event.filename &&
+                event.filename.includes("codemasr")
+            ) {
+                console.error(
+                    "CodeMasr application error:",
+                    event.message
+                );
+            }
+        });
+
+        window.addEventListener("unhandledrejection", function (event) {
+            console.error(
+                "Unhandled application promise:",
+                event.reason
+            );
+        });
+    }
+
+    /* ======================================================
+       19. INITIALIZE EVERYTHING
+       ====================================================== */
+
+    function init() {
+        if (state.initialized) {
+            return;
+        }
+
+        state.initialized = true;
+
+        initializeTheme();
+        initializeEditors();
+        initializeConsoleBridge();
+        initializeNavigation();
+        initializeSearch();
+        initializeButtons();
+        initializeGlobalErrors();
+        initializeMonaco();
+
+        updateDashboard();
+        updateLessonButtons();
+
+        console.log("CodeMasr initialized successfully.");
+
+        const preview = findPreview();
+
+        if (preview) {
+            runCode();
+        }
+    }
+
+    /* ======================================================
+       20. PUBLIC METHODS
+       ====================================================== */
+
+    return {
+        init,
+        runCode,
+        resetCode,
+        switchFile,
+        showSection,
+        toggleTheme,
+        markLessonCompleted,
+        resetProgress,
+        downloadHTML,
+        downloadCSS,
+        downloadJS,
+        downloadProject,
+        loadProject,
+        updateDashboard,
+        explainError
+    };
+
+})();
