@@ -619,3 +619,89 @@
     0 0 12px var(--st-accent),
     0 0 24px var(--st-accent-2) !important;
 }
+/* تصميم زر (+) لإضافة ملف جديد بجانب التبويبات */
+.vscode-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+}
+
+.vscode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+}
+
+.vscode-add-tab-btn,
+.pg-plus-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 4px;
+  border-radius: 6px;
+  border: 1px dashed var(--st-accent, #6c5ce7);
+  background: rgba(108, 92, 231, 0.12);
+  color: var(--st-accent, #6c5ce7);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vscode-add-tab-btn:hover,
+.pg-plus-tab-btn:hover {
+  background: var(--st-accent, #6c5ce7);
+  color: #000;
+  transform: scale(1.08);
+  box-shadow: 0 0 12px var(--st-accent, #6c5ce7);
+}
+
+.tab-close-x {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  opacity: 0.55;
+  font-size: 13px;
+  padding: 0 3px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tab-close-x:hover {
+  opacity: 1;
+  background: rgba(248, 81, 73, 0.25);
+  color: #ff5f56;
+}
+
+.py-dot {
+  background: #168f6a;
+}
+
+.quick-ext-chip {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--purple);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font: 600 11px 'DM Mono', monospace;
+  cursor: pointer;
+}
+
+.quick-ext-chip:hover {
+  background: var(--purple);
+  color: #fff;
+}
+
+/* رفع النافذة المنبثقة لتظهر فوق الفول سكرين عند الضغط على (+) */
+.modal-backdrop {
+  z-index: 10005 !important;
+}
