@@ -45,225 +45,100 @@
       tagClass: 'tag-html',
       badgeText: '5',
       badgeClass: 'html-badge',
-      lessons: [
+lessons: [
         {
           id: 'html-1',
           num: '01',
-          title: 'Meet HTML',
+          title: 'هيكل المستند الأساسي (Doctype, html, head, body)',
           duration: '15 min',
-          eyebrow: 'LESSON 01 · YOUR FIRST STEP',
-          lead: 'HTML gives a webpage its structure, like the concrete frame of a building. (بالمصري: الـ HTML هو الطوب والخرسانة اللي بنبني بيها هيكل أي موقع على الإنترنت).',
-          goal: 'Understand what HTML does and create your first heading (<h1>) and paragraph (<p>).',
-          sectionTitle: 'What is HTML?',
-          explanation: 'HTML stands for HyperText Markup Language. It uses elements called tags (وسوم) to describe content to the browser. Every tag usually has an opening tag like <h1> and a closing tag like </h1>. بالمصري: أي عنوان رئيسي بنحطه جوه <h1> وأي فقرة كلام عادي بنحطها جوه <p>، ولازم نقفل التاج بعلامة السلاش / علشان المتصفح ميتلخبطش.',
-          exampleCode: '<h1>Hello, world!</h1>\n<p>I am learning to code on CodeMasr.</p>',
-          starterCode: '<!-- اكتب عنوان رئيسي h1 وفقرة p تحت هنا واضغط Run -->\n<h1>Hello, world!</h1>\n<p>أول سطر برمجي ليا في HTML!</p>',
-          solutionCode: '<h1>Hello, world!</h1>\n<p>أول سطر برمجي ليا في HTML!</p>',
-          challengePrompt: 'تحدي الدرس: اكتب عنوان رئيسي باستخدام <h1> وتحته فقرة نصية باستخدام <p> تحتوي على أي جملة ترحيبية، ثم اضغط Run & Check.',
-          validate: function (doc, rawCode) {
+          eyebrow: 'HTML 01 · البنية التحتية القياسية',
+          lead: 'كل صفحة ويب تتكون من هيكل إلزامي يفصل بين بيانات المتصفح ومحركات البحث وبين المحتوى المرئي للمستخدم.',
+          goal: 'فهم معنى <!DOCTYPE html>، وتوزيع وسوم html و head و title و body بشكل قياسي.',
+          sectionTitle: 'التشريح المعماري لصفحة الويب',
+          explanation: 'يبدأ المستند بتعريف النوع <!DOCTYPE html> لإعلام المتصفح بتطبيق معايير HTML5 الحديثة.<br>ينقسم المستند بعد ذلك إلى قسمين منفصلين تماماً:<br>1. منطقة الرأس (<head>): تحتوي على معلومات المتصفح ومحركات البحث (العنوان والترميز وملفات التنسيق) ولا يظهر أي محتوى منها داخل الصفحة.<br>2. منطقة الجسم (<body>): تضم كل ما يراه المستخدم ويتفاعل معه بصرياً من نصوص وصور وأزرار.',
+          exampleCode: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n  <head>\n    <meta charset="UTF-8">\n    <title>أول صفحة ويب</title>\n  </head>\n  <body>\n    <h1>مرحباً بك في عالم تطوير الويب</h1>\n    <p>هذا النص يظهر داخل منطقة الـ body المرئية.</p>\n  </body>\n</html>',
+          starterCode: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n  <head>\n    <title>تحدي الهيكل الأساسي</title>\n  </head>\n  <body>\n    <h1>أول صفحة ويب متكاملة</h1>\n    <p>تم بناء الهيكل بنجاح.</p>\n  </body>\n</html>',
+          solutionCode: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n  <head>\n    <title>تحدي الهيكل الأساسي</title>\n  </head>\n  <body>\n    <h1>أول صفحة ويب متكاملة</h1>\n    <p>تم بناء الهيكل بنجاح.</p>\n  </body>\n</html>',
+          challengePrompt: 'تحدي الدرس: ابنِ هيكلاً قياسياً يحتوي على <!DOCTYPE html> وعنصر <html> وعنصر <head> بداخله <title> وعنصر <body> بداخله <h1> و <p>.',
+          validate: function (doc) {
             const h1 = doc.querySelector('h1');
             const p = doc.querySelector('p');
-            if (!h1) {
-              return {
-                passed: false,
-                msgAr: 'ناقص تكتب عنوان رئيسي باستخدام وسم <h1>...</h1>.',
-                msgEn: 'Missing an <h1> heading element.',
-                suggestedFix: '<h1>Hello, world!</h1>\n' + rawCode
-              };
-            }
-            if (!h1.textContent.trim()) {
-              return {
-                passed: false,
-                msgAr: 'وسم <h1> موجود بس فاضي! اكتب جواه أي عنوان.',
-                msgEn: 'Your <h1> element is empty. Add some text inside it.',
-                suggestedFix: rawCode.replace(/<h1>\s*<\/h1>/i, '<h1>أهلاً بك في عالم البرمجة</h1>')
-              };
-            }
-            if (!p || !p.textContent.trim()) {
-              return {
-                passed: false,
-                msgAr: 'ممتاز على العنوان! ناقص بس تضيف فقرة <p>...</p> جواها نص.',
-                msgEn: 'Great heading! Now add a non-empty <p> paragraph element.',
-                suggestedFix: rawCode + '\n<p>أنا بتعلم تطوير الويب خطوة بخطوة.</p>'
-              };
-            }
-            return {
-              passed: true,
-              msgAr: 'عاش يا بطل! كتبت العنوان <h1> والفقرة <p> بشكل سليم 100%.',
-              msgEn: 'Awesome job! Both <h1> and <p> are properly structured.'
-            };
+            if (!h1 || !h1.textContent.trim()) return { passed: false, msgAr: 'أضف عنواناً رئيسياً <h1> يحتوي على نص.', msgEn: 'Include an <h1> heading with text.' };
+            if (!p || !p.textContent.trim()) return { passed: false, msgAr: 'أضف فقرة <p> تحتوي على نص توضيحي.', msgEn: 'Include a <p> paragraph with text.' };
+            return { passed: true, msgAr: 'أحسنت! تم بناء الهيكل المعماري للمستند بدقة.', msgEn: 'Document structure verified successfully!' };
           }
         },
         {
           id: 'html-2',
           num: '02',
-          title: 'Elements & tags',
-          duration: '12 min',
-          eyebrow: 'LESSON 02 · HIERARCHY & EMPHASIS',
-          lead: 'Learn how to nest tags properly and emphasize key words with <strong>, <em>, and headings <h1> to <h3>.',
-          goal: 'Create a main heading (<h1>), a subheading (<h2>), and a paragraph containing bold text (<strong>).',
-          sectionTitle: 'Nesting & Hierarchy (التسلسل والتداخل)',
-          explanation: 'Headings rank from <h1> (most important, one per page) down to <h6>. Inside paragraphs, you can wrap important words with <strong> for bold importance or <em> for italic emphasis. بالمصري: لما تفتح تاج جوه تاج، لازم تقفل اللي جوه الأول قبل ما تقفل اللي بره!',
-          exampleCode: '<h1>دليل المبرمج المبتدئ</h1>\n<h2>الخطوة الأولى: الأساسيات</h2>\n<p>أهم قاعدة في البرمجة هي <strong>الممارسة اليومية</strong> والتجربة.</p>',
-          starterCode: '<h1>دليل المبرمج</h1>\n<!-- ضيف عنوان فرعي h2 وفقرة p جواها كلمة مهمة بداخل strong -->\n',
-          solutionCode: '<h1>دليل المبرمج</h1>\n<h2>أساسيات الويب</h2>\n<p>البرمجة تحتاج إلى <strong>تطبيق عملي</strong> مستمر.</p>',
-          challengePrompt: 'تحدي الدرس:تأكد من وجود عنوان <h1>، وعنوان فرعي <h2>، وفقرة <p> تحتوي بداخلها على وسم <strong> لتأكيد كلمة مهمة.',
+          title: 'عناوين الصفحات (العناوين من h1 إلى h6 والفروق الدلالية والـ SEO)',
+          duration: '15 min',
+          eyebrow: 'HTML 02 · التسلسل الهرمي للمحتوى',
+          lead: 'العناوين ليست لمجرد تكبير الخط، بل تمثل شجرة العناوين التي تفهرسها محركات البحث وقارئات الشاشة.',
+          goal: 'تنظيم الصفحة بتسلسل منطقي يبدأ بـ h1 واحد فقط للأقسام الكبرى يليه h2 ثم h3.',
+          sectionTitle: 'الفروق الدلالية وأهمية العناوين في معايير SEO',
+          explanation: 'توفر لغة HTML ستة مستويات من العناوين:<br>• <h1>: عنوان الصفحة الرئيسي الأوحد (Main Title)، ويُمنع تكراره أكثر من مرة في الصفحة للحفاظ على قوة ترتيبك في محركات البحث.<br>• <h2>: يمثل الأقسام والقطاعات الكبرى.<br>• <h3> إلى <h6>: عناوين فرعية متدرجة داخل كل قطاع.<br>قاعدة مهمة: لا تستخدم العناوين لمجرد تكبير الخط، فحجم الخط يتم ضبطه بواسطة CSS عبر font-size.',
+          exampleCode: '<h1>دليل هندسة البرمجيات</h1>\n<h2>المرحلة الأولى: هندسة الواجهات</h2>\n<h3>الدرس الأول: العناوين والفقرات</h3>\n<h2>المرحلة الثانية: النظم السحابية</h2>\n<h3>الدرس الأول: قواعد البيانات</h3>',
+          starterCode: '<h1>منصة التعلم المتكاملة</h1>\n<h2>مسار تطوير الويب</h2>\n<h3>أساسيات لغة HTML</h3>\n<h2>مسار النظم السحابية</h2>\n<h3>بناء قواعد البيانات</h3>',
+          solutionCode: '<h1>منصة التعلم المتكاملة</h1>\n<h2>مسار تطوير الويب</h2>\n<h3>أساسيات لغة HTML</h3>\n<h2>مسار النظم السحابية</h2>\n<h3>بناء قواعد البيانات</h3>',
+          challengePrompt: 'تحدي الدرس: أنشئ عنواناً رئيسياً <h1> واحداً فقط، وعنوانين فرعيين <h2>، وعنوانين <h3> متفرعين تحت كل منهما.',
           validate: function (doc) {
-            const h1 = doc.querySelector('h1');
-            const h2 = doc.querySelector('h2');
-            const strong = doc.querySelector('p strong, strong');
-            if (!h1) return { passed: false, msgAr: 'تأكد من وجود العنوان الرئيسي <h1>.', msgEn: 'Missing <h1> tag.' };
-            if (!h2) return { passed: false, msgAr: 'ناقص تضيف عنوان فرعي <h2> تحت العنوان الرئيسي.', msgEn: 'Add an <h2> subheading.' };
-            if (!strong || !strong.textContent.trim()) return { passed: false, msgAr: 'ناقص تستخدم وسم <strong>...</strong> جوه الفقرة لتوضيح كلمة مهمة.', msgEn: 'Include a <strong> element with text inside your paragraph.' };
-            return { passed: true, msgAr: 'الله ينور! تسلسل العناوين والتأكيد بـ <strong> مظبوط بالمللي.', msgEn: 'Perfect heading hierarchy and semantic strong tag!' };
+            const h1s = doc.querySelectorAll('h1');
+            const h2s = doc.querySelectorAll('h2');
+            const h3s = doc.querySelectorAll('h3');
+            if (h1s.length !== 1) return { passed: false, msgAr: 'يجب أن تحتوي الصفحة على وسم <h1> واحد فقط لضمان سلامة الـ SEO.', msgEn: 'Strictly one <h1> is allowed.' };
+            if (h2s.length < 2) return { passed: false, msgAr: 'أضف عنوانين فرعيين <h2> على الأقل.', msgEn: 'Include at least two <h2> subheadings.' };
+            if (h3s.length < 2) return { passed: false, msgAr: 'أضف عنوانين <h3> لتوضيح التدرج الهرمي.', msgEn: 'Include at least two <h3> headings.' };
+            return { passed: true, msgAr: 'تسلسل هرمي ممتاز ومطابق لمعايير الـ W3C العالمية!', msgEn: 'Perfect semantic hierarchy!' };
           }
         },
         {
           id: 'html-3',
           num: '03',
-          title: 'Links & images',
-          duration: '18 min',
-          eyebrow: 'LESSON 03 · CONNECTING THE WEB',
-          lead: 'Turn static text into interactive links with <a> and display rich visuals using <img>.',
-          goal: 'Add a working hyperlink (<a href="...">) and an accessible image (<img src="..." alt="...">).',
-          sectionTitle: 'Attributes: href, src, and alt',
-          explanation: 'Attributes provide extra info to tags. Links use <a href="URL">Text</a>. Images use <img src="URL" alt="Description"> and do not have a closing tag. بالمصري: خاصية alt في الصورة مهمة جداً علشان لو النت فصل أو لو شخص كفيف بيستخدم قارئ شاشة يعرف الصورة دي بتاعة إيه.',
-          exampleCode: '<h2>موقعي المفضل</h2>\n<p>تصفح المشاريع على <a href="https://github.com" target="_blank">GitHub</a>.</p>\n<img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400" alt="شاشة كمبيوتر عليها كود برمجي" width="280">',
-          starterCode: '<h2>معرض أعمالي</h2>\n<!-- 1. ضيف رابط <a> بخاصية href -->\n\n<!-- 2. ضيف صورة <img> بخاصية src و alt -->\n',
-          solutionCode: '<h2>معرض أعمالي</h2>\n<p>زوروا صفحتي على <a href="https://github.com" target="_blank">GitHub</a></p>\n<img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400" alt="شاشة برمجة" width="260">',
-          challengePrompt: 'تحدي الدرس: أضف رابطاً <a> يحتوي على خاصية href ونص، وصورة <img> تحتوي على خاصيتي src و alt غير فارغتين.',
+          title: 'الفقرات والفواصل والنصوص المنسقة (p, br, hr, pre)',
+          duration: '15 min',
+          eyebrow: 'HTML 03 · التعامل مع الكتل النصية',
+          lead: 'الفرق بين وسم الفقرة p والوسوم ذاتية الإغلاق br و hr، ولماذا يحافظ وسم pre على المسافات والأسطر.',
+          goal: 'استخدام p للفقرات، br لكسر السطر الداخلي، hr للفواصل، و pre للأكواد.',
+          sectionTitle: 'الفرق بين كسر السطر والفواصل والفقرات',
+          explanation: '• <p>: فقرة نصية مستقلة يترك المتصفح قبلها وبعدها هامشاً عمودياً تلقائياً.<br>• <br>: وسم ذاتي الإغلاق (Void Tag) لكسر السطر داخل نفس الفقرة بدون ترك فراغات عمودية ضخمة.<br>• <hr>: فاصل موضوعي دلالي بين فكرتين مختلفتين، ويظهر كخط أفقي.<br>• <pre>: يعطل دمج المسافات التلقائي للمتصفح ويعرض النص بمسافاته وأبعاده تماماً كما كُتب في المحرر وبخط أحادي العرض (Monospace).',
+          exampleCode: '<p>السطر الأول داخل الفقرة.<br>السطر الثاني داخل نفس الفقرة بعد الفاصل br.</p>\n<hr>\n<pre>\n  دالة برمجية:\n  total = 50 + 50;\n  print(total);\n</pre>',
+          starterCode: '<p>هندسة البرمجيات تبدأ بالتطبيق المستمر.<br>التدريب اليومي يصنع الفارق.</p>\n<hr>\n<pre>\n    *\n   ***\n  *****\n</pre>',
+          solutionCode: '<p>هندسة البرمجيات تبدأ بالتطبيق المستمر.<br>التدريب اليومي يصنع الفارق.</p>\n<hr>\n<pre>\n    *\n   ***\n  *****\n</pre>',
+          challengePrompt: 'تحدي الدرس: أدرج فقرة <p> تحوي فاصل سطر <br>، ثم فاصلاً موضوعياً <hr>، ثم عنصراً منسقاً مسبقاً <pre>.',
           validate: function (doc) {
-            const a = doc.querySelector('a[href]');
-            const img = doc.querySelector('img[src]');
-            if (!a || !a.getAttribute('href').trim() || !a.textContent.trim()) {
-              return { passed: false, msgAr: 'لازم تضيف رابط <a href="https://..."> مع نص مكتوب جواه.', msgEn: 'Add an <a> element with a valid href attribute and text.' };
-            }
-            if (!img || !img.getAttribute('src').trim()) {
-              return { passed: false, msgAr: 'لازم تضيف وسم صورة <img src="...">.', msgEn: 'Add an <img> tag with a src attribute.' };
-            }
-            if (!img.getAttribute('alt') || !img.getAttribute('alt').trim()) {
-              return { passed: false, msgAr: 'الصورة موجودة بس نسيت خاصية alt="..." لوصف الصورة!', msgEn: 'Always include a non-empty alt attribute on your <img> tag.' };
-            }
-            return { passed: true, msgAr: 'ممتاز يا هندسة! الرابط والصورة بالـ alt شغالين تمام.', msgEn: 'Great! Your link and accessible image are both valid.' };
+            const p = doc.querySelector('p');
+            const br = doc.querySelector('p br, br');
+            const hr = doc.querySelector('hr');
+            const pre = doc.querySelector('pre');
+            if (!p || !br) return { passed: false, msgAr: 'تأكد من وجود فقرة <p> وبداخلها وسم كسر السطر <br>.', msgEn: 'Include <p> with <br> inside.' };
+            if (!hr) return { passed: false, msgAr: 'أضف خطاً فاصلاً موضوعياً <hr>.', msgEn: 'Add an <hr> element.' };
+            if (!pre || !pre.textContent.trim()) return { passed: false, msgAr: 'أضف كتلة نصوص منسقة مسبقاً <pre> تحوي نصاً أو رسماً بمسافات.', msgEn: 'Add a <pre> block with content.' };
+            return { passed: true, msgAr: 'ممتاز! فهمت دور كل وسم وفروقات المسافات في المتصفح.', msgEn: 'Great understanding of text layout!' };
           }
         },
         {
           id: 'html-4',
           num: '04',
-          title: 'Lists & forms',
-          duration: '20 min',
-          eyebrow: 'LESSON 04 · LISTS & USER INPUT',
-          lead: 'Organize items with <ul> / <ol> lists and collect user data using interactive <form>, <input>, and <button> elements.',
-          goal: 'Build an unordered list (<ul> with <li> items) and a <form> containing an <input> and a <button>.',
-          sectionTitle: 'Lists & Interactive Forms',
-          explanation: 'Use <ul> for bullet points and <ol> for numbered steps. Every item goes inside an <li> tag. For user input, wrap fields inside <form>, use <input type="text" placeholder="...">, and add a <button type="submit">. بالمصري: أي لستة لازم عناصرها تكون <li>، وأي فورم بيحتاج input عشان المستخدم يكتب فيه وزرار button عشان يبعت البيانات.',
-          exampleCode: '<h3>مهاراتي البرمجية:</h3>\n<ul>\n  <li>HTML5</li>\n  <li>CSS3</li>\n</ul>\n<form>\n  <input type="text" placeholder="اكتب اسمك هنا..." required>\n  <button type="submit">إرسال</button>\n</form>',
-          starterCode: '<h3>قائمة المهام:</h3>\n<ul>\n  <li>تعلم القوائم في HTML</li>\n  <li>بناء نموذج تفاعلي</li>\n</ul>\n\n<!-- أنشئ وسم <form> بداخله <input> و <button> -->\n',
-          solutionCode: '<h3>قائمة المهام:</h3>\n<ul>\n  <li>تعلم القوائم في HTML</li>\n  <li>بناء نموذج تفاعلي</li>\n</ul>\n<form>\n  <input type="text" placeholder="أضف مهمة جديدة...">\n  <button type="submit">إضافة</button>\n</form>',
-          challengePrompt: 'تحدي الدرس: أنشئ قائمة (<ul> أو <ol>) بها عنصران <li> على الأقل، ونموذج <form> بداخله حقل <input> وزر <button>.',
-          validate: function (doc) {
-            const lis = doc.querySelectorAll('ul li, ol li');
-            const form = doc.querySelector('form');
-            const input = doc.querySelector('form input, input');
-            const btn = doc.querySelector('form button, button');
-            if (lis.length < 2) return { passed: false, msgAr: 'أضف قائمة <ul> أو <ol> جواها عنصرين <li> على الأقل.', msgEn: 'Create a list with at least two <li> items.' };
-            if (!form) return { passed: false, msgAr: 'لازم تضيف وسم <form>...</form> لاحتواء الحقول.', msgEn: 'Wrap your input and button inside a <form> element.' };
-            if (!input) return { passed: false, msgAr: 'ناقص تضيف حقل إدخال <input> داخل الفورم.', msgEn: 'Add an <input> field inside your form.' };
-            if (!btn) return { passed: false, msgAr: 'ناقص تضيف زرار <button> داخل الفورم.', msgEn: 'Add a <button> inside your form.' };
-            return { passed: true, msgAr: 'برافو عليك! القائمة والفورم جاهزين لاستقبال بيانات المستخدم.', msgEn: 'Spot on! Your list and interactive form are complete.' };
-          }
-        },
-        {
-          id: 'html-5',
-          num: '05',
-          title: 'Tables & data',
+          title: 'تنسيقات النصوص الدلالية (b مقابل strong، و i مقابل em، و sub و sup)',
           duration: '18 min',
-          eyebrow: 'LESSON 05 · STRUCTURED DATA',
-          lead: 'Display schedules, grades, and pricing cleanly using HTML <table>, <tr>, <th>, and <td> elements.',
-          goal: 'Create a table with header cells (<th>) and data cells (<td>) organized in rows (<tr>).',
-          sectionTitle: 'How HTML Tables Work',
-          explanation: 'Every table starts with <table>. Inside it, each horizontal row is a <tr> (Table Row). Header cells use <th> (bold & centered automatically), while normal data cells use <td> (Table Data). بالمصري: الجدول بيتقسم صفوف <tr>، وجوه كل صف بنحط العواميد سواء عناوين <th> أو بيانات عادية <td>.',
-          exampleCode: '<table border="1" cellpadding="8">\n  <tr>\n    <th>اللغة</th>\n    <th>الوظيفة</th>\n  </tr>\n  <tr>\n    <td>HTML</td>\n    <td>بناء هيكل الصفحة</td>\n  </tr>\n</table>',
-          starterCode: '<table border="1" cellpadding="8">\n  <tr>\n    <th>الطالب</th>\n    <th>الدرجة</th>\n  </tr>\n  <!-- ضيف صف جديد <tr> جواه خليتين <td> هنا -->\n\n</table>',
-          solutionCode: '<table border="1" cellpadding="8">\n  <tr>\n    <th>الطالب</th>\n    <th>الدرجة</th>\n  </tr>\n  <tr>\n    <td>أحمد حسني</td>\n    <td>100%</td>\n  </tr>\n</table>',
-          challengePrompt: 'تحدي الدرس: أكمل الجدول بحيث يحتوي على صف ترويسة به خليتين <th>، وصف بيانات به خليتين <td> على الأقل.',
+          eyebrow: 'HTML 04 · دلالات التوكيد والترميز العلمي',
+          lead: 'الفرق الدقيق بين التنسيق البصري الشكلي والتنسيق الدلالي لقارئات الشاشة، وطريقة كتابة المعادلات والصيغ الكيميائية.',
+          goal: 'استخدام strong للأهمية الحرجة و em للتوكيد الصوتي، وكتابة معادلات باستخدام sub و sup.',
+          sectionTitle: 'الفرق بين الدلالة البرمجية والشكل البصري',
+          explanation: '• <b> مقابل <strong>: الوسم <b> يجعل الخط عريضاً فقط للشكل، بينما <strong> يخبر محركات البحث وقارئات الشاشة بأن هذا النص بالغ الخطورة والأهمية (مثل التحذيرات).<br>• <i> مقابل <em>: الوسم <i> يميل الخط شكلياً، بينما <em> يعبر عن نبرة صوتية مؤكدة وتغير في النطق عند القراءة الآلية.<br>• <mark>: تمييز الكلمات باللون الأصفر مثل قلم الهايلايتر.<br>• <sub> و <sup>: الحروف المنخفضة للصيغ الكيميائية مثل H<sub>2</sub>O، والحروف المرتفعة للأسس الرياضية مثل X<sup>2</sup>.',
+          exampleCode: '<p>تحذير أمني: <strong>لا تشارك كلمة المرور</strong> مع أي طرف خارجي.</p>\n<p>الصيغة الكيميائية: H<sub>2</sub>O | الأس الرياضي: 10<sup>3</sup> = 1000</p>\n<p>السعر بعد الخصم: <mark>150 ج.م</mark></p>',
+          starterCode: '<p>تحذير: <strong>البيانات حساسة للغاية</strong></p>\n<p>مركب كيميائي: H<sub>2</sub>O</p>\n<p>معادلة رياضية: X<sup>2</sup> + Y<sup>2</sup></p>\n<p>قيمة مميزة: <mark>خصم 50%</mark></p>',
+          solutionCode: '<p>تحذير: <strong>البيانات حساسة للغاية</strong></p>\n<p>مركب كيميائي: H<sub>2</sub>O</p>\n<p>معادلة رياضية: X<sup>2</sup> + Y<sup>2</sup></p>\n<p>قيمة مميزة: <mark>خصم 50%</mark></p>',
+          challengePrompt: 'تحدي الدرس: أدرج نصاً يحوي <strong> للتوكيد، وعنصراً كيميائياً أو رياضياً باستخدام <sub> أو <sup>، وتحديداً عبر <mark>.',
           validate: function (doc) {
-            const table = doc.querySelector('table');
-            const ths = doc.querySelectorAll('table th');
-            const tds = doc.querySelectorAll('table td');
-            if (!table) return { passed: false, msgAr: 'وسم <table> غير موجود.', msgEn: 'Missing <table> element.' };
-            if (ths.length < 2) return { passed: false, msgAr: 'الجدول محتاج خليتين عنوان <th> على الأقل.', msgEn: 'Include at least two <th> header cells.' };
-            if (tds.length < 2) return { passed: false, msgAr: 'ضيف صف <tr> جواه خليتين بيانات <td> على الأقل.', msgEn: 'Add a row with at least two <td> data cells.' };
-            return { passed: true, msgAr: 'عظمة! الجدول متنسق ومترتب صح جداً.', msgEn: 'Excellent! Your HTML table is well structured.' };
-          }
-        },
-        {
-          id: 'html-6',
-          num: '06',
-          title: 'Semantic HTML5',
-          duration: '20 min',
-          eyebrow: 'LESSON 06 · MEANINGFUL STRUCTURE',
-          lead: 'Replace generic divs with meaningful landmarks: <header>, <nav>, <main>, <section>, and <footer>.',
-          goal: 'Structure a page using <header>, <main>, and <footer> semantic landmarks.',
-          sectionTitle: 'Why Semantic HTML Matters',
-          explanation: 'Semantic tags describe their purpose to search engines (SEO) and screen readers. Instead of using <div> everywhere, use <header> for the top banner, <nav> for navigation links, <main> for core content, and <footer> for copyright/bottom info.',
-          exampleCode: '<header>\n  <h1>أكاديمية كود مصر</h1>\n  <nav><a href="#courses">الكورسات</a></nav>\n</header>\n<main>\n  <section id="courses">\n    <h2>مسار الفرونت إند</h2>\n    <p>تعلم بالتطبيق العملي.</p>\n  </section>\n</main>\n<footer>\n  <p>© 2026 جميع الحقوق محفوظة</p>\n</footer>',
-          starterCode: '<!-- ابنِ هيكل دلالي يتكون من header و main و footer -->\n<header>\n  <h1>موقعي الشخصي</h1>\n</header>\n\n<!-- أضف <main> و <footer> بالأسفل -->\n',
-          solutionCode: '<header>\n  <h1>موقعي الشخصي</h1>\n</header>\n<main>\n  <p>أهلاً بكم في مساحة العمل الخاصة بي.</p>\n</main>\n<footer>\n  <p>© 2026 CodeMasr</p>\n</footer>',
-          challengePrompt: 'تحدي الدرس: أنشئ هيكل صفحة دلالي يضم <header> و <main> و <footer> بداخل كل منها محتوى نصي.',
-          validate: function (doc) {
-            const header = doc.querySelector('header');
-            const main = doc.querySelector('main');
-            const footer = doc.querySelector('footer');
-            if (!header) return { passed: false, msgAr: 'ناقص وسم <header> في أول الصفحة.', msgEn: 'Missing <header> element.' };
-            if (!main || !main.textContent.trim()) return { passed: false, msgAr: 'ناقص وسم <main> وبداخله المحتوى الأساسي.', msgEn: 'Add a <main> element with content inside.' };
-            if (!footer || !footer.textContent.trim()) return { passed: false, msgAr: 'ناقص وسم <footer> في آخر الصفحة.', msgEn: 'Add a <footer> element at the bottom.' };
-            return { passed: true, msgAr: 'احترافي! ده الهيكل القياسي اللي جوجل وأي متصفح بيحبه.', msgEn: 'Awesome semantic layout with header, main, and footer!' };
-          }
-        },
-        {
-          id: 'html-7',
-          num: '07',
-          title: 'Audio & video media',
-          duration: '15 min',
-          eyebrow: 'LESSON 07 · MULTIMEDIA',
-          lead: 'Embed native video and audio players directly in the browser using <video> and <audio> with controls.',
-          goal: 'Create a <video> or <audio> player with the controls attribute enabled.',
-          sectionTitle: 'Native HTML5 Media Players',
-          explanation: 'HTML5 lets you play media without external plugins. Always add the "controls" attribute to <video> or <audio> so the user can play, pause, and adjust volume! بالمصري: من غير كلمة controls الفيديو أو الصوت مش هيظهرله زرار تشغيل أصلاً.',
-          exampleCode: '<h2>شرح الدرس بالفيديو</h2>\n<video width="320" controls>\n  <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">\n  متصفحك لا يدعم الفيديو.\n</video>',
-          starterCode: '<h2>مشغل الوسائط</h2>\n<!-- ضيف وسم video أو audio مع خاصية controls -->\n<video width="300" controls>\n  <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">\n</video>',
-          solutionCode: '<h2>مشغل الوسائط</h2>\n<video width="300" controls>\n  <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">\n</video>',
-          challengePrompt: 'تحدي الدرس: أضف عنصر <video controls> أو <audio controls> يحتوي على مصدر ملف صوتي أو مرئي.',
-          validate: function (doc) {
-            const media = doc.querySelector('video[controls], audio[controls]');
-            if (!media) return { passed: false, msgAr: 'لازم تضيف <video controls> أو <audio controls> (تأكد من كتابة خاصية controls).', msgEn: 'Add a <video> or <audio> tag with the controls attribute.' };
-            return { passed: true, msgAr: 'ممتاز! مشغل الوسائط شغال وجاهز للعرض.', msgEn: 'Great job embedding an HTML5 media player with controls!' };
-          }
-        },
-        {
-          id: 'html-8',
-          num: '08',
-          title: 'Build a mini page',
-          duration: '25 min',
-          eyebrow: 'LESSON 08 · HTML CAPSTONE',
-          lead: 'Combine headings, paragraphs, lists, links, and buttons to build a complete personal profile mini page.',
-          goal: 'Build a personal page with <header>, <h1>, <p>, a list <ul>, and a <button> or <a> link.',
-          sectionTitle: 'Putting It All Together',
-          explanation: 'Now you have all the foundational building blocks of HTML! By combining semantic containers, headings, lists, and interactive elements, you can build real-world pages ready to be styled with CSS.',
-          exampleCode: '<header>\n  <h1>أحمد حسني</h1>\n  <p>مهندس برمجيات ومطور ويب</p>\n</header>\n<main>\n  <h2>المهارات</h2>\n  <ul>\n    <li>HTML5 & Semantic Web</li>\n    <li>Firebase & Cloud Systems</li>\n  </ul>\n  <button>تواصل معي الآن</button>\n</main>',
-          starterCode: '<header>\n  <h1>صفحتي الشخصية</h1>\n  <p>مطور واجهات أمامية</p>\n</header>\n<main>\n  <h2>مهاراتي</h2>\n  <ul>\n    <li>HTML5</li>\n    <li>Problem Solving</li>\n  </ul>\n  <button>تواصل معي</button>\n</main>',
-          solutionCode: '<header>\n  <h1>صفحتي الشخصية</h1>\n  <p>مطور واجهات أمامية</p>\n</header>\n<main>\n  <h2>مهاراتي</h2>\n  <ul>\n    <li>HTML5</li>\n    <li>Problem Solving</li>\n  </ul>\n  <button>تواصل معي</button>\n</main>',
-          challengePrompt: 'تحدي التخرج من مسار HTML: ابنِ صفحة متكاملة تحتوي على <h1>، فقرة <p>، قائمة <ul> بها عنصران <li>، وزر <button> أو رابط <a>.',
-          validate: function (doc) {
-            const h1 = doc.querySelector('h1');
-            const p = doc.querySelector('p');
-            const lis = doc.querySelectorAll('ul li, ol li');
-            const action = doc.querySelector('button, a');
-            if (!h1 || !p) return { passed: false, msgAr: 'الصفحة محتاجة عنوان <h1> وفقرة تعريفية <p>.', msgEn: 'Include both an <h1> heading and a <p> paragraph.' };
-            if (lis.length < 2) return { passed: false, msgAr: 'ضيف قائمة مهارات <ul> فيها عنصرين <li> على الأقل.', msgEn: 'Add a list with at least two <li> items.' };
-            if (!action) return { passed: false, msgAr: 'ضيف زرار <button> أو رابط <a> للتواصل.', msgEn: 'Add a <button> or <a> link for call-to-action.' };
-            return { passed: true, msgAr: 'ألف مبروك يا قدوة! قفلت مسار الـ HTML بنجاح وبنيت صفحة متكاملة!', msgEn: 'Congratulations! You completed the HTML Essentials track!' };
+            const strong = doc.querySelector('strong');
+            const subOrSup = doc.querySelector('sub, sup');
+            const mark = doc.querySelector('mark');
+            if (!strong) return { passed: false, msgAr: 'أضف وسم <strong> لتوضيح نص مهم دلالياً.', msgEn: 'Include a <strong> tag.' };
+            if (!subOrSup) return { passed: false, msgAr: 'أضف عنصراً يحمل <sub> للصيغ السفلية أو <sup> للأسس العلوية.', msgEn: 'Include <sub> or <sup>.' };
+            if (!mark) return { passed: false, msgAr: 'أضف نصاً محدداً بوسم التمييز <mark>.', msgEn: 'Include a <mark> tag.' };
+            return { passed: true, msgAr: 'رائع جداً! تم تطبيق الفروق الدلالية والترميز العلمي بنجاح.', msgEn: 'Semantic text formatting verified!' };
           }
         }
       ]
@@ -2014,7 +1889,70 @@ if (btn) {
           usingMonaco = true;
           if (host) host.classList.add('monaco-ready');
           if (fallbackEl) fallbackEl.hidden = true;
-
+// تسجيل محرك الإكمال التلقائي الذكي (Emmet / IntelliSense)
+          window.monaco.languages.registerCompletionItemProvider('html', {
+            provideCompletionItems: function (model, position) {
+              const suggestions = [
+                {
+                  label: 'ht',
+                  kind: window.monaco.languages.CompletionItemKind.Snippet,
+                  documentation: 'هيكل صفحة HTML5 قياسي متكامل',
+                  insertText: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>${1:عنوان الصفحة}</title>\n</head>\n<body>\n  ${0}\n</body>\n</html>',
+                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
+                },
+                {
+                  label: 'html:5',
+                  kind: window.monaco.languages.CompletionItemKind.Snippet,
+                  documentation: 'هيكل صفحة HTML5 متكامل مع الميتا واللغة',
+                  insertText: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <title>${1:Document}</title>\n</head>\n<body>\n  ${0}\n</body>\n</html>',
+                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
+                },
+                {
+                  label: 'h1',
+                  kind: window.monaco.languages.CompletionItemKind.Snippet,
+                  documentation: 'العنوان الرئيسي الوحيد للصفحة',
+                  insertText: '<h1>${1:العنوان الرئيسي}</h1>$0',
+                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
+                },
+                {
+                  label: 'h2',
+                  kind: window.monaco.languages.CompletionItemKind.Snippet,
+                  documentation: 'عنوان فرعي للأقسام الرئيسية',
+                  insertText: '<h2>${1:عنوان القسم}</h2>$0',
+                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
+                },
+                {
+                  label: 'a',
+                  kind: window.monaco.languages.CompletionItemKind.Snippet,
+                  documentation: 'رابط تشعبي مؤمن',
+                  insertText: '<a href="${1:https://}" target="_blank" rel="noopener noreferrer">${2:نص الرابط}</a>$0',
+                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
+                },
+                {
+                  label: 'img',
+                  kind: window.monaco.languages.CompletionItemKind.Snippet,
+                  documentation: 'إدراج صورة مع خاصية alt والمقاسات',
+                  insertText: '<img src="${1:image.jpg}" alt="${2:وصف الصورة}" width="${3:400}" height="${4:300}" loading="lazy">$0',
+                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
+                },
+                {
+                  label: 'table',
+                  kind: window.monaco.languages.CompletionItemKind.Snippet,
+                  documentation: 'جدول بيانات منظم بـ thead و tbody و th و td',
+                  insertText: '<table border="1" cellpadding="8">\n  <thead>\n    <tr>\n      <th>${1:العنوان الأول}</th>\n      <th>${2:العنوان الثاني}</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>${3:بيانات 1}</td>\n      <td>${4:بيانات 2}</td>\n    </tr>\n  </tbody>\n</table>$0',
+                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
+                },
+                {
+                  label: 'form',
+                  kind: window.monaco.languages.CompletionItemKind.Snippet,
+                  documentation: 'نموذج إدخال متكامل مع حقول وزر إرسال',
+                  insertText: '<form action="${1:/api}" method="${2:POST}">\n  <div>\n    <label for="${3:id}">${4:اسم الحقل}:</label>\n    <input type="${5:text}" id="${3:id}" required>\n  </div>\n  <button type="submit">${6:إرسال}</button>\n</form>$0',
+                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
+                }
+              ];
+              return { suggestions: suggestions };
+            }
+          });
           monacoEditorInstance = window.monaco.editor.create(document.getElementById('monaco-editor'), {
             value: state.playgroundFiles[state.activePlaygroundFile] || '',
             language: getMonacoLang(state.activePlaygroundFile),
@@ -2437,6 +2375,245 @@ if (btn) {
    * 13. EVENT BINDINGS FOR EVERY SINGLE ELEMENT IN INDEX.HTML
    * ========================================================================== */
   function bindAllEvents() {
+    // =========================================================================
+    // 1. منطق التكبير والتصغير المستقل للكود وللمعاينة (Independent Zoom)
+    // =========================================================================
+    let currentCodeFontSize = 13;
+    let currentPreviewZoom = 100;
+
+    function setCodeZoom(size) {
+      currentCodeFontSize = Math.max(10, Math.min(28, size));
+      const valEl = document.getElementById('code-zoom-val');
+      const studioValEl = document.getElementById('studio-code-zoom-val');
+      if (valEl) valEl.textContent = `${currentCodeFontSize}px`;
+      if (studioValEl) studioValEl.textContent = `${currentCodeFontSize}px`;
+      
+      if (monacoEditorInstance) {
+        monacoEditorInstance.updateOptions({ fontSize: currentCodeFontSize });
+      }
+      const fallback = document.getElementById('fallback-editor');
+      if (fallback) fallback.style.fontSize = `${currentCodeFontSize}px`;
+    }
+
+    function setPreviewZoom(pct) {
+      currentPreviewZoom = Math.max(50, Math.min(200, pct));
+      const valEl = document.getElementById('prev-zoom-val');
+      const studioValEl = document.getElementById('studio-prev-zoom-val');
+      if (valEl) valEl.textContent = `${currentPreviewZoom}%`;
+      if (studioValEl) studioValEl.textContent = `${currentPreviewZoom}%`;
+
+      const scale = currentPreviewZoom / 100;
+      const f1 = document.getElementById('preview-frame');
+      const f2 = document.getElementById('vscode-preview-frame');
+      if (f1) {
+        f1.style.transform = `scale(${scale})`;
+        f1.style.width = `${100 / scale}%`;
+        f1.style.height = `${100 / scale}%`;
+      }
+      if (f2) {
+        f2.style.transform = `scale(${scale})`;
+        f2.style.width = `${100 / scale}%`;
+        f2.style.height = `${100 / scale}%`;
+      }
+    }
+
+    // زووم الكود (أزرار)
+    document.getElementById('code-zoom-in')?.addEventListener('click', () => setCodeZoom(currentCodeFontSize + 2));
+    document.getElementById('code-zoom-out')?.addEventListener('click', () => setCodeZoom(currentCodeFontSize - 2));
+    document.getElementById('studio-code-zoom-in')?.addEventListener('click', () => setCodeZoom(currentCodeFontSize + 2));
+    document.getElementById('studio-code-zoom-out')?.addEventListener('click', () => setCodeZoom(currentCodeFontSize - 2));
+
+    // زووم المعاينة (أزرار)
+    document.getElementById('prev-zoom-in')?.addEventListener('click', () => setPreviewZoom(currentPreviewZoom + 10));
+    document.getElementById('prev-zoom-out')?.addEventListener('click', () => setPreviewZoom(currentPreviewZoom - 10));
+    document.getElementById('prev-zoom-reset')?.addEventListener('click', () => setPreviewZoom(100));
+    document.getElementById('studio-prev-zoom-in')?.addEventListener('click', () => setPreviewZoom(currentPreviewZoom + 10));
+    document.getElementById('studio-prev-zoom-out')?.addEventListener('click', () => setPreviewZoom(currentPreviewZoom - 10));
+
+    // زووم مستقل عند الوقوف على أي شاشة وعمل (Ctrl + بكرة الماوس)
+    document.getElementById('editor-panel-box')?.addEventListener('wheel', (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        setCodeZoom(currentCodeFontSize + (e.deltaY < 0 ? 1 : -1));
+      }
+    }, { passive: false });
+
+    document.getElementById('preview-viewport-wrapper')?.addEventListener('wheel', (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        setPreviewZoom(currentPreviewZoom + (e.deltaY < 0 ? 10 : -10));
+      }
+    }, { passive: false });
+
+    // =========================================================================
+    // 2. حرية أوضاع العرض في الفول سكرين (كود فقط / شاشتين / معاينة فقط)
+    // =========================================================================
+    const btnModeCode = document.getElementById('mode-code-only');
+    const btnModeSplit = document.getElementById('mode-split-view');
+    const btnModePrev = document.getElementById('mode-preview-only');
+    const studioEditor = document.getElementById('studio-editor-pane');
+    const studioPrev = document.getElementById('studio-preview-pane');
+    const studioSplitter = document.getElementById('studio-splitter');
+
+    function setStudioLayoutMode(mode) {
+      btnModeCode?.classList.toggle('active', mode === 'code');
+      btnModeSplit?.classList.toggle('active', mode === 'split');
+      btnModePrev?.classList.toggle('active', mode === 'prev');
+
+      if (mode === 'code') {
+        studioEditor?.classList.remove('hide-pane');
+        studioEditor?.classList.add('maximize-pane');
+        studioPrev?.classList.add('hide-pane');
+        if (studioSplitter) studioSplitter.style.display = 'none';
+      } else if (mode === 'prev') {
+        studioEditor?.classList.add('hide-pane');
+        studioPrev?.classList.remove('hide-pane');
+        studioPrev?.classList.add('maximize-pane');
+        if (studioSplitter) studioSplitter.style.display = 'none';
+      } else {
+        studioEditor?.classList.remove('hide-pane', 'maximize-pane');
+        studioPrev?.classList.remove('hide-pane', 'maximize-pane');
+        studioEditor.style.flex = '1 1 50%';
+        studioPrev.style.flex = '1 1 50%';
+        if (studioSplitter) studioSplitter.style.display = 'flex';
+      }
+
+      if (monacoEditorInstance) {
+        setTimeout(() => monacoEditorInstance.layout(), 60);
+      }
+    }
+
+    btnModeCode?.addEventListener('click', () => setStudioLayoutMode('code'));
+    btnModeSplit?.addEventListener('click', () => setStudioLayoutMode('split'));
+    btnModePrev?.addEventListener('click', () => setStudioLayoutMode('prev'));
+
+    // سحب الفاصل المرن في الفول سكرين يميناً ويساراً
+    if (studioSplitter && studioEditor && studioPrev) {
+      let isStudioDragging = false;
+      studioSplitter.addEventListener('mousedown', () => {
+        isStudioDragging = true;
+        studioSplitter.classList.add('is-dragging');
+        document.body.style.cursor = 'col-resize';
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isStudioDragging) return;
+        const box = document.getElementById('studio-workbench-split');
+        const rect = box.getBoundingClientRect();
+        const pct = Math.max(15, Math.min(85, ((e.clientX - rect.left) / rect.width) * 100));
+        studioEditor.style.flex = `0 0 ${pct}%`;
+        studioPrev.style.flex = `0 0 ${100 - pct}%`;
+        if (monacoEditorInstance) monacoEditorInstance.layout();
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isStudioDragging) {
+          isStudioDragging = false;
+          studioSplitter.classList.remove('is-dragging');
+          document.body.style.cursor = '';
+        }
+      });
+    }
+    // فتح استوديو فيجوال كود ملء الشاشة
+    const openStudioBtn = document.getElementById('open-studio-btn');
+    const studioModal = document.getElementById('vscode-studio-modal');
+    const closeStudioBtn = document.getElementById('close-studio-btn');
+    const studioUploadBtn = document.getElementById('studio-upload-img');
+    const assetInput = document.getElementById('asset-file-input');
+    const studioPreview = document.getElementById('vscode-preview-frame');
+    const studioRunBtn = document.getElementById('studio-run-code');
+
+    function updateStudioPreview() {
+      if (!studioPreview) return;
+      studioPreview.srcdoc = buildFullPlaygroundDocument();
+    }
+
+    if (openStudioBtn && studioModal) {
+      openStudioBtn.addEventListener('click', () => {
+        studioModal.hidden = false;
+        renderStudioFileTree();
+        updateStudioPreview();
+        showToast('⛶ تم فتح بيئة Visual Studio Code الكاملة');
+      });
+    }
+
+    if (closeStudioBtn && studioModal) {
+      closeStudioBtn.addEventListener('click', () => {
+        studioModal.hidden = true;
+        if (monacoEditorInstance) monacoEditorInstance.layout();
+      });
+    }
+
+    if (studioRunBtn) {
+      studioRunBtn.addEventListener('click', () => {
+        updateStudioPreview();
+        showToast('▶ تم تشغيل الكود في المعاينة');
+      });
+    }
+
+    if (studioUploadBtn && assetInput) {
+      studioUploadBtn.addEventListener('click', () => assetInput.click());
+      assetInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const dataUrl = evt.target.result;
+          state.playgroundFiles[file.name] = dataUrl;
+          renderStudioFileTree();
+          showToast(`🖼️ تم رفع "${file.name}" بنجاح! يمكنك استخدامها الآن.`);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderStudioFileTree() {
+      const tree = document.getElementById('vscode-file-tree');
+      if (!tree) return;
+      tree.innerHTML = '';
+      Object.keys(state.playgroundFiles).forEach((fname) => {
+        const item = document.createElement('div');
+        item.className = `tree-file-item ${state.activePlaygroundFile === fname ? 'active' : ''}`;
+        item.innerHTML = `<span>📄</span> <span>${escapeHtml(fname)}</span>`;
+        item.addEventListener('click', () => {
+          switchPlaygroundFileTab(fname);
+          renderStudioFileTree();
+        });
+        tree.appendChild(item);
+      });
+    }
+    // تفعيل شريط السحب للتحكم بمساحة الكود والمعاينة
+    const resizer = document.getElementById('workbench-resizer');
+    const editorBox = document.getElementById('editor-panel-box');
+    const previewBox = document.getElementById('preview-panel-box');
+    const container = document.getElementById('playground-resizable-layout');
+
+    if (resizer && editorBox && previewBox && container) {
+      let isDragging = false;
+      resizer.addEventListener('mousedown', () => {
+        isDragging = true;
+        resizer.classList.add('is-dragging');
+        document.body.style.cursor = 'col-resize';
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const rect = container.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const pct = Math.max(20, Math.min(80, (offsetX / rect.width) * 100));
+        editorBox.style.flex = `0 0 ${pct}%`;
+        previewBox.style.flex = `0 0 ${100 - pct}%`;
+        if (monacoEditorInstance) monacoEditorInstance.layout();
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          resizer.classList.remove('is-dragging');
+          document.body.style.cursor = '';
+        }
+      });
+    }
     // 1. Sidebar Workspace Navigation
     document.querySelectorAll('.nav-item[data-view]').forEach((btn) => {
       btn.addEventListener('click', () => {
