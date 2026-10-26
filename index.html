@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="style.css"/>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     </head>
     <body>
         <div class="app-shell">
@@ -111,6 +111,7 @@
                             <input id="global-search" type="search" placeholder="Search lessons, topics..." aria-label="Search lessons"/>
                             <kbd>⌘ K</kbd>
                         </div>
+                        <button class="primary-button" id="open-studio-btn" style="padding: 6px 12px; font-size: 11px;" title="فتح محرر فيجوال استوديو كامل ملء الشاشة"><span>⛶</span> VS Code Studio</button>
                         <button class="icon-button theme-toggle" id="theme-toggle" aria-label="Toggle theme">☼</button>
                         <button class="help-button" id="help-button">
                             ? <span>Help</span>
@@ -417,79 +418,75 @@
                             </button>
                         </div>
                     </div>
-                    <div class="playground-layout">
-                        <div class="editor-panel">
-                            <div class="editor-toolbar">
-                                <div class="file-tabs">
-                                    <button class="file-tab active" data-file="html">
-                                        <span class="file-dot html-dot"></span>
-                                        index.html
-                                    </button>
-                                    <button class="file-tab" data-file="css">
-                                        <span class="file-dot css-dot"></span>
-                                        style.css
-                                    </button>
-                                    <button class="file-tab" data-file="js">
-                                        <span class="file-dot js-dot"></span>
-                                        script.js
-                                    </button>
-                                </div>
-                                <div class="editor-tools">
-                                    <span class="save-state" id="save-state">● Saved locally</span>
-                                    <button class="icon-button small-icon" id="format-code" title="Format code">⤢</button>
-                                </div>
-                            </div>
-                            <div class="editor-host" id="editor-host">
-                                <div class="editor-loading" id="editor-loading">Preparing your editor…</div>
-                                <div id="monaco-editor"></div>
-                                <textarea id="fallback-editor" spellcheck="false" aria-label="Code editor" hidden></textarea>
-                            </div>
-                            <div class="editor-statusbar">
-                                <span id="editor-language">HTML</span>
-                                <span id="cursor-position">Ln 1, Col 1</span>
-                                <span>UTF-8</span>
-                                <span>Spaces: 2</span>
-                                <span class="status-ready">● Ready</span>
-                            </div>
-                        </div>
-                        <div class="preview-panel">
-                            <div class="preview-toolbar">
-                                <div class="preview-title">
-                                    <span class="browser-icon">◫</span>
-                                    <b>Live Preview</b>
-                                    <span class="preview-live">LIVE</span>
-                                </div>
-                                <div class="preview-tools">
-                                    <button class="icon-button small-icon" id="refresh-preview" title="Refresh preview">↻</button>
-                                    <button class="icon-button small-icon" id="open-preview" title="Open preview in new tab">↗</button>
-                                </div>
-                            </div>
-                            <div class="preview-address">
-                                <span>⌕</span>
-                                <span>localhost:3000 / preview</span>
-                                <span class="secure-mark">●</span>
-                            </div>
-                            <iframe id="preview-frame" title="Live code preview" sandbox="allow-scripts allow-forms allow-modals"></iframe>
-                            <div class="console-panel">
-                                <div class="console-heading">
-                                    <div>
-                                        <span class="console-prompt">›_</span>
-                                        <b>Console & diagnostics</b>
-                                        <span id="console-count" class="console-count">0</span>
-                                    </div>
-                                    <button class="text-button" id="clear-console">
-                                        Clear <span>×</span>
-                                    </button>
-                                </div>
-                                <div id="console-output" class="console-output">
-                                    <div class="console-empty">
-                                        <span>✓</span>
-                                        No errors. Your console is clear.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<!-- منطقة محرر الكود والمعاينة مع شريط السحب والزووم المستقل -->
+        <div class="playground-layout resizable" id="playground-resizable-layout">
+          <!-- لوحة محرر الكود -->
+          <div class="editor-panel" id="editor-panel-box">
+            <div class="editor-toolbar">
+              <div class="file-tabs" id="playground-file-tabs">
+                <button class="file-tab active" data-file="index.html"><span class="file-dot html-dot"></span> index.html</button>
+                <button class="file-tab" data-file="style.css"><span class="file-dot css-dot"></span> style.css</button>
+                <button class="file-tab" data-file="script.js"><span class="file-dot js-dot"></span> script.js</button>
+              </div>
+              <div class="editor-tools">
+                <!-- أزرار تكبير وتصغير الكود فقط -->
+                <div class="pane-zoom-ctrls" title="تكبير وتصغير خط الكود فقط">
+                  <button class="zoom-btn" id="code-zoom-out" type="button" title="تصغير خط الكود">A−</button>
+                  <span class="zoom-level" id="code-zoom-val">13px</span>
+                  <button class="zoom-btn" id="code-zoom-in" type="button" title="تكبير خط الكود">A+</button>
+                </div>
+                <span class="save-state" id="save-state">● Saved locally</span>
+                <button class="icon-button small-icon" id="format-code" title="تنسيق الكود">⤢</button>
+              </div>
+            </div>
+            <div class="editor-host" id="editor-host">
+              <div class="editor-loading" id="editor-loading">Preparing your editor…</div>
+              <div id="monaco-editor"></div>
+              <textarea id="fallback-editor" spellcheck="false" aria-label="Code editor" hidden></textarea>
+            </div>
+            <div class="editor-statusbar">
+              <span id="editor-language">HTML</span>
+              <span id="cursor-position">Ln 1, Col 1</span>
+              <span>UTF-8</span>
+              <span>Spaces: 2</span>
+              <span class="status-ready">● Ready</span>
+            </div>
+          </div>
+
+          <!-- شريط السحب المرن بالماوس لتوسيع الكود أو المعاينة يميناً ويساراً -->
+          <div class="workbench-resizer" id="workbench-resizer" title="اضغط واسحب يميناً أو يساراً لتعديل العرض">
+            <span class="resizer-handle">⋮</span>
+          </div>
+
+          <!-- لوحة المعاينة المباشرة -->
+          <div class="preview-panel" id="preview-panel-box">
+            <div class="preview-toolbar">
+              <div class="preview-title"><span class="browser-icon">◫</span><b>Live Preview</b><span class="preview-live">LIVE</span></div>
+              <div class="preview-tools">
+                <!-- أزرار تكبير وتصغير شاشة المعاينة فقط -->
+                <div class="pane-zoom-ctrls" title="تكبير وتصغير شاشة المعاينة فقط">
+                  <button class="zoom-btn" id="prev-zoom-out" type="button" title="تصغير المعاينة">🔍−</button>
+                  <span class="zoom-level" id="prev-zoom-val">100%</span>
+                  <button class="zoom-btn" id="prev-zoom-in" type="button" title="تكبير المعاينة">🔍+</button>
+                  <button class="zoom-btn" id="prev-zoom-reset" type="button" title="إعادة ضبط الحجم">↺</button>
+                </div>
+                <button class="icon-button small-icon" id="refresh-preview" title="تحديث المعاينة">↻</button>
+                <button class="icon-button small-icon" id="open-preview" title="فتح المعاينة في تبويب جديد">↗</button>
+              </div>
+            </div>
+            <div class="preview-address"><span>⌕</span><span>localhost:3000 / preview</span><span class="secure-mark">●</span></div>
+            <div class="iframe-viewport-wrapper" id="preview-viewport-wrapper">
+              <iframe id="preview-frame" title="Live code preview" sandbox="allow-scripts allow-forms allow-modals"></iframe>
+            </div>
+            <div class="console-panel">
+              <div class="console-heading">
+                <div><span class="console-prompt">›_</span><b>Console & diagnostics</b><span id="console-count" class="console-count">0</span></div>
+                <button class="text-button" id="clear-console">Clear <span>×</span></button>
+              </div>
+              <div id="console-output" class="console-output"><div class="console-empty"><span>✓</span> No errors. Your console is clear.</div></div>
+            </div>
+          </div>
+        </div>
                     <div class="editor-hint">
                         <span>✦</span>
                         <span>
@@ -784,6 +781,89 @@
                 <button class="primary-button modal-action" id="modal-action">Got it</button>
             </div>
         </div>
+<!-- شاشة الفول سكرين الاحترافية (VS Code Studio) مع خيارات العرض وشريط التوقيع المضيء -->
+  <div id="vscode-studio-modal" class="vscode-studio-overlay" hidden>
+    <div class="vscode-studio-topbar">
+      <div class="vscode-brand">
+        <span class="vscode-tag">VS Code Studio</span>
+        <b>CodeMasr — Fullscreen IDE</b>
+      </div>
+
+      <!-- أزرار حرية العرض (كود فقط / شاشتين / معاينة فقط) -->
+      <div class="studio-view-modes">
+        <button class="studio-mode-btn" id="mode-code-only" title="عرض شاشة الكود فقط وإخفاء المعاينة">💻 Code Only</button>
+        <button class="studio-mode-btn active" id="mode-split-view" title="عرض الكود والمعاينة جنباً إلى جنب مع السحب">◫ Split View</button>
+        <button class="studio-mode-btn" id="mode-preview-only" title="عرض شاشة المعاينة فقط وإخفاء الكود">👁 Output Only</button>
+      </div>
+
+      <div class="vscode-top-actions">
+        <button class="vscode-action-btn primary" id="studio-run-code">▶ Run Code (Ctrl+Enter)</button>
+        <button class="vscode-close-btn" id="close-studio-btn">✕ Exit Fullscreen</button>
+      </div>
+    </div>
+
+    <div class="vscode-studio-body">
+      <div class="vscode-workbench-split" id="studio-workbench-split">
+        <!-- شاشة الكود في الفول سكرين -->
+        <div class="vscode-editor-pane" id="studio-editor-pane">
+          <div class="vscode-tabs-header">
+            <div class="vscode-tabs" id="vscode-tabs-bar">
+              <div class="vscode-tab active">index.html</div>
+            </div>
+            <!-- زووم الكود في الفول سكرين -->
+            <div class="pane-zoom-ctrls studio-zoom">
+              <button class="zoom-btn" id="studio-code-zoom-out">A−</button>
+              <span class="zoom-level" id="studio-code-zoom-val">14px</span>
+              <button class="zoom-btn" id="studio-code-zoom-in">A+</button>
+            </div>
+          </div>
+          <div class="vscode-editor-container" id="vscode-editor-container"></div>
+        </div>
+
+        <!-- فاصل السحب في الفول سكرين -->
+        <div class="vscode-splitter" id="studio-splitter" title="اسحب يميناً أو يساراً">⋮</div>
+
+        <!-- شاشة المعاينة في الفول سكرين -->
+        <div class="vscode-preview-pane" id="studio-preview-pane">
+          <div class="vscode-preview-bar">
+            <span class="live-dot"></span>
+            <b>Live Output Preview</b>
+            <!-- زووم المعاينة في الفول سكرين -->
+            <div class="pane-zoom-ctrls studio-zoom" style="margin-left:auto;">
+              <button class="zoom-btn" id="studio-prev-zoom-out">🔍−</button>
+              <span class="zoom-level" id="studio-prev-zoom-val">100%</span>
+              <button class="zoom-btn" id="studio-prev-zoom-in">🔍+</button>
+            </div>
+            <button class="icon-button small-icon" id="studio-reload-preview" style="color:#ccc;">↻</button>
+          </div>
+          <div class="iframe-viewport-wrapper">
+            <iframe id="vscode-preview-frame" sandbox="allow-scripts allow-forms allow-modals"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الشريط السفلي العالمي المضيء (Neon Glowing Signature Bar) -->
+    <div class="vscode-glowing-footer">
+      <div class="neon-status-left">
+        <span class="neon-pulsing-dot"></span>
+        <span class="neon-tech-label">WORKSPACE ENGINE: ACTIVE</span>
+      </div>
+      
+      <!-- الخط المنور المميز باسمك -->
+      <div class="neon-signature">
+        <span class="neon-sparkle">✦</span>
+        <span class="neon-credit">Engineered & Developed by</span>
+        <strong class="neon-author-name">Eng. Ahmed M Hosny</strong>
+        <span class="neon-sparkle">✦</span>
+      </div>
+
+      <div class="neon-status-right">
+        <span>UTF-8</span>
+        <span>HTML5 & Emmet Ready</span>
+      </div>
+    </div>
+  </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js" crossorigin="anonymous"></script>
         <script src="script.js"></script>
     </body>
