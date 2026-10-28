@@ -3433,62 +3433,114 @@ if (btn) {
     }
   }
 
-// محرك التعرف التلقائي على نوع ولغة الملف من امتداده (.html, .css, .js, .json, .py, .md)
+// حالة تفعيل الاقتراحات التلقائية (افتراضياً شغالة، ويقدر الطالب يقفلها)
+  state.autoCompleteEnabled = localStorage.getItem('codemasr_autocomplete') !== 'off';
+
+  // 1. محرك التعرف التلقائي الشامل لكل لغات البرمجة والامتدادات
   function getFileExtensionInfo(rawKey) {
     const key = String(rawKey || 'html').trim();
     const lower = key.toLowerCase();
 
+    // HTML
     if (lower === 'html' || lower === 'index.html' || lower.endsWith('.html') || lower.endsWith('.htm')) {
       return {
-        lang: 'html',
-        label: 'HTML',
-        dot: 'html-dot',
+        lang: 'html', label: 'HTML5', dot: 'html-dot', isTerminal: false,
         displayName: lower === 'html' ? 'index.html' : key,
-        starter: `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>${key}</title>\n</head>\n<body>\n  <h1>صفحة ${key}</h1>\n  <a href="index.html">العودة للرئيسية</a>\n</body>\n</html>`
+        starter: `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>${key}</title>\n</head>\n<body>\n  <h1>صفحة ${key}</h1>\n</body>\n</html>`
       };
     }
+    // CSS
     if (lower === 'css' || lower === 'style.css' || lower.endsWith('.css')) {
       return {
-        lang: 'css',
-        label: 'CSS',
-        dot: 'css-dot',
+        lang: 'css', label: 'CSS3', dot: 'css-dot', isTerminal: false,
         displayName: lower === 'css' ? 'style.css' : key,
-        starter: `/* ملف تنسيقات ${key} */\nbody {\n  \n}\n`
+        starter: `/* تنسيقات ${key} */\nbody {\n  font-family: system-ui, sans-serif;\n}\n`
       };
     }
+    // JavaScript
     if (lower === 'js' || lower === 'script.js' || lower.endsWith('.js')) {
       return {
-        lang: 'javascript',
-        label: 'JAVASCRIPT',
-        dot: 'js-dot',
+        lang: 'javascript', label: 'JAVASCRIPT', dot: 'js-dot', isTerminal: false,
         displayName: lower === 'js' ? 'script.js' : key,
-        starter: `// ملف جافاسكريبت: ${key}\nconsole.log("${key} loaded successfully!");\n`
+        starter: `// JavaScript: ${key}\nconsole.log("Hello from ${key}!");\n`
       };
     }
-    if (lower.endsWith('.json')) {
+    // TypeScript
+    if (lower.endsWith('.ts')) {
       return {
-        lang: 'json',
-        label: 'JSON',
-        dot: 'js-dot',
+        lang: 'typescript', label: 'TYPESCRIPT', dot: 'css-dot', isTerminal: true,
         displayName: key,
-        starter: `{\n  "project": "CodeMasr",\n  "status": "active"\n}\n`
+        starter: `// TypeScript: ${key}\nconst greeting: string = "Hello TypeScript!";\nconsole.log(greeting);\n`
       };
     }
+    // Python (.py)
     if (lower.endsWith('.py')) {
       return {
-        lang: 'python',
-        label: 'PYTHON',
-        dot: 'py-dot',
+        lang: 'python', label: 'PYTHON 🐍', dot: 'py-dot', isTerminal: true,
         displayName: key,
-        starter: `# Python Script: ${key}\ndef main():\n    print("Hello from ${key}")\n\nmain()\n`
+        starter: `# ملف بايثون: ${key}\nname = "Eng. Ahmed"\nyear = 2026\nprint("Welcome to Python,", name)\nprint("Current Year:", year)\n`
+      };
+    }
+    // C++ (.cpp, .c++, .cc, .hpp)
+    if (lower.endsWith('.cpp') || lower.endsWith('.c++') || lower.endsWith('.cc') || lower.endsWith('.hpp')) {
+      return {
+        lang: 'cpp', label: 'C++ ⚙️', dot: 'cpp-dot', isTerminal: true,
+        displayName: key,
+        starter: `// برنامج C++: ${key}\n#include <iostream>\nusing namespace std;\n\nint main() {\n    string developer = "Eng. Ahmed";\n    int level = 100;\n    cout << "Hello C++ World! Developer: " << developer << endl;\n    cout << "Power Level: " << level << "%" << endl;\n    return 0;\n}\n`
+      };
+    }
+    // C (.c, .h)
+    if (lower.endsWith('.c') || lower.endsWith('.h')) {
+      return {
+        lang: 'c', label: 'C LANG 🛠️', dot: 'cpp-dot', isTerminal: true,
+        displayName: key,
+        starter: `// برنامج لغة C: ${key}\n#include <stdio.h>\n\nint main() {\n    int a = 15;\n    int b = 25;\n    printf("Welcome to C Language!\\n");\n    printf("Sum = %d\\n", a + b);\n    return 0;\n}\n`
+      };
+    }
+    // Java (.java)
+    if (lower.endsWith('.java')) {
+      return {
+        lang: 'java', label: 'JAVA ☕', dot: 'html-dot', isTerminal: true,
+        displayName: key,
+        starter: `// برنامج Java: ${key}\npublic class Main {\n    public static void main(String[] args) {\n        String msg = "Hello from Java VM!";\n        System.out.println(msg);\n        System.out.println("Calculation: " + (50 * 2));\n    }\n}\n`
+      };
+    }
+    // C# (.cs)
+    if (lower.endsWith('.cs')) {
+      return {
+        lang: 'csharp', label: 'C# 🎯', dot: 'py-dot', isTerminal: true,
+        displayName: key,
+        starter: `// برنامج C#: ${key}\nusing System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello from C# .NET!");\n    }\n}\n`
+      };
+    }
+    // SQL (.sql)
+    if (lower.endsWith('.sql')) {
+      return {
+        lang: 'sql', label: 'SQL 🗄️', dot: 'js-dot', isTerminal: true,
+        displayName: key,
+        starter: `-- استعلام قواعد بيانات SQL: ${key}\nCREATE TABLE Students (id INT, name TEXT, grade INT);\nINSERT INTO Students VALUES (1, 'Ahmed Hosny', 100);\nINSERT INTO Students VALUES (2, 'Sara Ali', 95);\n\nSELECT * FROM Students;\n`
+      };
+    }
+    // PHP (.php)
+    if (lower.endsWith('.php')) {
+      return {
+        lang: 'php', label: 'PHP 🐘', dot: 'cpp-dot', isTerminal: true,
+        displayName: key,
+        starter: `<?php\n// ملف PHP: ${key}\n$title = "CodeMasr Backend";\necho "Welcome to " . $title . "\\n";\n?>\n`
+      };
+    }
+    // JSON
+    if (lower.endsWith('.json')) {
+      return {
+        lang: 'json', label: 'JSON', dot: 'js-dot', isTerminal: false,
+        displayName: key,
+        starter: `{\n  "platform": "CodeMasr",\n  "architect": "Eng. Ahmed M Hosny"\n}\n`
       };
     }
     return {
-      lang: 'markdown',
-      label: 'TEXT / MD',
-      dot: 'html-dot',
+      lang: 'markdown', label: 'TEXT / MD', dot: 'html-dot', isTerminal: false,
       displayName: key,
-      starter: `# ${key}\n\nاكتب ملاحظاتك أو الكود هنا...\n`
+      starter: `# ${key}\n\nاكتب الكود أو الملاحظات هنا...\n`
     };
   }
 
@@ -3523,7 +3575,7 @@ if (btn) {
     if (langLabel) langLabel.textContent = info.label;
 
     const studioStatusFile = document.getElementById('studio-status-file');
-    if (studioStatusFile) studioStatusFile.textContent = info.displayName;
+    if (studioStatusFile) studioStatusFile.textContent = `${info.displayName} (${info.label})`;
 
     const content = state.playgroundFiles[fileKey] || '';
     if (usingMonaco && monacoEditorInstance && window.monaco) {
@@ -3539,28 +3591,259 @@ if (btn) {
       if (fallbackEl) fallbackEl.value = content;
     }
 
-    // تحديث شكل التبويبات في الشاشة العادية والفول سكرين
     if (typeof window.refreshAllEditorTabs === 'function') {
       window.refreshAllEditorTabs();
     }
 
-    // إذا كان الملف المفتوح هو صفحة HTML أخرى (مثل about.html)، اعرضها فوراً في المعاينة
-    if (info.lang === 'html') {
-      const f1 = document.getElementById('preview-frame');
-      const f2 = document.getElementById('vscode-preview-frame');
-      const docStr = buildFullPlaygroundDocument(fileKey);
-      if (f1) f1.srcdoc = docStr;
-      if (f2 && !document.getElementById('vscode-studio-modal')?.hidden) f2.srcdoc = docStr;
+    // تحديث شاشة المعاينة فوراً حسب نوع الملف المفتوح
+    const f1 = document.getElementById('preview-frame');
+    const f2 = document.getElementById('vscode-preview-frame');
+    const docStr = buildFullPlaygroundDocument();
+    if (f1) f1.srcdoc = docStr;
+    if (f2 && !document.getElementById('vscode-studio-modal')?.hidden) f2.srcdoc = docStr;
+  }
+
+  // 2. مُشغّل ومحاكي الـ Terminal الذكي للغات (Python, C++, C, Java, C#, SQL, PHP)
+  function executeTerminalLanguage(code, info) {
+    const lang = info.lang;
+    const lines = String(code || '').split('\n');
+    const vars = {};
+    const outputs = [];
+    const errors = [];
+
+    // Helper لتقييم التعبيرات الحسابية والنصية البسيطة
+    function evalExpr(expr) {
+      let e = String(expr || '').trim();
+      if (!e) return '';
+      if ((e.startsWith('"') && e.endsWith('"')) || (e.startsWith("'") && e.endsWith("'"))) {
+        return e.slice(1, -1);
+      }
+      if (vars[e] !== undefined) return vars[e];
+
+      // استبدال أسماء المتغيرات بقيمها داخل المعادلات
+      let replaced = e.replace(/\b[a-zA-Z_]\w*\b/g, (m) => {
+        return vars[m] !== undefined ? JSON.stringify(vars[m]) : m;
+      });
+      try {
+        // تقييم آمن للعمليات الحسابية ودمج النصوص
+        if (/^[\d\s+\-*/%()."']+$/.test(replaced)) {
+          return Function('"use strict"; return (' + replaced + ');')();
+        }
+      } catch (err) {}
+      return e.replace(/^["']|["']$/g, '');
     }
+
+    if (lang === 'python') {
+      lines.forEach((rawLine, idx) => {
+        const line = rawLine.trim();
+        if (!line || line.startsWith('#')) return;
+        if (/^(if|else|elif|def|for|while)\b/.test(line) && !line.endsWith(':')) {
+          errors.push(`SyntaxError (Line ${idx + 1}): expected ':' at the end of '${line}'\n💡 التصحيح: ضيف نقطتين فوق بعض (:) في آخر السطر ${idx + 1}.`);
+        }
+        const assign = line.match(/^([a-zA-Z_]\w*)\s*=\s*(.+)$/);
+        if (assign && !line.startsWith('if ') && !line.startsWith('while ')) {
+          vars[assign[1]] = evalExpr(assign[2]);
+        }
+        const printMatch = line.match(/^print\s*\((.*)\)$/);
+        if (printMatch) {
+          const inside = printMatch[1].trim();
+          const args = inside.split(',').map(a => evalExpr(a.trim()));
+          outputs.push(args.join(' '));
+        }
+      });
+    } else if (lang === 'cpp' || lang === 'c') {
+      if (!/#include\s*<(iostream|stdio\.h|bits\/stdc\+\+\.h)>/i.test(code)) {
+        errors.push(`Warning: لم يتم العثور على مكتبة الإدخال والإخراج القياسية مثل #include <iostream> أو <stdio.h>.`);
+      }
+      lines.forEach((rawLine, idx) => {
+        const line = rawLine.replace(/\/\/.*$/, '').trim();
+        if (!line || line.startsWith('#') || line.startsWith('using ')) return;
+
+        // فحص نسيان الفصلة المنقوطة في C/C++
+        if (!line.endsWith(';') && !line.endsWith('{') && !line.endsWith('}') && !/^(int|void)\s+main\s*\(/.test(line) && !/^(if|for|while|else)\b/.test(line)) {
+          errors.push(`Compiler Error (Line ${idx + 1}): expected ';' before end of line -> "${line}"\n💡 التصحيح: في لغة ${info.label} لازم تقفل السطر رقم ${idx + 1} بفصلة منقوطة (;).`);
+        }
+
+        // قراءة المتغيرات في C/C++
+        const varMatch = line.match(/^(?:int|float|double|string|char|long|auto)\s+([a-zA-Z_]\w*)\s*=\s*([^;]+);?/);
+        if (varMatch) {
+          vars[varMatch[1]] = evalExpr(varMatch[2]);
+        }
+
+        // تنفيذ cout في C++
+        if (line.startsWith('cout') || line.startsWith('std::cout')) {
+          const parts = line.replace(/^(std::)?cout\s*<<\s*/, '').replace(/;\s*$/, '').split('<<');
+          let lineOut = '';
+          parts.forEach((p) => {
+            const clean = p.trim();
+            if (clean === 'endl' || clean === 'std::endl' || clean === '"\\n"' || clean === "'\\n'") {
+              lineOut += '\n';
+            } else {
+              lineOut += evalExpr(clean);
+            }
+          });
+          outputs.push(lineOut.replace(/\n$/, ''));
+        }
+
+        // تنفيذ printf في C
+        const printfMatch = line.match(/^printf\s*\(\s*"([^"]*)"(?:\s*,\s*([^)]+))?\s*\)\s*;?/);
+        if (printfMatch) {
+          let fmt = printfMatch[1].replace(/\\n/g, '\n');
+          const restArgs = printfMatch[2] ? printfMatch[2].split(',').map(a => evalExpr(a.trim())) : [];
+          let argIdx = 0;
+          fmt = fmt.replace(/%[difs]/g, () => (restArgs[argIdx++] !== undefined ? restArgs[argIdx - 1] : ''));
+          outputs.push(fmt.replace(/\n$/, ''));
+        }
+      });
+    } else if (lang === 'java' || lang === 'csharp' || lang === 'php' || lang === 'typescript') {
+      lines.forEach((rawLine) => {
+        const line = rawLine.replace(/\/\/.*$/, '').trim();
+        if (!line) return;
+        const varMatch = line.match(/^(?:String|int|double|var|let|const|\$)\s*([a-zA-Z_]\w*)\s*=\s*([^;]+);?/);
+        if (varMatch) vars[varMatch[1]] = evalExpr(varMatch[2]);
+
+        const outMatch = line.match(/(?:System\.out\.println|Console\.WriteLine|console\.log|echo)\s*\(?([^);]+)\)?\s*;?/);
+        if (outMatch) {
+          const parts = outMatch[1].split(/[+.]/).map(p => evalExpr(p.trim()));
+          outputs.push(parts.join(''));
+        }
+      });
+    } else if (lang === 'sql') {
+      const rows = [];
+      lines.forEach((rawLine) => {
+        const line = rawLine.trim();
+        const ins = line.match(/INSERT\s+INTO\s+\w+\s+VALUES\s*\(([^)]+)\)/i);
+        if (ins) {
+          rows.push(ins[1].split(',').map(c => c.trim().replace(/^['"]|['"]$/g, '')));
+        }
+      });
+      if (/SELECT\s+/i.test(code)) {
+        if (rows.length > 0) {
+          outputs.push('┌────┬──────────────────┬───────┐');
+          outputs.push('│ ID │ Name             │ Grade │');
+          outputs.push('├────┼──────────────────┼───────┤');
+          rows.forEach((r) => {
+            outputs.push(`│ ${String(r[0] || '').padEnd(2)} │ ${String(r[1] || '').padEnd(16)} │ ${String(r[2] || '').padEnd(5)} │`);
+          });
+          outputs.push('└────┴──────────────────┴───────┘');
+          outputs.push(`\n(${rows.length} rows returned successfully in 0.004s)`);
+        } else {
+          outputs.push('Query executed successfully. (0 rows affected)');
+        }
+      }
+    }
+
+    const cmdMap = {
+      python: `python3 ${info.displayName}`,
+      cpp: `g++ ${info.displayName} -o main && ./main`,
+      c: `gcc ${info.displayName} -o main && ./main`,
+      java: `javac ${info.displayName} && java Main`,
+      csharp: `dotnet run ${info.displayName}`,
+      sql: `sqlite3 database.db < ${info.displayName}`,
+      php: `php ${info.displayName}`,
+      typescript: `ts-node ${info.displayName}`
+    };
+
+    const hasErr = errors.length > 0;
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #090d16;
+      color: #e2e8f0;
+      font-family: 'DM Mono', Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .term-box {
+      background: #0f172a;
+      border: 1px solid ${hasErr ? '#f85149' : '#1e293b'};
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+    }
+    .term-header {
+      background: #1e293b;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .term-badge {
+      background: ${hasErr ? '#f8514925' : '#10b98125'};
+      color: ${hasErr ? '#ff7b72' : '#34d399'};
+      border: 1px solid ${hasErr ? '#f85149' : '#10b981'};
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+    .term-body {
+      padding: 16px;
+    }
+    .cmd-line {
+      color: #38bdf8;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #334155;
+    }
+    .stdout {
+      color: #4ade80;
+      white-space: pre-wrap;
+      margin: 0;
+    }
+    .stderr {
+      color: #ff7b72;
+      background: rgba(248, 81, 73, 0.1);
+      border-right: 3px solid #f85149;
+      padding: 10px 12px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      margin-top: 10px;
+      direction: rtl;
+      text-align: right;
+    }
+    .exit-status {
+      margin-top: 16px;
+      font-size: 11px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="term-box">
+    <div class="term-header">
+      <span>›_ CodeMasr Multi-Language Terminal (${escapeHtml(info.label)})</span>
+      <span class="term-badge">${hasErr ? '✖ Compilation / Syntax Issue' : '✓ Executed Successfully'}</span>
+    </div>
+    <div class="term-body">
+      <div class="cmd-line">$ ${escapeHtml(cmdMap[lang] || info.displayName)}</div>
+      ${outputs.length > 0 ? `<pre class="stdout">${escapeHtml(outputs.join('\n'))}</pre>` : (!hasErr ? `<pre class="stdout" style="color:#94a3b8;">(تم تنفيذ الكود بنجاح. استخدم دالة الطباعة لعرض المخرجات هنا)</pre>` : '')}
+      ${hasErr ? `<div class="stderr">${escapeHtml(errors.join('\n\n'))}</div>` : ''}
+      <div class="exit-status">Process finished with exit code ${hasErr ? '1' : '0'} · Engineered by Eng. Ahmed M Hosny</div>
+    </div>
+  </div>
+</body>
+</html>`;
   }
 
   function buildFullPlaygroundDocument(targetHtmlKey) {
-    // تحديد أي ملف HTML سيتم عرضه (الملف النشط إذا كان HTML، وإلا index.html الأساسي)
     const activeInfo = getFileExtensionInfo(state.activePlaygroundFile);
+
+    // إذا كان الملف المفتوح حالياً هو بايثون أو C++ أو Java أو C أو SQL، نشغله في شاشة الـ Terminal فوراً!
+    if (!targetHtmlKey && activeInfo.isTerminal) {
+      const code = state.playgroundFiles[state.activePlaygroundFile] || '';
+      return executeTerminalLanguage(code, activeInfo);
+    }
+
     const htmlKeyToRender = targetHtmlKey || (activeInfo.lang === 'html' ? state.activePlaygroundFile : 'html');
     const htmlPart = state.playgroundFiles[htmlKeyToRender] || state.playgroundFiles.html || '';
 
-    // تجميع كل ملفات الـ CSS والـ JS الموجودة في المشروع لربطها تلقائياً
     let allCss = '';
     let allJs = '';
     Object.keys(state.playgroundFiles).forEach((k) => {
@@ -3595,7 +3878,6 @@ if (btn) {
               parent.postMessage({ source: 'codemasr-preview-zoom', deltaY: e.deltaY }, '*');
             }
           }, { passive: false });
-          // دعم التنقل السلس بين صفحات الـ HTML المتعددة التي ينشئها الطالب
           document.addEventListener('click', function(e) {
             var link = e.target.closest('a[href]');
             if (!link) return;
@@ -4167,87 +4449,85 @@ if (btn) {
 
     window.refreshAllEditorTabs = renderStudioTabs;
 
-    // نافذة ذكية لإضافة ملف جديد مع كشف فوري للامتداد أثناء الكتابة
-    function promptCreateNewFile() {
-      const modalHtml = `
-        <div style="direction:rtl; text-align:right; font-family:'Cairo',sans-serif;">
-          <p style="margin:0 0 8px; font-size:12px;">اكتب اسم الملف مع الامتداد (مثل: <code>about.html</code> أو <code>app.js</code> أو <code>theme.css</code>):</p>
-          <input id="new-file-name-input" type="text" placeholder="مثال: contact.html أو helper.js" style="width:100%; padding:10px 12px; border:1px solid var(--purple); border-radius:9px; font:600 13px 'DM Mono',monospace; direction:ltr; text-align:left;" autocomplete="off" />
-          <div id="ext-live-detector" style="margin-top:10px; padding:8px 12px; border-radius:8px; background:var(--purple-soft); color:var(--purple); font-size:11px; font-weight:700;">
-            ✨ اكتب الامتداد وسيتم التعرف على اللغة وتجهيز القالب تلقائياً...
-          </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
-            <small style="width:100%; color:var(--muted); font-size:10px;">اختصارات سريعة:</small>
-            <button type="button" class="quick-ext-chip" data-sample="page2.html">+ page2.html</button>
-            <button type="button" class="quick-ext-chip" data-sample="cards.css">+ cards.css</button>
-            <button type="button" class="quick-ext-chip" data-sample="app.js">+ app.js</button>
-            <button type="button" class="quick-ext-chip" data-sample="data.json">+ data.json</button>
-          </div>
-        </div>
-      `;
+// =========================================================================
+    // التحكم في تشغيل أو إيقاف الاقتراحات التلقائية (Auto-Complete ON / OFF)
+    // =========================================================================
+    function applyAutoCompleteSetting(isEnabled) {
+      state.autoCompleteEnabled = Boolean(isEnabled);
+      localStorage.setItem('codemasr_autocomplete', state.autoCompleteEnabled ? 'on' : 'off');
 
-      openModal('➕', 'Create New File (إضافة ملف جديد)', modalHtml, 'إنشاء وفتح الملف ✦', () => {
-        const input = document.getElementById('new-file-name-input');
-        let rawName = (input ? input.value : '').trim();
-        if (!rawName) {
-          showToast('⚠ من فضلك اكتب اسم الملف أولاً.');
-          return false;
-        }
-        // إذا لم يكتب المستخدم نقطة امتداد، نضيف .html افتراضياً
-        if (!rawName.includes('.')) {
-          rawName += '.html';
-        }
-        const normalized = normalizeFileKey(rawName);
-        if (state.playgroundFiles[normalized] !== undefined) {
-          switchPlaygroundFileTab(normalized);
-          showToast(`📄 تم التبديل إلى الملف الموجود: ${rawName}`);
-          return true;
-        }
+      const toggleBtn = document.getElementById('studio-autocomplete-toggle');
+      const statusText = document.getElementById('autocomplete-status-text');
+      if (toggleBtn) {
+        toggleBtn.classList.toggle('active', state.autoCompleteEnabled);
+      }
+      if (statusText) {
+        statusText.textContent = state.autoCompleteEnabled ? 'مفعّل (ON)' : 'مغلق للتدريب (OFF)';
+      }
 
-        const extInfo = getFileExtensionInfo(normalized);
-        state.playgroundFiles[normalized] = extInfo.starter;
-        saveState();
-        switchPlaygroundFileTab(normalized);
-        showToast(`✓ تم إنشاء ملف ${extInfo.displayName} بلغة ${extInfo.label} بنجاح!`);
-        return true;
+      if (monacoEditorInstance) {
+        monacoEditorInstance.updateOptions({
+          quickSuggestions: state.autoCompleteEnabled ? { other: true, comments: false, strings: true } : false,
+          suggestOnTriggerCharacters: state.autoCompleteEnabled,
+          wordBasedSuggestions: state.autoCompleteEnabled ? 'currentDocument' : 'off',
+          parameterHints: { enabled: state.autoCompleteEnabled },
+          snippetSuggestions: state.autoCompleteEnabled ? 'top' : 'none'
+        });
+      }
+    }
+
+    document.getElementById('studio-autocomplete-toggle')?.addEventListener('click', () => {
+      applyAutoCompleteSetting(!state.autoCompleteEnabled);
+      showToast(
+        state.autoCompleteEnabled
+          ? '💡 تم تفعيل الاقتراحات التلقائية للأكواد (IntelliSense ON)'
+          : '🔒 تم إيقاف الاقتراحات التلقائية (وضع التدريب الحر من الذاكرة OFF)'
+      );
+    });
+
+    // تسجيل قوالب الإكمال التلقائي للغات Python و C++ و Java و SQL عند تفعيل الاقتراحات
+    function registerMultiLangSnippets() {
+      if (!window.monaco || window._multiLangSnippetsRegistered) return;
+      window._multiLangSnippetsRegistered = true;
+
+      const K = window.monaco.languages.CompletionItemKind.Snippet;
+      const R = window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet;
+
+      // Python Snippets
+      window.monaco.languages.registerCompletionItemProvider('python', {
+        provideCompletionItems: function () {
+          if (!state.autoCompleteEnabled) return { suggestions: [] };
+          return {
+            suggestions: [
+              { label: 'pr', kind: K, documentation: 'طباعة نص في بايثون print()', insertText: 'print("${1:Hello World}")$0', insertTextRules: R },
+              { label: 'def', kind: K, documentation: 'تعريف دالة جديدة في بايثون', insertText: 'def ${1:func_name}(${2:arg}):\n    ${3:print(arg)}\n$0', insertTextRules: R },
+              { label: 'for', kind: K, documentation: 'حلقة تكرار for in range', insertText: 'for ${1:i} in range(${2:10}):\n    print(${1:i})\n$0', insertTextRules: R },
+              { label: 'if', kind: K, documentation: 'جملة شرطية if / else', insertText: 'if ${1:x > 0}:\n    print("${2:Positive}")\nelse:\n    print("${3:Negative}")$0', insertTextRules: R }
+            ]
+          };
+        }
       });
 
-      const nameInput = document.getElementById('new-file-name-input');
-      const detectorBox = document.getElementById('ext-live-detector');
-
-      function updateLiveDetector() {
-        if (!nameInput || !detectorBox) return;
-        const val = nameInput.value.trim();
-        if (!val) {
-          detectorBox.innerHTML = '✨ اكتب الامتداد وسيتم التعرف على اللغة وتجهيز القالب تلقائياً...';
-          return;
+      // C++ Snippets
+      window.monaco.languages.registerCompletionItemProvider('cpp', {
+        provideCompletionItems: function () {
+          if (!state.autoCompleteEnabled) return { suggestions: [] };
+          return {
+            suggestions: [
+              { label: 'main', kind: K, documentation: 'هيكل برنامج C++ كامل', insertText: '#include <iostream>\nusing namespace std;\n\nint main() {\n    ${1:cout << "Hello C++!" << endl;}\n    return 0;\n}$0', insertTextRules: R },
+              { label: 'cout', kind: K, documentation: 'طباعة مخرجات بـ cout', insertText: 'cout << "${1:Message}" << endl;$0', insertTextRules: R },
+              { label: 'for', kind: K, documentation: 'حلقة تكرار for في C++', insertText: 'for (int ${1:i} = 0; ${1:i} < ${2:10}; ${1:i}++) {\n    ${3:cout << i << endl;}\n}$0', insertTextRules: R }
+            ]
+          };
         }
-        const testName = val.includes('.') ? val : val + '.html';
-        const info = getFileExtensionInfo(testName);
-        detectorBox.innerHTML = `✅ تم التعرف التلقائي: <b>${escapeHtml(info.displayName)}</b> — اللغة: <b>${info.label}</b> (سيتم تجهيز الكود الافتراضي تلقائياً)`;
-      }
-
-      if (nameInput) {
-        setTimeout(() => nameInput.focus(), 50);
-        nameInput.addEventListener('input', updateLiveDetector);
-        nameInput.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            document.getElementById('modal-action')?.click();
-          }
-        });
-      }
-
-      document.querySelectorAll('.quick-ext-chip').forEach((chip) => {
-        chip.addEventListener('click', () => {
-          if (nameInput) {
-            nameInput.value = chip.getAttribute('data-sample');
-            updateLiveDetector();
-            nameInput.focus();
-          }
-        });
       });
     }
+
+    // استدعاء إعدادات الاقتراحات بمجرد فتح الاستوديو
+    setTimeout(() => {
+      registerMultiLangSnippets();
+      applyAutoCompleteSetting(state.autoCompleteEnabled);
+    }, 1000);
 
     function deleteCustomFile(fileKey) {
       if (['html', 'css', 'js'].includes(fileKey)) return;
