@@ -4447,11 +4447,95 @@ if (btn) {
       }
     }
 
-    window.refreshAllEditorTabs = renderStudioTabs;
+window.refreshAllEditorTabs = renderStudioTabs;
 
-// =========================================================================
-    // التحكم في تشغيل أو إيقاف الاقتراحات التلقائية (Auto-Complete ON / OFF)
-    // =========================================================================
+    // Smart Modal to create a new file with automatic extension & language detection (English UI)
+    function promptCreateNewFile() {
+      const modalHtml = `
+        <div>
+          <p style="margin:0 0 8px; font-size:12px;">Enter file name with extension (e.g. <code>about.html</code>, <code>main.py</code>, <code>main.cpp</code>):</p>
+          <input id="new-file-name-input" type="text" placeholder="e.g. app.py or program.cpp" style="width:100%; padding:10px 12px; border:1px solid var(--purple); border-radius:9px; font:600 13px 'DM Mono',monospace;" autocomplete="off" />
+          <div id="ext-live-detector" style="margin-top:10px; padding:8px 12px; border-radius:8px; background:var(--purple-soft); color:var(--purple); font-size:11px; font-weight:700;">
+            ✨ Type a file extension to auto-detect language & starter template...
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+            <small style="width:100%; color:var(--muted); font-size:10px;">Quick Templates:</small>
+            <button type="button" class="quick-ext-chip" data-sample="main.py">🐍 main.py</button>
+            <button type="button" class="quick-ext-chip" data-sample="main.cpp">⚙️ main.cpp</button>
+            <button type="button" class="quick-ext-chip" data-sample="main.c">🛠️ main.c</button>
+            <button type="button" class="quick-ext-chip" data-sample="Main.java">☕ Main.java</button>
+            <button type="button" class="quick-ext-chip" data-sample="Program.cs">🎯 Program.cs</button>
+            <button type="button" class="quick-ext-chip" data-sample="query.sql">🗄️ query.sql</button>
+            <button type="button" class="quick-ext-chip" data-sample="about.html">🌐 about.html</button>
+            <button type="button" class="quick-ext-chip" data-sample="cards.css">🎨 cards.css</button>
+            <button type="button" class="quick-ext-chip" data-sample="app.js">⚡ app.js</button>
+          </div>
+        </div>
+      `;
+
+      openModal('➕', 'Create New File', modalHtml, 'Create & Open File ✦', () => {
+        const input = document.getElementById('new-file-name-input');
+        let rawName = (input ? input.value : '').trim();
+        if (!rawName) {
+          showToast('⚠ Please enter a file name first.');
+          return false;
+        }
+        if (!rawName.includes('.')) {
+          rawName += '.html';
+        }
+        const normalized = normalizeFileKey(rawName);
+        if (state.playgroundFiles[normalized] !== undefined) {
+          switchPlaygroundFileTab(normalized);
+          showToast(`📄 Switched to existing file: ${rawName}`);
+          return true;
+        }
+
+        const extInfo = getFileExtensionInfo(normalized);
+        state.playgroundFiles[normalized] = extInfo.starter;
+        saveState();
+        switchPlaygroundFileTab(normalized);
+        showToast(`✓ Created ${extInfo.displayName} (${extInfo.label})`);
+        return true;
+      });
+
+      const nameInput = document.getElementById('new-file-name-input');
+      const detectorBox = document.getElementById('ext-live-detector');
+
+      function updateLiveDetector() {
+        if (!nameInput || !detectorBox) return;
+        const val = nameInput.value.trim();
+        if (!val) {
+          detectorBox.innerHTML = '✨ Type a file extension to auto-detect language & starter template...';
+          return;
+        }
+        const testName = val.includes('.') ? val : val + '.html';
+        const info = getFileExtensionInfo(testName);
+        detectorBox.innerHTML = `✅ Auto-Detected: <b>${escapeHtml(info.displayName)}</b> — Language: <b>${info.label}</b>`;
+      }
+
+      if (nameInput) {
+        setTimeout(() => nameInput.focus(), 50);
+        nameInput.addEventListener('input', updateLiveDetector);
+        nameInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('modal-action')?.click();
+          }
+        });
+      }
+
+      document.querySelectorAll('.quick-ext-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          if (nameInput) {
+            nameInput.value = chip.getAttribute('data-sample');
+            updateLiveDetector();
+            nameInput.focus();
+          }
+        });
+      });
+    }
+
+    // Auto-Complete ON / OFF Toggle (English UI)
     function applyAutoCompleteSetting(isEnabled) {
       state.autoCompleteEnabled = Boolean(isEnabled);
       localStorage.setItem('codemasr_autocomplete', state.autoCompleteEnabled ? 'on' : 'off');
@@ -4462,7 +4546,7 @@ if (btn) {
         toggleBtn.classList.toggle('active', state.autoCompleteEnabled);
       }
       if (statusText) {
-        statusText.textContent = state.autoCompleteEnabled ? 'مفعّل (ON)' : 'مغلق للتدريب (OFF)';
+        statusText.textContent = state.autoCompleteEnabled ? 'ON' : 'OFF';
       }
 
       if (monacoEditorInstance) {
@@ -4480,12 +4564,11 @@ if (btn) {
       applyAutoCompleteSetting(!state.autoCompleteEnabled);
       showToast(
         state.autoCompleteEnabled
-          ? '💡 تم تفعيل الاقتراحات التلقائية للأكواد (IntelliSense ON)'
-          : '🔒 تم إيقاف الاقتراحات التلقائية (وضع التدريب الحر من الذاكرة OFF)'
+          ? '💡 IntelliSense Auto-Complete: ON'
+          : '🔒 IntelliSense Auto-Complete: OFF (Practice Mode)'
       );
     });
 
-    // تسجيل قوالب الإكمال التلقائي للغات Python و C++ و Java و SQL عند تفعيل الاقتراحات
     function registerMultiLangSnippets() {
       if (!window.monaco || window._multiLangSnippetsRegistered) return;
       window._multiLangSnippetsRegistered = true;
@@ -4493,37 +4576,34 @@ if (btn) {
       const K = window.monaco.languages.CompletionItemKind.Snippet;
       const R = window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet;
 
-      // Python Snippets
       window.monaco.languages.registerCompletionItemProvider('python', {
         provideCompletionItems: function () {
           if (!state.autoCompleteEnabled) return { suggestions: [] };
           return {
             suggestions: [
-              { label: 'pr', kind: K, documentation: 'طباعة نص في بايثون print()', insertText: 'print("${1:Hello World}")$0', insertTextRules: R },
-              { label: 'def', kind: K, documentation: 'تعريف دالة جديدة في بايثون', insertText: 'def ${1:func_name}(${2:arg}):\n    ${3:print(arg)}\n$0', insertTextRules: R },
-              { label: 'for', kind: K, documentation: 'حلقة تكرار for in range', insertText: 'for ${1:i} in range(${2:10}):\n    print(${1:i})\n$0', insertTextRules: R },
-              { label: 'if', kind: K, documentation: 'جملة شرطية if / else', insertText: 'if ${1:x > 0}:\n    print("${2:Positive}")\nelse:\n    print("${3:Negative}")$0', insertTextRules: R }
+              { label: 'pr', kind: K, documentation: 'Python print()', insertText: 'print("${1:Hello World}")$0', insertTextRules: R },
+              { label: 'def', kind: K, documentation: 'Define Python function', insertText: 'def ${1:func_name}(${2:arg}):\n    ${3:print(arg)}\n$0', insertTextRules: R },
+              { label: 'for', kind: K, documentation: 'Python for loop', insertText: 'for ${1:i} in range(${2:10}):\n    print(${1:i})\n$0', insertTextRules: R },
+              { label: 'if', kind: K, documentation: 'Python if / else', insertText: 'if ${1:x > 0}:\n    print("${2:Positive}")\nelse:\n    print("${3:Negative}")$0', insertTextRules: R }
             ]
           };
         }
       });
 
-      // C++ Snippets
       window.monaco.languages.registerCompletionItemProvider('cpp', {
         provideCompletionItems: function () {
           if (!state.autoCompleteEnabled) return { suggestions: [] };
           return {
             suggestions: [
-              { label: 'main', kind: K, documentation: 'هيكل برنامج C++ كامل', insertText: '#include <iostream>\nusing namespace std;\n\nint main() {\n    ${1:cout << "Hello C++!" << endl;}\n    return 0;\n}$0', insertTextRules: R },
-              { label: 'cout', kind: K, documentation: 'طباعة مخرجات بـ cout', insertText: 'cout << "${1:Message}" << endl;$0', insertTextRules: R },
-              { label: 'for', kind: K, documentation: 'حلقة تكرار for في C++', insertText: 'for (int ${1:i} = 0; ${1:i} < ${2:10}; ${1:i}++) {\n    ${3:cout << i << endl;}\n}$0', insertTextRules: R }
+              { label: 'main', kind: K, documentation: 'C++ main boilerplate', insertText: '#include <iostream>\nusing namespace std;\n\nint main() {\n    ${1:cout << "Hello C++!" << endl;}\n    return 0;\n}$0', insertTextRules: R },
+              { label: 'cout', kind: K, documentation: 'std::cout output', insertText: 'cout << "${1:Message}" << endl;$0', insertTextRules: R },
+              { label: 'for', kind: K, documentation: 'C++ for loop', insertText: 'for (int ${1:i} = 0; ${1:i} < ${2:10}; ${1:i}++) {\n    ${3:cout << i << endl;}\n}$0', insertTextRules: R }
             ]
           };
         }
       });
     }
 
-    // استدعاء إعدادات الاقتراحات بمجرد فتح الاستوديو
     setTimeout(() => {
       registerMultiLangSnippets();
       applyAutoCompleteSetting(state.autoCompleteEnabled);
@@ -4538,7 +4618,7 @@ if (btn) {
       } else {
         renderStudioTabs();
       }
-      showToast(`🗑️ تم حذف الملف ${fileKey}`);
+      showToast(`🗑️ Deleted file ${fileKey}`);
     }
 
     function downloadActiveFile() {
@@ -4550,23 +4630,21 @@ if (btn) {
       a.href = URL.createObjectURL(blob);
       a.download = info.displayName;
       a.click();
-      showToast(`⬇ جاري تحميل ${info.displayName}...`);
+      showToast(`⬇ Downloading ${info.displayName}...`);
     }
 
-    // الاستماع لحدث التنقل بين صفحات HTML المتعددة من داخل شاشة المعاينة
     window.addEventListener('message', (e) => {
       if (e.data && e.data.source === 'codemasr-navigate-file') {
         const target = normalizeFileKey(e.data.targetFile);
         if (state.playgroundFiles[target] !== undefined) {
           switchPlaygroundFileTab(target);
-          showToast(`🔗 تم الانتقال إلى صفحة ${e.data.targetFile}`);
+          showToast(`🔗 Navigated to ${e.data.targetFile}`);
         } else {
-          showToast(`⚠ الصفحة "${e.data.targetFile}" غير موجودة بعد! اضغط (+) لإنشائها.`);
+          showToast(`⚠ File "${e.data.targetFile}" not found. Click (+) to create it.`);
         }
       }
     });
 
-    // تفعيل التبويبات عند بدء التشغيل
     renderStudioTabs();
 
     function updateStudioPreview() {
