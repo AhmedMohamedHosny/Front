@@ -705,3 +705,20 @@
 .modal-backdrop {
   z-index: 10005 !important;
 }
+/* تلوين زرار التحكم في الاقتراح التلقائي وأيقونات اللغات */
+.autocomplete-toggle-btn {
+  border: 1px solid var(--st-border) !important;
+  transition: all 0.25s ease;
+}
+
+.autocomplete-toggle-btn.active {
+  background: rgba(0, 242, 254, 0.14) !important;
+  border-color: var(--st-accent) !important;
+  color: var(--st-accent) !important;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+}
+
+.cpp-dot {
+  background: #00599c;
+  box-shadow: 0 0 6px #00599c;
+}
