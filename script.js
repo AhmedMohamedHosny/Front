@@ -3822,15 +3822,19 @@ usingMonaco = true;
     return diagnostics;
   }
 
-  // مترجم ومشغل فعلي كامل لـ Java / C++ / C# / Python (يدعم الـ OOP والـ Classes والـ Inheritance والـ super والدوال والحلقات)
+// مترجم ومشغل فعلي كامل لـ Java / C++ / C# / Python (يفصل رأس الدالة عن جسمها ويدعم الـ OOP والـ Inheritance والـ super)
   function transpileAndRunOOPCode(code, lang) {
     const outputs = [];
+    // تنظيف المسافات غير القياسية (\u00A0) التي تأتي عند نسخ الكود
+    const normalizedInput = String(code || '').replace(/\u00A0/g, ' ');
 
     if (lang === 'java' || lang === 'csharp') {
-      let src = String(code || '');
+      let src = normalizedInput;
       src = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       src = src.replace(/^\s*(package|import|using)\s+[^;]+;/gm, '');
+      src = src.replace(/@[a-zA-Z_]\w*(?:\s*\([^)]*\))?/g, '');
 
+      // تتبع الحقول والدوال من نوع double/float لطباعة .0 مطابقة لـ Java الحقيقي
       const doubleMembers = new Set();
       const doubleDeclRegex = /\b(?:double|float)\s+([a-zA-Z_]\w*)\b/g;
       let dm;
@@ -3838,7 +3842,7 @@ usingMonaco = true;
         doubleMembers.add(dm[1]);
       }
 
-      const classRegex = /(?:public\s+|private\s+|protected\s+|abstract\s+|final\s+|static\s+)*class\s+([a-zA-Z_]\w*)(?:\s+(?:extends|:)\s+([a-zA-Z_]\w*))?\s*\{/g;
+      const classRegex = /(?:public\s+|private\s+|protected\s+|abstract\s+|final\s+|static\s+)*class\s+([a-zA-Z_]\w*)(?:\s+(?:extends|:)\s+([a-zA-Z_]\w*))?(?:\s+implements\s+[^{]+)?\s*\{/g;
       const classes = [];
       let match;
 
@@ -3854,9 +3858,10 @@ usingMonaco = true;
           i++;
         }
         const body = src.slice(bodyStart, i - 1);
-        classes.push({ className, parentName, body, fullMatchStart: match.index, fullMatchEnd: i });
+        classes.push({ className, parentName, body });
       }
 
+      // جمع أسماء الحقول والدوال في الكلاسات لربطها بـ this داخل جسم الدوال فقط
       const allClassMembers = new Set();
       classes.forEach((cls) => {
         const fRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|var)\s+([a-zA-Z_]\w*)\s*(?:=\s*[^;]+)?;/g;
@@ -3864,7 +3869,7 @@ usingMonaco = true;
         while ((fm = fRegex.exec(cls.body)) !== null) {
           allClassMembers.add(fm[1]);
         }
-        const mRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:void|String|int|double|float|boolean|bool|char|long|[a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)\s*\(/g;
+        const mRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:void|String|int|double|float|boolean|bool|char|long|[a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)\s*\(/g;
         let mm;
         while ((mm = mRegex.exec(cls.body)) !== null) {
           if (mm[1] !== cls.className && mm[1] !== 'main' && mm[1] !== 'Main') {
@@ -3879,7 +3884,8 @@ usingMonaco = true;
       classes.forEach((cls) => {
         let b = cls.body;
 
-        const mainRegex = /(?:public\s+|static\s+)*void\s+(?:main|Main)\s*\([^)]*\)\s*\{/;
+        // 1. استخراج دالة main إن وجدت داخل الكلاس
+        const mainRegex = /(?:public\s+|private\s+|protected\s+|static\s+|final\s+)*void\s+(?:main|Main)\s*\([^)]*\)\s*\{/;
         const mainMatch = mainRegex.exec(b);
         if (mainMatch) {
           const mStart = mainMatch.index + mainMatch[0].length;
@@ -3893,6 +3899,7 @@ usingMonaco = true;
           b = b.slice(0, mainMatch.index) + b.slice(k);
         }
 
+        // 2. استخراج الـ Constructors (التي تحمل نفس اسم الكلاس)
         const constructors = [];
         const ctorRegex = new RegExp(`(?:public|private|protected)?\\s*\\b${cls.className}\\s*\\(([^)]*)\\)\\s*\\{`, 'g');
         let cm;
@@ -3916,29 +3923,46 @@ usingMonaco = true;
           b = b.slice(0, constructors[idx].start) + b.slice(constructors[idx].end);
         }
 
-        b = b.replace(
-          /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:void|String|int|double|float|boolean|bool|char|long|[a-zA-Z_]\w*(?:\[\])?)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g,
-          function (_, mName, paramsRaw) {
-            const pNames = paramsRaw.trim()
-              ? paramsRaw.split(',').map(p => p.trim().split(/\s+/).pop().replace(/\[\]/g, '')).join(', ')
-              : '';
-            return `${mName}(${pNames}) {`;
+        // 3. استخراج الدوال (Methods) واحدة تلو الأخرى وفصل رأس الدالة عن جسمها تماماً!
+        const methods = [];
+        const methodRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:synchronized\s+)?(?:void|String|int|double|float|boolean|bool|char|long|[a-zA-Z_]\w*(?:\[\])?)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g;
+        let mm;
+        while ((mm = methodRegex.exec(b)) !== null) {
+          const mName = mm[1];
+          const paramsRaw = mm[2].trim();
+          const pNames = paramsRaw
+            ? paramsRaw.split(',').map(p => p.trim().split(/\s+/).pop().replace(/\[\]/g, ''))
+            : [];
+          const mStart = mm.index + mm[0].length;
+          let d = 1, k = mStart;
+          while (k < b.length && d > 0) {
+            if (b[k] === '{') d++;
+            else if (b[k] === '}') d--;
+            k++;
           }
-        );
+          const mBody = b.slice(mStart, k - 1);
+          methods.push({ mName, pNames, mBody, start: mm.index, end: k });
+        }
 
+        for (let idx = methods.length - 1; idx >= 0; idx--) {
+          b = b.slice(0, methods[idx].start) + b.slice(methods[idx].end);
+        }
+
+        // 4. استخراج الحقول المتبقية في الكلاس
         const fieldInits = [];
-        b = b.replace(
-          /^\s*(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long)\s+([a-zA-Z_]\w*)\s*(?:=\s*([^;]+))?;/gm,
+        b.replace(
+          /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|[A-Z]\w*)\s+([a-zA-Z_]\w*)\s*(?:=\s*([^;]+))?;/g,
           function (_, fName, fVal) {
             if (fVal !== undefined) {
               fieldInits.push(`this.${fName} = ${fVal.trim()};`);
             } else {
-              fieldInits.push(`if (this.${fName} === undefined) this.${fName} = null;`);
+              fieldInits.push(`if (this.${fName} === undefined) this.${fName} = ${doubleMembers.has(fName) ? '0' : 'null'};`);
             }
             return '';
           }
         );
 
+        // 5. بناء الـ Constructor بصيغة JS سليمة
         let ctorJS = '';
         if (constructors.length === 1) {
           const c = constructors[0];
@@ -3958,8 +3982,13 @@ usingMonaco = true;
           ctorJS = `constructor(...__args) {\n${cls.parentName ? 'super(...__args);\n' : ''}${fieldInits.join('\n')}\n}`;
         }
 
-        b = transformMethodBody(b, [], allClassMembers, doubleMembers);
-        jsClasses.push(`class ${cls.className}${cls.parentName ? ` extends ${cls.parentName}` : ''} {\n${ctorJS}\n${b}\n}`);
+        // 6. بناء الدوال بعد تحويل جسم كل دالة على حدة دون المساس برأس الدالة
+        const methodsJS = methods.map((m) => {
+          const transformedBody = transformMethodBody(m.mBody, m.pNames, allClassMembers, doubleMembers);
+          return `${m.mName}(${m.pNames.join(', ')}) {\n${transformedBody}\n}`;
+        }).join('\n');
+
+        jsClasses.push(`class ${cls.className}${cls.parentName ? ` extends ${cls.parentName}` : ''} {\n${ctorJS}\n${methodsJS}\n}`);
       });
 
       const fullMainJS = transformMethodBody(mainBodyJS || src, [], new Set(), doubleMembers);
@@ -3998,7 +4027,7 @@ usingMonaco = true;
     }
 
     if (lang === 'cpp' || lang === 'c') {
-      let src = String(code || '');
+      let src = normalizedInput;
       src = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       src = src.replace(/^\s*#include.*$/gm, '').replace(/^\s*using\s+namespace\s+\w+\s*;/gm, '');
 
@@ -4043,7 +4072,7 @@ usingMonaco = true;
     }
 
     if (lang === 'python') {
-      let pyLines = String(code || '').replace(/\r\n/g, '\n').split('\n');
+      let pyLines = normalizedInput.replace(/\r\n/g, '\n').split('\n');
       let jsLines = ['const __out = [];', 'function print(...args) { __out.push(args.join(" ")); }', 'function range(a, b, step = 1) { let arr = []; let start = b === undefined ? 0 : a; let end = b === undefined ? a : b; for (let i = start; i < end; i += step) arr.push(i); return arr; }'];
       let indentStack = [0];
 
@@ -4098,7 +4127,7 @@ usingMonaco = true;
     }
 
     if (lang === 'typescript' || lang === 'php') {
-      let src = String(code || '').replace(/<\?php|\?>/g, '');
+      let src = normalizedInput.replace(/<\?php|\?>/g, '');
       src = src.replace(/:\s*(?:string|number|boolean|any|void)(?:\[\])?/g, '');
       src = src.replace(/\becho\s+([^;]+);/g, 'console.log($1);');
       src = src.replace(/\$([a-zA-Z_]\w*)/g, '$1');
@@ -4118,11 +4147,19 @@ usingMonaco = true;
     let s = String(bodyStr || '');
     const localVars = new Set(paramNames || []);
 
+    // تحويل تعريفات المصفوفات والمتغيرات المحلية إلى let
     s = s.replace(
-      /\b(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|[A-Z][a-zA-Z0-9_]*)\s+([a-zA-Z_]\w*)\s*=/g,
+      /\b(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|[A-Z][a-zA-Z0-9_]*)(?:\[\])?\s+([a-zA-Z_]\w*)\s*=/g,
       function (_, vName) {
         localVars.add(vName);
         return `let ${vName} =`;
+      }
+    );
+    s = s.replace(
+      /\bfor\s*\(\s*(?:int|double|float|String|long|var|[A-Z][a-zA-Z0-9_]*)\s+([a-zA-Z_]\w*)\s*:\s*([^)]+)\)/g,
+      function (_, vName, listExpr) {
+        localVars.add(vName);
+        return `for (let ${vName} of ${listExpr})`;
       }
     );
     s = s.replace(/\bfor\s*\(\s*(?:int|double|long|var)\s+([a-zA-Z_]\w*)/g, function (_, vName) {
@@ -4130,16 +4167,22 @@ usingMonaco = true;
       return `for (let ${vName}`;
     });
 
+    // إضافة this. للحقول والدوال الخاصة بالكلاس داخل جسم الدالة فقط
     classMembers.forEach((member) => {
       if (!localVars.has(member)) {
-        const reg = new RegExp(`(?<!\\.|this\\.|new\\s+|function\\s+)\\b${member}\\b(?!\\s*:)`, 'g');
+        const reg = new RegExp(`(?<!\\.|this\\.|super\\.|new\\s+|function\\s+|let\\s+)\\b${member}\\b(?!\\s*:)`, 'g');
         s = s.replace(reg, `this.${member}`);
       }
     });
 
-    doubleMembers.forEach((dName) => {
-      const dReg = new RegExp(`(\\+\\s*)(this\\.${dName}|[a-zA-Z_]\\w*\\.${dName}\\s*\\([^)]*\\)|${dName}\\s*\\([^)]*\\)|${dName})(?!\\s*[+\\-*/])`, 'g');
-      s = s.replace(dReg, `$1__fmt($2, true)`);
+    // تنسيق قيم double بـ (.0) فقط عند طباعتها داخل System.out.print / Console.Write دون المساس بالعمليات الحسابية مثل return salary + bonus
+    s = s.replace(/(System\.out\.print(?:ln)?|Console\.Write(?:Line)?)\s*\(([\s\S]*?)\)\s*;/g, function (full, fnCall, insideArgs) {
+      let updatedArgs = insideArgs;
+      doubleMembers.forEach((dName) => {
+        const dReg = new RegExp(`((?:this\\.|[a-zA-Z_]\\w*\\.)?\\b${dName}\\b(?:\\s*\\([^)]*\\))?)`, 'g');
+        updatedArgs = updatedArgs.replace(dReg, `__fmt($1, true)`);
+      });
+      return `${fnCall}(${updatedArgs});`;
     });
 
     return s;
@@ -4163,7 +4206,9 @@ usingMonaco = true;
     if (syntaxDiagnostics.length > 0) {
       syntaxDiagnostics.forEach(d => appendDiagnosticToConsole(d));
       const firstErr = syntaxDiagnostics[0];
-      const encodedFix = encodeURIComponent(firstErr.fixedCode || buildSmartAutoFixedCode(code, lang));
+      const fixedStr = firstErr.fixedCode || buildSmartAutoFixedCode(code, lang);
+      window.__codemasrPendingFix = { fileKey: state.activePlaygroundFile, fixedCode: fixedStr };
+      const encodedFix = encodeURIComponent(fixedStr).replace(/'/g, '%27');
       return `<!DOCTYPE html>
 <html>
 <head>
@@ -4233,7 +4278,8 @@ usingMonaco = true;
     } catch (runtimeErr) {
       const explained = explainRuntimeError(runtimeErr.message);
       const fallbackFixed = buildSmartAutoFixedCode(code, lang);
-      const encodedFallbackFix = encodeURIComponent(fallbackFixed);
+      window.__codemasrPendingFix = { fileKey: state.activePlaygroundFile, fixedCode: fallbackFixed };
+      const encodedFallbackFix = encodeURIComponent(fallbackFixed).replace(/'/g, '%27');
       appendDiagnosticToConsole({
         file: state.activePlaygroundFile,
         severity: 'error',
@@ -4250,7 +4296,7 @@ usingMonaco = true;
     <h3 style="margin:0 0 10px;color:#ff7b72;">⛔ توقف التشغيل بسبب خطأ برمجي (Error Detected)</h3>
     <div style="direction:ltr;text-align:left;background:#0d1117;padding:10px;border-radius:8px;color:#ffa198;font-family:monospace;margin-bottom:10px;">✖ ${escapeHtml(runtimeErr.toString())}</div>
     <p style="margin:0 0 8px;"><b>الشرح:</b> ${escapeHtml(explained.explainAr)}</p>
-    <p style="margin:0 0 12px;color:#34d399;"><b>💡 الحل المقترح:</b> اضغط على الزر بالأسفل لإصلاح الأقواس والفصلات المنقوطة تلقائياً أو تأكد من أسماء المتغيرات.</p>
+    <p style="margin:0 0 12px;color:#34d399;"><b>💡 الحل المقترح:</b> اضغط على الزر بالأسفل لإصلاح الأقواس والفصلات المنقوطة وتنسيق الكود تلقائياً.</p>
     <button style="background:#10b981;color:#052e16;border:0;padding:9px 16px;border-radius:8px;font-weight:800;cursor:pointer;font-size:12px;" onclick="parent.postMessage({ source: 'codemasr-autofix', fileKey: '${escapeHtml(state.activePlaygroundFile)}', fixedCode: decodeURIComponent('${encodedFallbackFix}') }, '*')">⚡ صلح الخطأ تلقائياً وشغّل الكود</button>
   </div>
 </body>
@@ -4812,15 +4858,28 @@ function cleanAndFormatCodeString(rawCode, lang) {
     }
   });
 
-  window.addEventListener('message', (e) => {
+window.addEventListener('message', (e) => {
     if (e.data && e.data.source === 'codemasr-autofix') {
-      const targetKey = normalizeFileKey(e.data.fileKey || state.activePlaygroundFile);
-      if (e.data.fixedCode && state.playgroundFiles[targetKey] !== undefined) {
-        state.playgroundFiles[targetKey] = e.data.fixedCode;
-        switchPlaygroundFileTab(targetKey);
+      const targetKey = normalizeFileKey(e.data.fileKey || (window.__codemasrPendingFix && window.__codemasrPendingFix.fileKey) || state.activePlaygroundFile);
+      const rawFixed = e.data.fixedCode || (window.__codemasrPendingFix && window.__codemasrPendingFix.fixedCode);
+      if (rawFixed && state.playgroundFiles[targetKey] !== undefined) {
+        const info = getFileExtensionInfo(targetKey);
+        const nicelyFormatted = cleanAndFormatCodeString(rawFixed, info.lang);
+        state.playgroundFiles[targetKey] = nicelyFormatted;
+
+        if (usingMonaco && monacoEditorInstance) {
+          monacoEditorInstance.setValue(nicelyFormatted);
+        } else {
+          const fallbackEl = document.getElementById('fallback-editor');
+          if (fallbackEl) fallbackEl.value = nicelyFormatted;
+        }
+
         saveState();
         runPlaygroundCode(true);
-        showToast('⚡ تم إصلاح الخطأ تلقائياً وإعادة تشغيل الكود بنجاح!');
+
+        const toastContainer = document.getElementById('toast-container');
+        if (toastContainer) toastContainer.style.zIndex = '10050';
+        showToast('⚡ تم إصلاح الخطأ وتنسيق الكود وإعادة التشغيل بنجاح!');
       }
     }
   });
@@ -5461,8 +5520,7 @@ window.refreshAllEditorTabs = renderStudioTabs;
       });
     }
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
+window.addEventListener('beforeinstallprompt', (e) => {
       deferredInstallPrompt = e;
       if (installPwaBtn) installPwaBtn.hidden = false;
     });
