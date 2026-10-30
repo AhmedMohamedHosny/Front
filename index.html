@@ -428,10 +428,9 @@
                 <button class="file-tab" data-file="style.css"><span class="file-dot css-dot"></span> style.css</button>
                 <button class="file-tab" data-file="script.js"><span class="file-dot js-dot"></span> script.js</button>
               </div>
-              <div class="editor-tools">
-
+<div class="editor-tools">
                 <span class="save-state" id="save-state">● Saved locally</span>
-                <button class="icon-button small-icon" id="format-code" title="تنسيق الكود">⤢</button>
+                <button class="secondary-button" id="format-code" type="button" style="padding: 5px 12px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;" title="تنظيف وتنسيق الكود تلقائياً">✨ Clean Code</button>
               </div>
             </div>
             <div class="editor-host" id="editor-host">
@@ -802,6 +801,7 @@
   💡 Auto-Complete: <b id="autocomplete-status-text">ON</b>
 </button>
 
+        <button class="vscode-action-btn" id="studio-clean-code" type="button" title="تنظيف وتنسيق الكود وجعله متناسقاً"> Clean Code</button>
         <button class="vscode-action-btn primary" id="studio-run-code">▶ Run Code (Ctrl+Enter)</button>
         <button class="vscode-close-btn" id="close-studio-btn">✕ Exit Fullscreen</button>
       </div>

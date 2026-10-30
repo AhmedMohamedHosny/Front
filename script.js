@@ -3106,7 +3106,7 @@ if (btn) {
     executeInLessonCode(course, lesson, true);
   }
 
-  function executeInLessonCode(course, lesson, isInitialLoad) {
+function executeInLessonCode(course, lesson, isInitialLoad) {
     const textarea = document.getElementById('in-lesson-textarea');
     const iframe = document.getElementById('in-lesson-iframe');
     const feedbackBox = document.getElementById('in-lesson-feedback');
@@ -3121,67 +3121,50 @@ if (btn) {
       refreshAllUI();
     }
 
-    // 1. Check if Python track
+    // 1. إذا كان المسار بايثون: افحص الأخطاء أولاً وأوقف التنفيذ فوراً عند وجود خطأ
     if (course.id === 'python') {
       const pyDiag = analyzeCodeDiagnostics(rawCode, '', '', 'python');
-      let pyOutput = '';
-      const printMatches = rawCode.matchAll(/print\s*\(([^)]*)\)/gi);
-      const vars = {};
-      rawCode.split('\n').forEach((line) => {
-        const assign = line.match(/^\s*([a-zA-Z_]\w*)\s*=\s*(.+)$/);
-        if (assign) {
-          const k = assign[1];
-          const valExpr = assign[2].trim();
-          if (/^['"].*['"]$/.test(valExpr)) {
-            vars[k] = valExpr.slice(1, -1);
-          } else if (/^\d+(\.\d+)?\s*\+\s*\d+(\.\d+)?$/.test(valExpr)) {
-            const parts = valExpr.split('+');
-            vars[k] = Number(parts[0]) + Number(parts[1]);
-          } else if (!isNaN(Number(valExpr))) {
-            vars[k] = Number(valExpr);
-          } else if (valExpr.includes('+')) {
-            const parts = valExpr.split('+').map(p => p.trim());
-            const v1 = vars[parts[0]] !== undefined ? vars[parts[0]] : Number(parts[0]);
-            const v2 = vars[parts[1]] !== undefined ? vars[parts[1]] : Number(parts[1]);
-            vars[k] = v1 + v2;
-          }
-        }
-      });
-
-      for (const m of printMatches) {
-        const args = m[1].split(',').map((a) => {
-          const clean = a.trim();
-          if (/^['"].*['"]$/.test(clean)) return clean.slice(1, -1);
-          if (vars[clean] !== undefined) return vars[clean];
-          return clean;
-        });
-        pyOutput += args.join(' ') + '\n';
-      }
-
-      iframe.srcdoc = `<body style="font-family:'DM Mono',monospace;background:#121322;color:#8ee4b7;padding:16px;margin:0;"><div style="color:#85899e;font-size:11px;margin-bottom:8px;">python3 main.py</div><pre style="margin:0;white-space:pre-wrap;">${escapeHtml(pyOutput || '(No output printed yet)')}</pre></body>`;
-
       if (pyDiag.length > 0) {
-        renderLessonDiagnosticError(feedbackBox, pyDiag[0], textarea, course, lesson);
+        const err = pyDiag[0];
+        iframe.srcdoc = `<body style="font-family:system-ui,sans-serif;background:#1a0f14;color:#ff8b94;padding:18px;margin:0;direction:rtl;text-align:right;">
+          <div style="border:1px solid #f85149;background:rgba(248,81,73,0.12);border-radius:10px;padding:14px;">
+            <b style="color:#ff7b72;font-size:13px;">⛔ تم إيقاف تشغيل الكود لوجود خطأ (Execution Halted)</b>
+            <p style="margin:8px 0 4px;font-size:12px;color:#ffdcd7;">${escapeHtml(err.title)}</p>
+            <p style="margin:4px 0;font-size:12px;color:#f0f6fc;">${escapeHtml(err.explainAr)}</p>
+          </div>
+        </body>`;
+        renderLessonDiagnosticError(feedbackBox, err, textarea, course, lesson);
         return;
       }
 
+      iframe.srcdoc = executeTerminalLanguage(rawCode, getFileExtensionInfo('main.py'));
       const check = lesson.validate(null, rawCode);
       renderLessonValidationResult(feedbackBox, check, textarea, course, lesson);
       return;
     }
 
-    // 2. HTML / CSS / JS Execution in Sandbox
-    iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:'Manrope',system-ui,sans-serif;padding:16px;margin:0;color:#171a2b;line-height:1.6}</style></head><body>${rawCode}</body></html>`;
-
-    // 3. Run Smart Diagnostics (Syntax & Tag Check)
+    // 2. فحص أخطاء HTML / CSS / JS قبل التشغيل وإيقاف الـ Run فوراً إذا وُجد خطأ
     const issues = analyzeCodeDiagnostics(rawCode, '', '', 'web');
     const errorsOnly = issues.filter(i => i.severity === 'error');
     if (errorsOnly.length > 0) {
-      renderLessonDiagnosticError(feedbackBox, errorsOnly[0], textarea, course, lesson);
+      const err = errorsOnly[0];
+      iframe.srcdoc = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"></head>
+        <body style="font-family:'Cairo',system-ui,sans-serif;background:#fff5f5;color:#842029;padding:20px;margin:0;">
+          <div style="border:2px solid #f5c2c7;background:#ffffff;border-radius:12px;padding:16px;box-shadow:0 8px 20px rgba(213,79,89,0.12);">
+            <h3 style="margin:0 0 8px;color:#d54f59;font-size:15px;">⛔ تم إيقاف التشغيل لوجود خطأ في الكود!</h3>
+            <div style="font-family:monospace;background:#fff0f0;padding:8px 10px;border-radius:6px;direction:ltr;text-align:left;font-size:12px;margin-bottom:8px;">${escapeHtml(err.title)}</div>
+            <p style="margin:0 0 6px;font-size:13px;line-height:1.6;"><b>السبب:</b> ${escapeHtml(err.explainAr)}</p>
+            <p style="margin:0;font-size:12px;color:#18a878;font-weight:700;">💡 الحل المقترح: اضغط على زرار "صلحلي الخطأ تلقائياً" بالأسفل ليتم إصلاحه وتشغيله.</p>
+          </div>
+        </body></html>`;
+      renderLessonDiagnosticError(feedbackBox, err, textarea, course, lesson);
       return;
     }
 
-    // 4. Validate against Lesson Challenge Goal
+    // 3. تشغيل الكود فقط إذا كان سليماً وخالياً من الأخطاء
+    iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:'Manrope',system-ui,sans-serif;padding:16px;margin:0;color:#171a2b;line-height:1.6}</style></head><body>${rawCode}</body></html>`;
+
+    // 4. تقييم تحدي الدرس
     const parser = new DOMParser();
     const doc = parser.parseFromString(rawCode, 'text/html');
     const validation = lesson.validate(doc, rawCode);
@@ -3603,136 +3586,515 @@ if (btn) {
     if (f2 && !document.getElementById('vscode-studio-modal')?.hidden) f2.srcdoc = docStr;
   }
 
-  // 2. مُشغّل ومحاكي الـ Terminal الذكي للغات (Python, C++, C, Java, C#, SQL, PHP)
+// 2. فاحص الأخطاء ومُشغّل اللغات الحقيقي (Java OOP, C++, C, Python, C#, PHP, TypeScript, SQL)
+  function checkTerminalSyntaxAndSuggestFix(code, info) {
+    const lang = info.lang;
+    const rawLines = String(code || '').split('\n');
+    const diagnostics = [];
+
+    // أ) فحص توازن الأقواس { } و ( )
+    let openCurly = 0, closeCurly = 0, openParen = 0, closeParen = 0;
+    rawLines.forEach((l) => {
+      const clean = l.replace(/\/\/.*$/, '').replace(/#.*$/, '').replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
+      openCurly += (clean.match(/\{/g) || []).length;
+      closeCurly += (clean.match(/\}/g) || []).length;
+      openParen += (clean.match(/\(/g) || []).length;
+      closeParen += (clean.match(/\)/g) || []).length;
+    });
+
+    if (openCurly > closeCurly) {
+      diagnostics.push({
+        file: state.activePlaygroundFile,
+        severity: 'error',
+        title: `SyntaxError: Missing ${openCurly - closeCurly} closing curly brace(s) '}'`,
+        explainAr: `بالمصري: فتحت قوس مجموعة '{' في الكود ونسيت تقفله بـ '}' (ناقص ${openCurly - closeCurly} قوس إغلاق). الكود مش هيشتغل غير لما الأقواس تتقفل صح.`,
+        explainEn: `Unbalanced curly braces: ${openCurly} '{' opened vs ${closeCurly} '}' closed.`,
+        suggestionAr: `إضافة '${'}'.repeat(openCurly - closeCurly)}' في نهاية الكود لقفل البلوكات المفتوحة.`,
+        fixedCode: code + '\n' + '}\n'.repeat(openCurly - closeCurly)
+      });
+    } else if (closeCurly > openCurly) {
+      diagnostics.push({
+        file: state.activePlaygroundFile,
+        severity: 'error',
+        title: `SyntaxError: Extra closing curly brace '}' found`,
+        explainAr: `بالمصري: فيه قوس إغلاق '}' زيادة في الكود ملوش قوس فتح '{' مقابله.`,
+        explainEn: `Found ${closeCurly} '}' but only ${openCurly} '{'.`,
+        suggestionAr: `حذف قوس الإغلاق '}' الزائد من الكود.`,
+        fixedCode: code.replace(/\}\s*$/, '')
+      });
+    }
+
+    if (openParen > closeParen) {
+      diagnostics.push({
+        file: state.activePlaygroundFile,
+        severity: 'error',
+        title: `SyntaxError: Missing closing parenthesis ')'`,
+        explainAr: `بالمصري: فتحت قوس عادي '(' ونسيت تقفله بـ ')'. راجع أقواس الدوال أو الطباعة.`,
+        explainEn: `Unclosed parenthesis '(' detected.`,
+        suggestionAr: `إغلاق القوس المفتوح ')'.`,
+        fixedCode: code + ')'.repeat(openParen - closeParen)
+      });
+    }
+
+    // ب) فحص أخطاء Python
+    if (lang === 'python') {
+      rawLines.forEach((rawLine, idx) => {
+        const trimmed = rawLine.replace(/#.*$/, '').trim();
+        if (!trimmed) return;
+        if (/^(if|else|elif|def|for|while|class)\b/.test(trimmed) && !trimmed.endsWith(':')) {
+          diagnostics.push({
+            file: state.activePlaygroundFile,
+            severity: 'error',
+            line: idx + 1,
+            title: `SyntaxError (Line ${idx + 1}): expected ':' after '${trimmed.split(/\s+/)[0]}' statement`,
+            explainAr: `بالمصري: في السطر رقم ${idx + 1} نسيت تحط النقطتين فوق بعض (:) في آخر جملة ${trimmed.split(/\s+/)[0]}.`,
+            explainEn: `Python requires ':' at the end of block headers (if, for, def, class).`,
+            suggestionAr: `إضافة ':' في نهاية السطر رقم ${idx + 1}.`,
+            fixedCode: rawLines.map((l, i) => (i === idx ? l.replace(/\s*$/, ':') : l)).join('\n')
+          });
+        }
+        if (/\b(pritn|pirnt|prnt|Pint|Print)\s*\(/.test(trimmed)) {
+          diagnostics.push({
+            file: state.activePlaygroundFile,
+            severity: 'error',
+            line: idx + 1,
+            title: `NameError (Line ${idx + 1}): name is not defined (Misspelled 'print')`,
+            explainAr: `بالمصري: في السطر رقم ${idx + 1} كتبت دالة الطباعة غلط، والصحيح في بايثون هو print() بحروف صغيرة.`,
+            explainEn: `Function 'print' is misspelled or capitalized on line ${idx + 1}.`,
+            suggestionAr: `تصحيح اسم الدالة إلى print(...) في السطر ${idx + 1}.`,
+            fixedCode: code.replace(/\b(pritn|pirnt|prnt|Pint|Print)\s*\(/g, 'print(')
+          });
+        }
+      });
+    }
+
+    // ج) فحص أخطاء Java / C++ / C / C#
+    if (lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') {
+      rawLines.forEach((rawLine, idx) => {
+        const clean = rawLine.replace(/\/\/.*$/, '').trim();
+        if (!clean || clean.startsWith('#') || clean.startsWith('@') || clean.startsWith('/*') || clean.startsWith('*')) return;
+
+        // فحص الأخطاء الإملائية المشهورة في Java
+        if (lang === 'java') {
+          if (/\bsystem\.out\./.test(clean)) {
+            diagnostics.push({
+              file: state.activePlaygroundFile,
+              severity: 'error',
+              line: idx + 1,
+              title: `Compiler Error (Line ${idx + 1}): package system does not exist`,
+              explainAr: `بالمصري: في السطر ${idx + 1} كتبت كلمة system بحرف s صغير، وفي لغة الجافا لازم تبدأ بحرف كبير System.out.println.`,
+              explainEn: `Java is case-sensitive. Use 'System.out.println' with an uppercase 'S'.`,
+              suggestionAr: `تحويل system.out إلى System.out.`,
+              fixedCode: code.replace(/\bsystem\.out\./g, 'System.out.')
+            });
+          }
+          if (/\bstring\s+[a-zA-Z_]\w*/.test(clean)) {
+            diagnostics.push({
+              file: state.activePlaygroundFile,
+              severity: 'error',
+              line: idx + 1,
+              title: `Compiler Error (Line ${idx + 1}): cannot find symbol class 'string'`,
+              explainAr: `بالمصري: في السطر ${idx + 1} كتبت نوع النص string بحرف s صغير، وفي الجافا لازم يتكتب String بحرف S كابيتال.`,
+              explainEn: `In Java, 'String' is a class and must start with an uppercase 'S'.`,
+              suggestionAr: `تحويل كلمة string إلى String.`,
+              fixedCode: code.replace(/\bstring(\s+[a-zA-Z_]\w*)/g, 'String$1')
+            });
+          }
+        }
+
+        // فحص cout >> الغلط في C++
+        if (lang === 'cpp' && /\bcout\s*>>/.test(clean)) {
+          diagnostics.push({
+            file: state.activePlaygroundFile,
+            severity: 'error',
+            line: idx + 1,
+            title: `Compiler Error (Line ${idx + 1}): invalid operands to binary expression ('ostream' and '>>')`,
+            explainAr: `بالمصري: في السطر ${idx + 1} استخدمت علامة '>>' مع cout، والصح إن cout بتاخد علامة الأصغر من مرتين '<<' (أما cin هي اللي بتاخد '>>').`,
+            explainEn: `Use the insertion operator '<<' with cout instead of '>>'.`,
+            suggestionAr: `تغيير 'cout >>' إلى 'cout <<'.`,
+            fixedCode: code.replace(/\bcout\s*>>/g, 'cout <<')
+          });
+        }
+
+        // فحص نسيان الفصلة المنقوطة (;) في نهاية الأسطر التنفيذية
+        const isBlockOrHeader =
+          clean.endsWith(';') ||
+          clean.endsWith('{') ||
+          clean.endsWith('}') ||
+          clean.endsWith(':') ||
+          clean.endsWith(',') ||
+          clean.endsWith('+') ||
+          clean.endsWith('(') ||
+          /^(public|private|protected|class|interface|enum|struct|namespace|if|else|for|while|do|switch|try|catch|finally|void|int|double|float|String|char|bool|boolean|static)\b.*\(.*\)\s*$/.test(clean) ||
+          /^(public\s+|private\s+|abstract\s+|final\s+)?(class|interface|enum|struct|namespace)\b/.test(clean) ||
+          /^else\b/.test(clean);
+
+        if (!isBlockOrHeader) {
+          diagnostics.push({
+            file: state.activePlaygroundFile,
+            severity: 'error',
+            line: idx + 1,
+            title: `Compiler Error (Line ${idx + 1}): ';' expected at end of statement`,
+            explainAr: `بالمصري: في السطر رقم ${idx + 1} (${clean}) نسيت تقفل الجملة البرمجية بفصلة منقوطة (;)! في لغة ${info.label} أي أمر لازم ينتهي بـ (;).`,
+            explainEn: `Missing semicolon ';' at the end of line ${idx + 1}.`,
+            suggestionAr: `إضافة فصلة منقوطة ';' في نهاية السطر رقم ${idx + 1}.`,
+            fixedCode: rawLines.map((l, i) => (i === idx ? l.replace(/\s*$/, ';') : l)).join('\n')
+          });
+        }
+      });
+    }
+
+    return diagnostics;
+  }
+
+  // مترجم ومشغل فعلي كامل لـ Java / C++ / C# / Python (يدعم الـ OOP والـ Classes والـ Inheritance والـ super والدوال والحلقات)
+  function transpileAndRunOOPCode(code, lang) {
+    const outputs = [];
+
+    if (lang === 'java' || lang === 'csharp') {
+      let src = String(code || '');
+      // إزالة التعليقات والـ package والـ import
+      src = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+      src = src.replace(/^\s*(package|import|using)\s+[^;]+;/gm, '');
+
+      // تتبع الحقول والدوال من نوع double/float لطباعة .0 مطابقة لـ Java الحقيقي
+      const doubleMembers = new Set();
+      const doubleDeclRegex = /\b(?:double|float)\s+([a-zA-Z_]\w*)\b/g;
+      let dm;
+      while ((dm = doubleDeclRegex.exec(src)) !== null) {
+        doubleMembers.add(dm[1]);
+      }
+
+      // استخراج كل الكلاسات لتحويل الـ Fields والـ Constructors والـ Methods إلى JavaScript Classes حقيقية
+      const classRegex = /(?:public\s+|private\s+|protected\s+|abstract\s+|final\s+|static\s+)*class\s+([a-zA-Z_]\w*)(?:\s+(?:extends|:)\s+([a-zA-Z_]\w*))?\s*\{/g;
+      const classes = [];
+      let match;
+
+      while ((match = classRegex.exec(src)) !== null) {
+        const className = match[1];
+        const parentName = match[2] || null;
+        const bodyStart = match.index + match[0].length;
+        let depth = 1;
+        let i = bodyStart;
+        while (i < src.length && depth > 0) {
+          if (src[i] === '{') depth++;
+          else if (src[i] === '}') depth--;
+          i++;
+        }
+        const body = src.slice(bodyStart, i - 1);
+        classes.push({ className, parentName, body, fullMatchStart: match.index, fullMatchEnd: i });
+      }
+
+      // جمع كل أسماء الحقول والدوال في الكلاسات لربطها بـ this تلقائياً
+      const allClassMembers = new Set();
+      classes.forEach((cls) => {
+        const fRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|var)\s+([a-zA-Z_]\w*)\s*(?:=\s*[^;]+)?;/g;
+        let fm;
+        while ((fm = fRegex.exec(cls.body)) !== null) {
+          allClassMembers.add(fm[1]);
+        }
+        const mRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:void|String|int|double|float|boolean|bool|char|long|[a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)\s*\(/g;
+        let mm;
+        while ((mm = mRegex.exec(cls.body)) !== null) {
+          if (mm[1] !== cls.className && mm[1] !== 'main' && mm[1] !== 'Main') {
+            allClassMembers.add(mm[1]);
+          }
+        }
+      });
+
+      let mainBodyJS = '';
+      const jsClasses = [];
+
+      classes.forEach((cls) => {
+        let b = cls.body;
+
+        // فحص هل يحتوي الكلاس على دالة main
+        const mainRegex = /(?:public\s+|static\s+)*void\s+(?:main|Main)\s*\([^)]*\)\s*\{/;
+        const mainMatch = mainRegex.exec(b);
+        if (mainMatch) {
+          const mStart = mainMatch.index + mainMatch[0].length;
+          let d = 1, k = mStart;
+          while (k < b.length && d > 0) {
+            if (b[k] === '{') d++;
+            else if (b[k] === '}') d--;
+            k++;
+          }
+          mainBodyJS = b.slice(mStart, k - 1);
+          b = b.slice(0, mainMatch.index) + b.slice(k);
+        }
+
+        // استخراج الـ Constructors (التي تحمل نفس اسم الكلاس)
+        const constructors = [];
+        const ctorRegex = new RegExp(`(?:public|private|protected)?\\s*\\b${cls.className}\\s*\\(([^)]*)\\)\\s*\\{`, 'g');
+        let cm;
+        while ((cm = ctorRegex.exec(b)) !== null) {
+          const cStart = cm.index + cm[0].length;
+          let d = 1, k = cStart;
+          while (k < b.length && d > 0) {
+            if (b[k] === '{') d++;
+            else if (b[k] === '}') d--;
+            k++;
+          }
+          const paramsRaw = cm[1].trim();
+          const paramNames = paramsRaw
+            ? paramsRaw.split(',').map(p => p.trim().split(/\s+/).pop().replace(/\[\]/g, ''))
+            : [];
+          const cBody = b.slice(cStart, k - 1);
+          constructors.push({ paramNames, cBody, start: cm.index, end: k });
+        }
+
+        // حذف الـ Constructors من نص الكلاس الأصلي من الخلف للأمام
+        for (let idx = constructors.length - 1; idx >= 0; idx--) {
+          b = b.slice(0, constructors[idx].start) + b.slice(constructors[idx].end);
+        }
+
+        // تحويل الدوال (Methods) داخل الكلاس
+        b = b.replace(
+          /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:void|String|int|double|float|boolean|bool|char|long|[a-zA-Z_]\w*(?:\[\])?)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g,
+          function (_, mName, paramsRaw) {
+            const pNames = paramsRaw.trim()
+              ? paramsRaw.split(',').map(p => p.trim().split(/\s+/).pop().replace(/\[\]/g, '')).join(', ')
+              : '';
+            return `${mName}(${pNames}) {`;
+          }
+        );
+
+        // حذف تعريفات الحقول الفارغة وتحويل الحقول ذات القيمة الابتدائية
+        const fieldInits = [];
+        b = b.replace(
+          /^\s*(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long)\s+([a-zA-Z_]\w*)\s*(?:=\s*([^;]+))?;/gm,
+          function (_, fName, fVal) {
+            if (fVal !== undefined) {
+              fieldInits.push(`this.${fName} = ${fVal.trim()};`);
+            } else {
+              fieldInits.push(`if (this.${fName} === undefined) this.${fName} = null;`);
+            }
+            return '';
+          }
+        );
+
+        // بناء الـ constructor الموحد للكلاس
+        let ctorJS = '';
+        if (constructors.length === 1) {
+          const c = constructors[0];
+          let bodyTransformed = transformMethodBody(c.cBody, c.paramNames, allClassMembers, doubleMembers);
+          if (cls.parentName && !/\bsuper\s*\(/.test(bodyTransformed)) {
+            bodyTransformed = `super();\n` + bodyTransformed;
+          }
+          ctorJS = `constructor(${c.paramNames.join(', ')}) {\n${bodyTransformed}\n}`;
+        } else if (constructors.length > 1) {
+          // دعم Constructor Overloading في الجافا
+          let branches = constructors.map((c) => {
+            let bTrans = transformMethodBody(c.cBody, c.paramNames, allClassMembers, doubleMembers);
+            const assignArgs = c.paramNames.map((p, i) => `let ${p} = __args[${i}];`).join(' ');
+            return `if (__args.length === ${c.paramNames.length}) { ${assignArgs}\n${bTrans}\n}`;
+          }).join(' else ');
+          ctorJS = `constructor(...__args) {\n${cls.parentName ? 'super(...__args);\n' : ''}${fieldInits.join('\n')}\n${branches}\n}`;
+        } else {
+          ctorJS = `constructor(...__args) {\n${cls.parentName ? 'super(...__args);\n' : ''}${fieldInits.join('\n')}\n}`;
+        }
+
+        // تحويل جسم باقي الدوال في الكلاس
+        b = transformMethodBody(b, [], allClassMembers, doubleMembers);
+
+        jsClasses.push(`class ${cls.className}${cls.parentName ? ` extends ${cls.parentName}` : ''} {\n${ctorJS}\n${b}\n}`);
+      });
+
+      const fullMainJS = transformMethodBody(mainBodyJS || src, [], new Set(), doubleMembers);
+
+      const runnerScript = `
+        function __fmt(v, isDoubleHint) {
+          if (typeof v === 'number' && isDoubleHint && Number.isInteger(v)) {
+            return v.toFixed(1);
+          }
+          return v;
+        }
+        const __out = [];
+        const System = {
+          out: {
+            println: function(...args) { __out.push(args.join('')); },
+            print: function(...args) { __out.push(args.join('')); },
+            printf: function(fmt, ...args) {
+              let i = 0;
+              let s = String(fmt || '').replace(/\\n/g, '').replace(/%(?:\\.\\d+)?[dfs]/g, () => args[i++] ?? '');
+              __out.push(s);
+            }
+          }
+        };
+        const Console = {
+          WriteLine: function(...args) { __out.push(args.join('')); },
+          Write: function(...args) { __out.push(args.join('')); }
+        };
+        ${jsClasses.join('\n\n')}
+        ${fullMainJS}
+        return __out;
+      `;
+
+      const res = Function(runnerScript)();
+      res.forEach(line => outputs.push(line));
+      return outputs;
+    }
+
+    // 2. تشغيل C++ و C بشكل فعلي (الدوال، المتغيرات، المصفوفات، الحلقات، والـ OOP)
+    if (lang === 'cpp' || lang === 'c') {
+      let src = String(code || '');
+      src = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+      src = src.replace(/^\s*#include.*$/gm, '').replace(/^\s*using\s+namespace\s+\w+\s*;/gm, '');
+
+      // تحويل cout << a << b << endl; إلى __cout(a, b, "\n");
+      src = src.replace(/(?:std::)?cout\s*<<([^;]+);/g, function (_, expr) {
+        const parts = expr.split('<<').map((p) => {
+          const clean = p.trim();
+          if (clean === 'endl' || clean === 'std::endl') return '"\\n"';
+          return clean;
+        });
+        return `__cout(${parts.join(', ')});`;
+      });
+
+      // تحويل printf في C
+      src = src.replace(/\bprintf\s*\(/g, '__printf(');
+
+      // تحويل تعريفات الدوال والمتغيرات إلى JS
+      src = src.replace(/\b(?:int|void|double|float|string|std::string|char|bool|long|auto)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g, function (_, fnName, params) {
+        const pNames = params.trim()
+          ? params.split(',').map(p => p.trim().replace(/&|\*/g, '').split(/\s+/).pop().replace(/\[\]/g, '')).join(', ')
+          : '';
+        return `function ${fnName}(${pNames}) {`;
+      });
+
+      src = src.replace(/\b(?:const\s+)?(?:int|double|float|string|std::string|char|bool|long|auto)\s+([a-zA-Z_]\w*(?:\s*=\s*[^;,]+)?(?:\s*,\s*[a-zA-Z_]\w*(?:\s*=\s*[^;,]+)?)*)\s*;/g, 'let $1;');
+      src = src.replace(/\bfor\s*\(\s*(?:int|size_t|long|auto)\s+/g, 'for (let ');
+
+      const runnerScript = `
+        let __buf = '';
+        function __cout(...args) {
+          __buf += args.join('');
+        }
+        function __printf(fmt, ...args) {
+          let i = 0;
+          let s = String(fmt || '').replace(/%(?:\\.\\d+)?[difs]/g, () => args[i++] ?? '');
+          __buf += s;
+        }
+        ${src}
+        if (typeof main === 'function') main();
+        return __buf.replace(/\\n$/, '').split('\\n');
+      `;
+      const res = Function(runnerScript)();
+      res.forEach(l => outputs.push(l));
+      return outputs;
+    }
+
+    // 3. تشغيل Python (المتغيرات، الحسابات، الحلقات، الشروط، الدوال، الـ Classes)
+    if (lang === 'python') {
+      let pyLines = String(code || '').replace(/\r\n/g, '\n').split('\n');
+      let jsLines = ['const __out = [];', 'function print(...args) { __out.push(args.join(" ")); }', 'function range(a, b, step = 1) { let arr = []; let start = b === undefined ? 0 : a; let end = b === undefined ? a : b; for (let i = start; i < end; i += step) arr.push(i); return arr; }'];
+      let indentStack = [0];
+
+      pyLines.forEach((raw) => {
+        const withoutComment = raw.replace(/#.*$/, '');
+        if (!withoutComment.trim()) return;
+        const indent = raw.match(/^\s*/)[0].length;
+        let trimmed = withoutComment.trim();
+
+        while (indent < indentStack[indentStack.length - 1]) {
+          indentStack.pop();
+          jsLines.push('}');
+        }
+
+        if (/^elif\s+(.+):$/.test(trimmed)) {
+          const cond = trimmed.replace(/^elif\s+/, '').slice(0, -1).replace(/\band\b/g, '&&').replace(/\bor\b/g, '||').replace(/\bnot\b/g, '!');
+          if (jsLines[jsLines.length - 1] === '}') jsLines.pop();
+          jsLines.push(`} else if (${cond}) {`);
+          indentStack.push(indent + 2);
+        } else if (/^else\s*:$/.test(trimmed)) {
+          if (jsLines[jsLines.length - 1] === '}') jsLines.pop();
+          jsLines.push('} else {');
+          indentStack.push(indent + 2);
+        } else if (/^if\s+(.+):$/.test(trimmed)) {
+          const cond = trimmed.replace(/^if\s+/, '').slice(0, -1).replace(/\band\b/g, '&&').replace(/\bor\b/g, '||').replace(/\bnot\b/g, '!');
+          jsLines.push(`if (${cond}) {`);
+          indentStack.push(indent + 2);
+        } else if (/^for\s+([a-zA-Z_]\w*)\s+in\s+(.+):$/.test(trimmed)) {
+          const m = trimmed.match(/^for\s+([a-zA-Z_]\w*)\s+in\s+(.+):$/);
+          jsLines.push(`for (let ${m[1]} of ${m[2]}) {`);
+          indentStack.push(indent + 2);
+        } else if (/^while\s+(.+):$/.test(trimmed)) {
+          const cond = trimmed.replace(/^while\s+/, '').slice(0, -1);
+          jsLines.push(`while (${cond}) {`);
+          indentStack.push(indent + 2);
+        } else if (/^def\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*:$/.test(trimmed)) {
+          const m = trimmed.match(/^def\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*:$/);
+          jsLines.push(`function ${m[1]}(${m[2]}) {`);
+          indentStack.push(indent + 2);
+        } else {
+          trimmed = trimmed.replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false').replace(/\bNone\b/g, 'null');
+          jsLines.push(trimmed + ';');
+        }
+      });
+
+      while (indentStack.length > 1) {
+        indentStack.pop();
+        jsLines.push('}');
+      }
+      jsLines.push('return __out;');
+      return Function(jsLines.join('\n'))();
+    }
+
+    // 4. تشغيل TypeScript و PHP
+    if (lang === 'typescript' || lang === 'php') {
+      let src = String(code || '').replace(/<\?php|\?>/g, '');
+      src = src.replace(/:\s*(?:string|number|boolean|any|void)(?:\[\])?/g, '');
+      src = src.replace(/\becho\s+([^;]+);/g, 'console.log($1);');
+      src = src.replace(/\$([a-zA-Z_]\w*)/g, '$1');
+      const runner = `
+        const __out = [];
+        const console = { log: (...a) => __out.push(a.join(' ')) };
+        ${src}
+        return __out;
+      `;
+      return Function(runner)();
+    }
+
+    return outputs;
+  }
+
+  function transformMethodBody(bodyStr, paramNames, classMembers, doubleMembers) {
+    let s = String(bodyStr || '');
+    const localVars = new Set(paramNames || []);
+
+    // استخراج المتغيرات المحلية داخل الدالة وتحويل أنواعها إلى let
+    s = s.replace(
+      /\b(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|[A-Z][a-zA-Z0-9_]*)\s+([a-zA-Z_]\w*)\s*=/g,
+      function (_, vName) {
+        localVars.add(vName);
+        return `let ${vName} =`;
+      }
+    );
+    s = s.replace(/\bfor\s*\(\s*(?:int|double|long|var)\s+([a-zA-Z_]\w*)/g, function (_, vName) {
+      localVars.add(vName);
+      return `for (let ${vName}`;
+    });
+
+    // إذا كان هناك super(...) في السطر الأول أو الثاني، نضمن تهيئة الحقول بعد super()
+    classMembers.forEach((member) => {
+      if (!localVars.has(member)) {
+        // استبدال اسم الحقل أو الدالة غير المسبوق بنقطة أو كلمة مفتاحية بـ this.member
+        const reg = new RegExp(`(?<!\\.|this\\.|new\\s+|function\\s+)\\b${member}\\b(?!\\s*:)`, 'g');
+        s = s.replace(reg, `this.${member}`);
+      }
+    });
+
+    // تنسيق الأرقام العشرية (double) لتظهر بـ .0 عند الطباعة كما في Java تماماً
+    doubleMembers.forEach((dName) => {
+      const dReg = new RegExp(`(\\+\\s*)(this\\.${dName}|[a-zA-Z_]\\w*\\.${dName}\\s*\\([^)]*\\)|${dName}\\s*\\([^)]*\\)|${dName})(?!\\s*[+\\-*/])`, 'g');
+      s = s.replace(dReg, `$1__fmt($2, true)`);
+    });
+
+    return s;
+  }
+
   function executeTerminalLanguage(code, info) {
     const lang = info.lang;
-    const lines = String(code || '').split('\n');
-    const vars = {};
-    const outputs = [];
-    const errors = [];
-
-    // Helper لتقييم التعبيرات الحسابية والنصية البسيطة
-    function evalExpr(expr) {
-      let e = String(expr || '').trim();
-      if (!e) return '';
-      if ((e.startsWith('"') && e.endsWith('"')) || (e.startsWith("'") && e.endsWith("'"))) {
-        return e.slice(1, -1);
-      }
-      if (vars[e] !== undefined) return vars[e];
-
-      // استبدال أسماء المتغيرات بقيمها داخل المعادلات
-      let replaced = e.replace(/\b[a-zA-Z_]\w*\b/g, (m) => {
-        return vars[m] !== undefined ? JSON.stringify(vars[m]) : m;
-      });
-      try {
-        // تقييم آمن للعمليات الحسابية ودمج النصوص
-        if (/^[\d\s+\-*/%()."']+$/.test(replaced)) {
-          return Function('"use strict"; return (' + replaced + ');')();
-        }
-      } catch (err) {}
-      return e.replace(/^["']|["']$/g, '');
-    }
-
-    if (lang === 'python') {
-      lines.forEach((rawLine, idx) => {
-        const line = rawLine.trim();
-        if (!line || line.startsWith('#')) return;
-        if (/^(if|else|elif|def|for|while)\b/.test(line) && !line.endsWith(':')) {
-          errors.push(`SyntaxError (Line ${idx + 1}): expected ':' at the end of '${line}'\n💡 التصحيح: ضيف نقطتين فوق بعض (:) في آخر السطر ${idx + 1}.`);
-        }
-        const assign = line.match(/^([a-zA-Z_]\w*)\s*=\s*(.+)$/);
-        if (assign && !line.startsWith('if ') && !line.startsWith('while ')) {
-          vars[assign[1]] = evalExpr(assign[2]);
-        }
-        const printMatch = line.match(/^print\s*\((.*)\)$/);
-        if (printMatch) {
-          const inside = printMatch[1].trim();
-          const args = inside.split(',').map(a => evalExpr(a.trim()));
-          outputs.push(args.join(' '));
-        }
-      });
-    } else if (lang === 'cpp' || lang === 'c') {
-      if (!/#include\s*<(iostream|stdio\.h|bits\/stdc\+\+\.h)>/i.test(code)) {
-        errors.push(`Warning: لم يتم العثور على مكتبة الإدخال والإخراج القياسية مثل #include <iostream> أو <stdio.h>.`);
-      }
-      lines.forEach((rawLine, idx) => {
-        const line = rawLine.replace(/\/\/.*$/, '').trim();
-        if (!line || line.startsWith('#') || line.startsWith('using ')) return;
-
-        // فحص نسيان الفصلة المنقوطة في C/C++
-        if (!line.endsWith(';') && !line.endsWith('{') && !line.endsWith('}') && !/^(int|void)\s+main\s*\(/.test(line) && !/^(if|for|while|else)\b/.test(line)) {
-          errors.push(`Compiler Error (Line ${idx + 1}): expected ';' before end of line -> "${line}"\n💡 التصحيح: في لغة ${info.label} لازم تقفل السطر رقم ${idx + 1} بفصلة منقوطة (;).`);
-        }
-
-        // قراءة المتغيرات في C/C++
-        const varMatch = line.match(/^(?:int|float|double|string|char|long|auto)\s+([a-zA-Z_]\w*)\s*=\s*([^;]+);?/);
-        if (varMatch) {
-          vars[varMatch[1]] = evalExpr(varMatch[2]);
-        }
-
-        // تنفيذ cout في C++
-        if (line.startsWith('cout') || line.startsWith('std::cout')) {
-          const parts = line.replace(/^(std::)?cout\s*<<\s*/, '').replace(/;\s*$/, '').split('<<');
-          let lineOut = '';
-          parts.forEach((p) => {
-            const clean = p.trim();
-            if (clean === 'endl' || clean === 'std::endl' || clean === '"\\n"' || clean === "'\\n'") {
-              lineOut += '\n';
-            } else {
-              lineOut += evalExpr(clean);
-            }
-          });
-          outputs.push(lineOut.replace(/\n$/, ''));
-        }
-
-        // تنفيذ printf في C
-        const printfMatch = line.match(/^printf\s*\(\s*"([^"]*)"(?:\s*,\s*([^)]+))?\s*\)\s*;?/);
-        if (printfMatch) {
-          let fmt = printfMatch[1].replace(/\\n/g, '\n');
-          const restArgs = printfMatch[2] ? printfMatch[2].split(',').map(a => evalExpr(a.trim())) : [];
-          let argIdx = 0;
-          fmt = fmt.replace(/%[difs]/g, () => (restArgs[argIdx++] !== undefined ? restArgs[argIdx - 1] : ''));
-          outputs.push(fmt.replace(/\n$/, ''));
-        }
-      });
-    } else if (lang === 'java' || lang === 'csharp' || lang === 'php' || lang === 'typescript') {
-      lines.forEach((rawLine) => {
-        const line = rawLine.replace(/\/\/.*$/, '').trim();
-        if (!line) return;
-        const varMatch = line.match(/^(?:String|int|double|var|let|const|\$)\s*([a-zA-Z_]\w*)\s*=\s*([^;]+);?/);
-        if (varMatch) vars[varMatch[1]] = evalExpr(varMatch[2]);
-
-        const outMatch = line.match(/(?:System\.out\.println|Console\.WriteLine|console\.log|echo)\s*\(?([^);]+)\)?\s*;?/);
-        if (outMatch) {
-          const parts = outMatch[1].split(/[+.]/).map(p => evalExpr(p.trim()));
-          outputs.push(parts.join(''));
-        }
-      });
-    } else if (lang === 'sql') {
-      const rows = [];
-      lines.forEach((rawLine) => {
-        const line = rawLine.trim();
-        const ins = line.match(/INSERT\s+INTO\s+\w+\s+VALUES\s*\(([^)]+)\)/i);
-        if (ins) {
-          rows.push(ins[1].split(',').map(c => c.trim().replace(/^['"]|['"]$/g, '')));
-        }
-      });
-      if (/SELECT\s+/i.test(code)) {
-        if (rows.length > 0) {
-          outputs.push('┌────┬──────────────────┬───────┐');
-          outputs.push('│ ID │ Name             │ Grade │');
-          outputs.push('├────┼──────────────────┼───────┤');
-          rows.forEach((r) => {
-            outputs.push(`│ ${String(r[0] || '').padEnd(2)} │ ${String(r[1] || '').padEnd(16)} │ ${String(r[2] || '').padEnd(5)} │`);
-          });
-          outputs.push('└────┴──────────────────┴───────┘');
-          outputs.push(`\n(${rows.length} rows returned successfully in 0.004s)`);
-        } else {
-          outputs.push('Query executed successfully. (0 rows affected)');
-        }
-      }
-    }
-
     const cmdMap = {
       python: `python3 ${info.displayName}`,
       cpp: `g++ ${info.displayName} -o main && ./main`,
@@ -3744,88 +4106,126 @@ if (btn) {
       typescript: `ts-node ${info.displayName}`
     };
 
-    const hasErr = errors.length > 0;
+    // 1. فحص الأخطاء البرمجية أولاً: إذا وُجد خطأ، نوقف التشغيل تماماً ونعرض سبب الخطأ والحل المقترح!
+    const syntaxDiagnostics = checkTerminalSyntaxAndSuggestFix(code, info);
+    if (syntaxDiagnostics.length > 0) {
+      syntaxDiagnostics.forEach(d => appendDiagnosticToConsole(d));
+      const firstErr = syntaxDiagnostics[0];
+      const encodedFix = encodeURIComponent(firstErr.fixedCode || '');
+      return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { margin: 0; padding: 20px; background: #090d16; color: #e2e8f0; font-family: 'Cairo', 'DM Mono', monospace; font-size: 13px; line-height: 1.7; }
+    .halt-box { background: #160d12; border: 2px solid #f85149; border-radius: 14px; overflow: hidden; box-shadow: 0 14px 34px rgba(248, 81, 73, 0.2); }
+    .halt-header { background: rgba(248, 81, 73, 0.18); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(248, 81, 73, 0.35); color: #ff7b72; font-weight: 800; }
+    .halt-body { padding: 18px; direction: rtl; text-align: right; }
+    .err-code { direction: ltr; text-align: left; background: #0d1117; border: 1px solid #30363d; color: #ffa198; padding: 10px 14px; border-radius: 8px; font-family: 'DM Mono', monospace; margin-bottom: 12px; }
+    .explain-box { background: rgba(255, 255, 255, 0.04); border-right: 4px solid #f85149; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; }
+    .solution-box { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.4); border-right: 4px solid #10b981; padding: 12px 14px; border-radius: 8px; color: #a7f3d0; }
+    .fix-btn { margin-top: 12px; background: #10b981; color: #052e16; border: 0; padding: 9px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
+    .fix-btn:hover { background: #34d399; }
+  </style>
+</head>
+<body>
+  <div class="halt-box">
+    <div class="halt-header">
+      <span>⛔ Compilation Failed — Execution Halted (${escapeHtml(info.label)})</span>
+      <span>Exit Code 1</span>
+    </div>
+    <div class="halt-body">
+      <div style="font-weight:800; color:#ff7b72; margin-bottom:8px;">تم إيقاف تشغيل الكود لوجود خطأ برمجي يجب إصلاحه أولاً:</div>
+      <div class="err-code">✖ ${escapeHtml(firstErr.title)}</div>
+      <div class="explain-box">
+        <b>🧐 إيه سبب الإيرور ده؟</b><br>
+        ${escapeHtml(firstErr.explainAr)}
+      </div>
+      <div class="solution-box">
+        <b>💡 الحل المقترح:</b><br>
+        ${escapeHtml(firstErr.suggestionAr || 'راجع السطر المذكور وصحح القوس أو الفصلة المنقوطة.')}
+        ${firstErr.fixedCode ? `<br><button class="fix-btn" onclick="parent.postMessage({ source: 'codemasr-autofix', fileKey: '${escapeHtml(state.activePlaygroundFile)}', fixedCode: decodeURIComponent('${encodedFix}') }, '*')">⚡ صلح الخطأ تلقائياً وشغّل الكود</button>` : ''}
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+    }
+
+    // 2. إذا كان الكود سليماً، ننفذه فعلياً ونعرض المخرجات
+    let outputs = [];
+    try {
+      if (lang === 'sql') {
+        const rows = [];
+        String(code || '').split('\n').forEach((rawLine) => {
+          const ins = rawLine.trim().match(/INSERT\s+INTO\s+\w+\s+VALUES\s*\(([^)]+)\)/i);
+          if (ins) rows.push(ins[1].split(',').map(c => c.trim().replace(/^['"]|['"]$/g, '')));
+        });
+        if (/SELECT\s+/i.test(code)) {
+          if (rows.length > 0) {
+            outputs.push('┌────┬──────────────────┬───────┐');
+            outputs.push('│ ID │ Name             │ Grade │');
+            outputs.push('├────┼──────────────────┼───────┤');
+            rows.forEach((r) => {
+              outputs.push(`│ ${String(r[0] || '').padEnd(2)} │ ${String(r[1] || '').padEnd(16)} │ ${String(r[2] || '').padEnd(5)} │`);
+            });
+            outputs.push('└────┴──────────────────┴───────┘');
+            outputs.push(`\n(${rows.length} rows returned in 0.003s)`);
+          } else {
+            outputs.push('Query executed successfully.');
+          }
+        }
+      } else {
+        outputs = transpileAndRunOOPCode(code, lang);
+      }
+    } catch (runtimeErr) {
+      const explained = explainRuntimeError(runtimeErr.message);
+      appendDiagnosticToConsole({
+        file: state.activePlaygroundFile,
+        severity: 'error',
+        title: `Runtime / Compilation Error: ${runtimeErr.message}`,
+        explainAr: explained.explainAr,
+        explainEn: explained.explainEn
+      });
+      return `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:20px;background:#090d16;color:#e2e8f0;font-family:'Cairo','DM Mono',monospace;">
+  <div style="background:#160d12;border:2px solid #f85149;border-radius:14px;padding:18px;direction:rtl;text-align:right;">
+    <h3 style="margin:0 0 10px;color:#ff7b72;">⛔ توقف التشغيل بسبب خطأ برمجي (Error Detected)</h3>
+    <div style="direction:ltr;text-align:left;background:#0d1117;padding:10px;border-radius:8px;color:#ffa198;font-family:monospace;margin-bottom:10px;">✖ ${escapeHtml(runtimeErr.toString())}</div>
+    <p style="margin:0 0 8px;"><b>الشرح:</b> ${escapeHtml(explained.explainAr)}</p>
+    <p style="margin:0;color:#34d399;"><b>💡 الحل المقترح:</b> تأكد من تعريف جميع المتغيرات والدوال بنفس حالة الأحرف (Capital / Small) قبل استدعائها.</p>
+  </div>
+</body>
+</html>`;
+    }
+
     return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #090d16;
-      color: #e2e8f0;
-      font-family: 'DM Mono', Consolas, monospace;
-      font-size: 13px;
-      line-height: 1.7;
-    }
-    .term-box {
-      background: #0f172a;
-      border: 1px solid ${hasErr ? '#f85149' : '#1e293b'};
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.45);
-    }
-    .term-header {
-      background: #1e293b;
-      padding: 8px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11px;
-      color: #94a3b8;
-    }
-    .term-badge {
-      background: ${hasErr ? '#f8514925' : '#10b98125'};
-      color: ${hasErr ? '#ff7b72' : '#34d399'};
-      border: 1px solid ${hasErr ? '#f85149' : '#10b981'};
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-weight: 700;
-    }
-    .term-body {
-      padding: 16px;
-    }
-    .cmd-line {
-      color: #38bdf8;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px dashed #334155;
-    }
-    .stdout {
-      color: #4ade80;
-      white-space: pre-wrap;
-      margin: 0;
-    }
-    .stderr {
-      color: #ff7b72;
-      background: rgba(248, 81, 73, 0.1);
-      border-right: 3px solid #f85149;
-      padding: 10px 12px;
-      border-radius: 6px;
-      white-space: pre-wrap;
-      margin-top: 10px;
-      direction: rtl;
-      text-align: right;
-    }
-    .exit-status {
-      margin-top: 16px;
-      font-size: 11px;
-      color: #64748b;
-    }
+    body { margin: 0; padding: 20px; background: #090d16; color: #e2e8f0; font-family: 'DM Mono', Consolas, monospace; font-size: 13px; line-height: 1.7; }
+    .term-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.45); }
+    .term-header { background: #1e293b; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #94a3b8; }
+    .term-badge { background: #10b98125; color: #34d399; border: 1px solid #10b981; padding: 2px 8px; border-radius: 6px; font-weight: 700; }
+    .term-body { padding: 16px; }
+    .cmd-line { color: #38bdf8; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #334155; }
+    .stdout { color: #4ade80; white-space: pre-wrap; margin: 0; font-size: 14px; }
+    .exit-status { margin-top: 16px; font-size: 11px; color: #64748b; }
   </style>
 </head>
 <body>
   <div class="term-box">
     <div class="term-header">
       <span>›_ CodeMasr Multi-Language Terminal (${escapeHtml(info.label)})</span>
-      <span class="term-badge">${hasErr ? '✖ Compilation / Syntax Issue' : '✓ Executed Successfully'}</span>
+      <span class="term-badge">✓ Compiled & Executed</span>
     </div>
     <div class="term-body">
       <div class="cmd-line">$ ${escapeHtml(cmdMap[lang] || info.displayName)}</div>
-      ${outputs.length > 0 ? `<pre class="stdout">${escapeHtml(outputs.join('\n'))}</pre>` : (!hasErr ? `<pre class="stdout" style="color:#94a3b8;">(تم تنفيذ الكود بنجاح. استخدم دالة الطباعة لعرض المخرجات هنا)</pre>` : '')}
-      ${hasErr ? `<div class="stderr">${escapeHtml(errors.join('\n\n'))}</div>` : ''}
-      <div class="exit-status">Process finished with exit code ${hasErr ? '1' : '0'} · Engineered by Eng. Ahmed M Hosny</div>
+      ${outputs.length > 0 ? `<pre class="stdout">${escapeHtml(outputs.join('\n'))}</pre>` : `<pre class="stdout" style="color:#94a3b8;">(تم تنفيذ البرنامج بنجاح بدون أخطاء)</pre>`}
+      <div class="exit-status">Process finished with exit code 0 · Engineered by Eng. Ahmed M Hosny</div>
     </div>
   </div>
 </body>
@@ -3835,12 +4235,13 @@ if (btn) {
   function buildFullPlaygroundDocument(targetHtmlKey) {
     const activeInfo = getFileExtensionInfo(state.activePlaygroundFile);
 
-    // إذا كان الملف المفتوح حالياً هو بايثون أو C++ أو Java أو C أو SQL، نشغله في شاشة الـ Terminal فوراً!
+    // 1. إذا كان الملف المفتوح لغة Terminal (Java, C++, Python, C, C#, SQL, PHP)
     if (!targetHtmlKey && activeInfo.isTerminal) {
       const code = state.playgroundFiles[state.activePlaygroundFile] || '';
       return executeTerminalLanguage(code, activeInfo);
     }
 
+    // 2. فحص أخطاء HTML / CSS / JS قبل بناء المعاينة: إذا وُجد خطأ نوقف التشغيل فوراً ولا نعرض الكود المكسور!
     const htmlKeyToRender = targetHtmlKey || (activeInfo.lang === 'html' ? state.activePlaygroundFile : 'html');
     const htmlPart = state.playgroundFiles[htmlKeyToRender] || state.playgroundFiles.html || '';
 
@@ -3851,6 +4252,41 @@ if (btn) {
       if (inf.lang === 'css') allCss += '\n' + (state.playgroundFiles[k] || '');
       if (inf.lang === 'javascript') allJs += '\n' + (state.playgroundFiles[k] || '');
     });
+
+    const webIssues = analyzeCodeDiagnostics(htmlPart, allCss, allJs, 'web');
+    const webErrors = webIssues.filter(i => i.severity === 'error');
+    if (webErrors.length > 0) {
+      const err = webErrors[0];
+      const targetTab = (err.file || 'html').toLowerCase();
+      const encodedFix = encodeURIComponent(err.fixedCode || '');
+      return `<!DOCTYPE html>
+<html dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { margin: 0; padding: 24px; background: #140c14; color: #f8fafc; font-family: 'Cairo', system-ui, sans-serif; }
+    .err-card { background: #1f111b; border: 2px solid #f85149; border-radius: 14px; padding: 20px; max-width: 620px; margin: 10px auto; box-shadow: 0 14px 35px rgba(248, 81, 73, 0.22); }
+    .err-title { color: #ff7b72; font-size: 17px; font-weight: 800; margin: 0 0 10px; }
+    .err-tech { direction: ltr; text-align: left; font-family: 'DM Mono', monospace; font-size: 12px; background: #0d1117; color: #ffa198; padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #30363d; }
+    .err-ar { font-size: 13px; line-height: 1.7; background: rgba(255,255,255,0.04); padding: 10px 14px; border-radius: 8px; border-right: 4px solid #f85149; margin-bottom: 12px; }
+    .err-fix { font-size: 13px; line-height: 1.7; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.4); padding: 12px 14px; border-radius: 8px; color: #a7f3d0; }
+    .fix-btn { margin-top: 10px; background: #10b981; color: #052e16; border: 0; padding: 9px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="err-card">
+    <h2 class="err-title">⛔ تم إيقاف تشغيل الكود لوجود خطأ في ملف (${escapeHtml(err.file || 'CODE')})</h2>
+    <div class="err-tech">✖ ${escapeHtml(err.title)}</div>
+    <div class="err-ar"><b>🧐 سبب الخطأ:</b><br>${escapeHtml(err.explainAr)}</div>
+    <div class="err-fix">
+      <b>💡 الحل المقترح:</b><br>
+      ${escapeHtml(err.explainEn)}
+      ${err.fixedCode ? `<br><button class="fix-btn" onclick="parent.postMessage({ source: 'codemasr-autofix', fileKey: '${escapeHtml(targetTab)}', fixedCode: decodeURIComponent('${encodedFix}') }, '*')">⚡ صلح الخطأ تلقائياً وشغّل الكود</button>` : ''}
+    </div>
+  </div>
+</body>
+</html>`;
+    }
 
     const bridgeScript = `
       <script>
@@ -3869,7 +4305,9 @@ if (btn) {
           console.warn = function(){ send('warn', arguments); origWarn.apply(console, arguments); };
           console.error = function(){ send('error', arguments); origErr.apply(console, arguments); };
           window.onerror = function(msg, url, lineNo) {
-            send('runtime-error', [msg + (lineNo ? ' (Line ' + lineNo + ')' : '')]);
+            var fullMsg = msg + (lineNo ? ' (Line ' + lineNo + ')' : '');
+            send('runtime-error', [fullMsg]);
+            document.body.innerHTML = '<div dir="rtl" style="font-family:system-ui,sans-serif;background:#1f111b;color:#fff;border:2px solid #f85149;border-radius:12px;padding:18px;margin:16px;"><h3 style="color:#ff7b72;margin:0 0 8px;">⛔ توقف التشغيل بسبب خطأ في الجافاسكريبت (Runtime Error)</h3><pre style="direction:ltr;text-align:left;background:#0d1117;color:#ffa198;padding:10px;border-radius:6px;overflow:auto;">' + fullMsg + '</pre><p style="margin:8px 0 0;color:#a7f3d0;font-size:13px;">💡 راجع نافذة الـ Console بالأسفل لمعرفة شرح الخطأ بالمصري وكيفية حله.</p></div>';
             return false;
           };
           window.addEventListener('wheel', function(e) {
@@ -3904,7 +4342,7 @@ if (btn) {
     try {
       ${allJs}
     } catch (err) {
-      parent.postMessage({ source: 'codemasr-preview', level: 'runtime-error', message: err.toString() }, '*');
+      window.onerror(err.toString(), '', 0);
     }
   <\/script>
 </body>
@@ -3913,6 +4351,7 @@ if (btn) {
 
   function runPlaygroundCode(incrementStats) {
     const frame = document.getElementById('preview-frame');
+    const studioFrame = document.getElementById('vscode-preview-frame');
     if (!frame) return;
 
     clearConsoleOutput();
@@ -3921,23 +4360,30 @@ if (btn) {
       state.runCount++;
       saveState();
       refreshAllUI();
-      showToast('▶ Code executed in live preview!');
     }
 
-    // 1. Run static diagnostics on HTML, CSS, JS
-    const issues = analyzeCodeDiagnostics(
-      state.playgroundFiles.html,
-      state.playgroundFiles.css,
-      state.playgroundFiles.js,
-      'web'
-    );
+    const activeInfo = getFileExtensionInfo(state.activePlaygroundFile);
+    if (!activeInfo.isTerminal) {
+      const issues = analyzeCodeDiagnostics(
+        state.playgroundFiles.html,
+        state.playgroundFiles.css,
+        state.playgroundFiles.js,
+        'web'
+      );
+      issues.forEach((diag) => appendDiagnosticToConsole(diag));
+      const hasErrors = issues.some(i => i.severity === 'error');
+      if (hasErrors && incrementStats) {
+        showToast('⛔ تم إيقاف التشغيل لوجود خطأ في الكود! راجع الحل المقترح.');
+      } else if (incrementStats) {
+        showToast('▶ Code executed successfully!');
+      }
+    }
 
-    issues.forEach((diag) => {
-      appendDiagnosticToConsole(diag);
-    });
-
-    // 2. Render in iframe
-    frame.srcdoc = buildFullPlaygroundDocument();
+    const docOutput = buildFullPlaygroundDocument();
+    frame.srcdoc = docOutput;
+    if (studioFrame && !document.getElementById('vscode-studio-modal')?.hidden) {
+      studioFrame.srcdoc = docOutput;
+    }
   }
 
   function clearConsoleOutput() {
@@ -4185,20 +4631,143 @@ if (btn) {
       .replace(/"/g, '&quot;');
   }
 
-  function formatCurrentPlaygroundCode() {
-    const key = state.activePlaygroundFile;
-    let code = state.playgroundFiles[key] || '';
-    if (key === 'html') {
-      code = code.replace(/>\s*</g, '>\n<');
-    } else if (key === 'css' || key === 'js') {
-      code = code.replace(/\{\s*/g, ' {\n  ').replace(/;\s*/g, ';\n  ').replace(/\s*\}/g, '\n}\n');
+function cleanAndFormatCodeString(rawCode, lang) {
+    let code = String(rawCode || '').replace(/\r\n/g, '\n').trim();
+    if (!code) return '';
+
+    // 1. تنسيق وتنظيف كود HTML
+    if (lang === 'html') {
+      const voidTags = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+      code = code.replace(/>\s+</g, '>\n<');
+      const lines = code.split('\n');
+      let indent = 0;
+      const formatted = [];
+
+      lines.forEach((rawLine) => {
+        const line = rawLine.trim();
+        if (!line) return;
+        const isClosing = /^<\/[a-zA-Z0-9-]+>/.test(line);
+        const isSelfClosingOrVoid = /\/>$/.test(line) || /^<!/.test(line) || /^<[a-zA-Z0-9-]+[^>]*>.*<\/[a-zA-Z0-9-]+>$/.test(line);
+        const tagMatch = line.match(/^<([a-zA-Z0-9-]+)/);
+        const tagName = tagMatch ? tagMatch[1].toLowerCase() : '';
+
+        if (isClosing) indent = Math.max(0, indent - 1);
+        formatted.push('  '.repeat(indent) + line);
+        if (!isClosing && !isSelfClosingOrVoid && tagName && !voidTags.has(tagName)) {
+          indent++;
+        }
+      });
+      return formatted.join('\n');
     }
-    state.playgroundFiles[key] = code.trim();
-    switchPlaygroundFileTab(key);
-    saveState();
-    showToast('⤢ Code formatted cleanly!');
+
+    // 2. تنسيق وتنظيف كود Python
+    if (lang === 'python') {
+      return code
+        .split('\n')
+        .map((line) => {
+          const leading = (line.match(/^\s*/) || [''])[0].replace(/\t/g, '    ');
+          const content = line.trim().replace(/\s*,\s*/g, ', ');
+          return content ? leading + content : '';
+        })
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n');
+    }
+
+    // 3. تنسيق وتنظيف اللغات ذات الأقواس { } (Java, C++, C, C#, JS, TS, CSS, PHP)
+    const tabUnit = (lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') ? '    ' : '  ';
+
+    // فصل الأقواس والفصلات المنقوطة الملتصقة (مع الحفاظ على حلقات for والمصفوفات)
+    let normalized = '';
+    let inString = false, strChar = '', parenDepth = 0;
+    for (let i = 0; i < code.length; i++) {
+      const ch = code[i];
+      const prev = code[i - 1];
+      if ((ch === '"' || ch === "'") && prev !== '\\') {
+        if (!inString) { inString = true; strChar = ch; }
+        else if (strChar === ch) { inString = false; }
+        normalized += ch;
+        continue;
+      }
+      if (inString) {
+        normalized += ch;
+        continue;
+      }
+      if (ch === '(') parenDepth++;
+      else if (ch === ')') parenDepth = Math.max(0, parenDepth - 1);
+
+      if (ch === '{') {
+        normalized = normalized.replace(/[ \t]*$/, '') + ' {\n';
+      } else if (ch === '}') {
+        normalized = normalized.replace(/[ \t]*$/, '') + '\n}\n';
+      } else if (ch === ';' && parenDepth === 0) {
+        normalized += ';\n';
+      } else {
+        normalized += ch;
+      }
+    }
+
+    const rawLines = normalized.split('\n');
+    let depth = 0;
+    const result = [];
+
+    rawLines.forEach((rawLine) => {
+      const line = rawLine.trim();
+      if (!line) return;
+
+      if (line.startsWith('}')) {
+        depth = Math.max(0, depth - 1);
+      }
+
+      result.push(tabUnit.repeat(depth) + line);
+
+      if (line.endsWith('{')) {
+        depth++;
+      }
+    });
+
+    return result.join('\n').replace(/\n{3,}/g, '\n\n');
   }
 
+  function formatCurrentPlaygroundCode() {
+    const key = state.activePlaygroundFile || 'html';
+    const info = getFileExtensionInfo(key);
+    const currentCode = usingMonaco && monacoEditorInstance
+      ? monacoEditorInstance.getValue()
+      : (state.playgroundFiles[key] || '');
+
+    const cleaned = cleanAndFormatCodeString(currentCode, info.lang);
+    state.playgroundFiles[key] = cleaned;
+
+    if (usingMonaco && monacoEditorInstance) {
+      monacoEditorInstance.setValue(cleaned);
+    } else {
+      const fallbackEl = document.getElementById('fallback-editor');
+      if (fallbackEl) fallbackEl.value = cleaned;
+    }
+
+    saveState();
+    showToast(`✨ Clean Code: تم تنسيق وترتيب كود ${info.displayName} بنجاح!`);
+  }
+
+  // ربط زرار Clean Code في شاشة الفول سكرين واستقبال أمر الإصلاح التلقائي (Auto-Fix) من شاشة المعاينة
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.closest('#studio-clean-code')) {
+      formatCurrentPlaygroundCode();
+    }
+  });
+
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.source === 'codemasr-autofix') {
+      const targetKey = normalizeFileKey(e.data.fileKey || state.activePlaygroundFile);
+      if (e.data.fixedCode && state.playgroundFiles[targetKey] !== undefined) {
+        state.playgroundFiles[targetKey] = e.data.fixedCode;
+        switchPlaygroundFileTab(targetKey);
+        saveState();
+        runPlaygroundCode(true);
+        showToast('⚡ تم إصلاح الخطأ تلقائياً وإعادة تشغيل الكود بنجاح!');
+      }
+    }
+  });
   /* ==========================================================================
    * 13. EVENT BINDINGS FOR EVERY SINGLE ELEMENT IN INDEX.HTML
    * ========================================================================== */
