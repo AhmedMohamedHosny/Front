@@ -1,0 +1,35 @@
+{
+  "id": "./index.html",
+  "name": "CodeMasr — Interactive Coding Studio",
+  "short_name": "CodeMasr",
+  "description": "Learn HTML, CSS, JavaScript, Python, Java & C++ with an interactive offline-first IDE engineered by Eng. Ahmed M Hosny.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
+  "background_color": "#0b1020",
+  "theme_color": "#6c5ce7",
+  "lang": "ar",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "CM.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "CM.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "CM.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

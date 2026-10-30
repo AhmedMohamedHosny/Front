@@ -3308,74 +3308,17 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
           clearTimeout(timeoutId);
           if (!window.monaco) return activateFallbackEditor();
 
-          usingMonaco = true;
+usingMonaco = true;
           if (host) host.classList.add('monaco-ready');
           if (fallbackEl) fallbackEl.hidden = true;
-// تسجيل محرك الإكمال التلقائي الذكي (Emmet / IntelliSense)
-          window.monaco.languages.registerCompletionItemProvider('html', {
-            provideCompletionItems: function (model, position) {
-              const suggestions = [
-                {
-                  label: 'ht',
-                  kind: window.monaco.languages.CompletionItemKind.Snippet,
-                  documentation: 'هيكل صفحة HTML5 قياسي متكامل',
-                  insertText: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>${1:عنوان الصفحة}</title>\n</head>\n<body>\n  ${0}\n</body>\n</html>',
-                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
-                },
-                {
-                  label: 'html:5',
-                  kind: window.monaco.languages.CompletionItemKind.Snippet,
-                  documentation: 'هيكل صفحة HTML5 متكامل مع الميتا واللغة',
-                  insertText: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <title>${1:Document}</title>\n</head>\n<body>\n  ${0}\n</body>\n</html>',
-                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
-                },
-                {
-                  label: 'h1',
-                  kind: window.monaco.languages.CompletionItemKind.Snippet,
-                  documentation: 'العنوان الرئيسي الوحيد للصفحة',
-                  insertText: '<h1>${1:العنوان الرئيسي}</h1>$0',
-                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
-                },
-                {
-                  label: 'h2',
-                  kind: window.monaco.languages.CompletionItemKind.Snippet,
-                  documentation: 'عنوان فرعي للأقسام الرئيسية',
-                  insertText: '<h2>${1:عنوان القسم}</h2>$0',
-                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
-                },
-                {
-                  label: 'a',
-                  kind: window.monaco.languages.CompletionItemKind.Snippet,
-                  documentation: 'رابط تشعبي مؤمن',
-                  insertText: '<a href="${1:https://}" target="_blank" rel="noopener noreferrer">${2:نص الرابط}</a>$0',
-                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
-                },
-                {
-                  label: 'img',
-                  kind: window.monaco.languages.CompletionItemKind.Snippet,
-                  documentation: 'إدراج صورة مع خاصية alt والمقاسات',
-                  insertText: '<img src="${1:image.jpg}" alt="${2:وصف الصورة}" width="${3:400}" height="${4:300}" loading="lazy">$0',
-                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
-                },
-                {
-                  label: 'table',
-                  kind: window.monaco.languages.CompletionItemKind.Snippet,
-                  documentation: 'جدول بيانات منظم بـ thead و tbody و th و td',
-                  insertText: '<table border="1" cellpadding="8">\n  <thead>\n    <tr>\n      <th>${1:العنوان الأول}</th>\n      <th>${2:العنوان الثاني}</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>${3:بيانات 1}</td>\n      <td>${4:بيانات 2}</td>\n    </tr>\n  </tbody>\n</table>$0',
-                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
-                },
-                {
-                  label: 'form',
-                  kind: window.monaco.languages.CompletionItemKind.Snippet,
-                  documentation: 'نموذج إدخال متكامل مع حقول وزر إرسال',
-                  insertText: '<form action="${1:/api}" method="${2:POST}">\n  <div>\n    <label for="${3:id}">${4:اسم الحقل}:</label>\n    <input type="${5:text}" id="${3:id}" required>\n  </div>\n  <button type="submit">${6:إرسال}</button>\n</form>$0',
-                  insertTextRules: window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet
-                }
-              ];
-              return { suggestions: suggestions };
-            }
-          });
+
+          if (typeof window.registerAllCodeMasrSnippets === 'function') {
+            window.registerAllCodeMasrSnippets();
+          }
+
           monacoEditorInstance = window.monaco.editor.create(document.getElementById('monaco-editor'), {
+            tabCompletion: 'on',
+            suggestSelection: 'first',
             mouseWheelZoom: true, // تفعيل تكبير وتصغير الخط ببكرة الماوس مع Ctrl مثل VS Code تماماً
             value: state.playgroundFiles[state.activePlaygroundFile] || '',
             language: getMonacoLang(state.activePlaygroundFile),
@@ -3586,20 +3529,167 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
     if (f2 && !document.getElementById('vscode-studio-modal')?.hidden) f2.srcdoc = docStr;
   }
 
-// 2. فاحص الأخطاء ومُشغّل اللغات الحقيقي (Java OOP, C++, C, Python, C#, PHP, TypeScript, SQL)
+// دالة إصلاح شامل ذكي لأي كود به أقواس ناقصة أو زائدة أو علامات تنصيص أو فصلات منقوطة
+  function buildSmartAutoFixedCode(code, lang) {
+    let fixed = String(code || '');
+    // 1. إزالة أي ); أو ) شاردة بعد قوس إغلاق الكلاس الأخير } في Java / C++ / C#
+    if (lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') {
+      fixed = fixed.replace(/\}\s*\)\s*;?\s*$/, '}');
+    }
+
+    const lines = fixed.split('\n');
+    const repairedLines = lines.map((rawLine) => {
+      const commentMatch = rawLine.match(/(\/\/.*|#.*)$/);
+      const commentPart = commentMatch ? commentMatch[1] : '';
+      let codePart = commentMatch ? rawLine.slice(0, commentMatch.index) : rawLine;
+      const trimmed = codePart.trim();
+      if (!trimmed) return rawLine;
+
+      // إصلاح علامة تنصيص مزدوجة مفتوحة في نفس السطر
+      const doubleQuotes = (codePart.match(/(?<!\\)"/g) || []).length;
+      if (doubleQuotes % 2 !== 0) {
+        if (codePart.trimEnd().endsWith(';')) {
+          codePart = codePart.replace(/;\s*$/, '";');
+        } else {
+          codePart += '"';
+        }
+      }
+
+      // إصلاح الأقواس الدائرية ( ) غير المتوازنة في نفس السطر (مثل System.out.println("..." ;)
+      const withoutStrings = codePart.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
+      const openP = (withoutStrings.match(/\(/g) || []).length;
+      const closeP = (withoutStrings.match(/\)/g) || []).length;
+      if (openP > closeP) {
+        const missingClose = ')'.repeat(openP - closeP);
+        if (codePart.trimEnd().endsWith(';')) {
+          codePart = codePart.replace(/\s*;\s*$/, missingClose + ';');
+        } else if (lang === 'python' && codePart.trimEnd().endsWith(':')) {
+          codePart = codePart.replace(/\s*:\s*$/, missingClose + ':');
+        } else {
+          codePart = codePart.trimEnd() + missingClose;
+        }
+      } else if (closeP > openP && /^\s*\}\s*\)\s*;?\s*$/.test(codePart)) {
+        codePart = codePart.replace(/\)\s*;?/, '');
+      }
+
+      // إصلاح الفصلة المنقوطة الناقصة في Java / C++ / C / C#
+      if (lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') {
+        const t = codePart.trim();
+        const isHeaderOrBrace =
+          !t ||
+          t.startsWith('#') ||
+          t.startsWith('@') ||
+          t.startsWith('//') ||
+          t.startsWith('/*') ||
+          t.startsWith('*') ||
+          t.endsWith(';') ||
+          t.endsWith('{') ||
+          t.endsWith('}') ||
+          t.endsWith(':') ||
+          t.endsWith(',') ||
+          /^(public|private|protected|class|interface|enum|struct|namespace|if|else|for|while|do|switch|try|catch|finally|void|int|double|float|String|char|bool|boolean|static)\b.*\(.*\)\s*$/.test(t) ||
+          /^(public\s+|private\s+|abstract\s+|final\s+)?(class|interface|enum|struct|namespace)\b/.test(t) ||
+          /^else\b/.test(t);
+
+        if (!isHeaderOrBrace) {
+          codePart = codePart.replace(/\s*$/, ';');
+        }
+      }
+
+      return codePart + (commentPart ? ' ' + commentPart : '');
+    });
+
+    let result = repairedLines.join('\n');
+
+    // موازنة أقواس المجموعة { } في نهاية الملف
+    if (lang !== 'python' && lang !== 'sql') {
+      const cleanAll = result.replace(/\/\/.*$/gm, '').replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
+      const openC = (cleanAll.match(/\{/g) || []).length;
+      const closeC = (cleanAll.match(/\}/g) || []).length;
+      if (openC > closeC) {
+        result += '\n' + '}\n'.repeat(openC - closeC);
+      }
+    }
+
+    return result;
+  }
+
+  // 2. فاحص الأخطاء ومُشغّل اللغات الحقيقي (Java OOP, C++, C, Python, C#, PHP, TypeScript, SQL)
   function checkTerminalSyntaxAndSuggestFix(code, info) {
     const lang = info.lang;
     const rawLines = String(code || '').split('\n');
     const diagnostics = [];
+    const smartFixedAll = buildSmartAutoFixedCode(code, lang);
 
-    // أ) فحص توازن الأقواس { } و ( )
-    let openCurly = 0, closeCurly = 0, openParen = 0, closeParen = 0;
+    // أ) فحص وجود `});` شاردة في نهاية الكلاس (مثل خطأ الصورة بالضبط!)
+    if ((lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') && /\}\s*\)\s*;?\s*$/.test(code)) {
+      diagnostics.push({
+        file: state.activePlaygroundFile,
+        severity: 'error',
+        line: rawLines.length,
+        title: `SyntaxError (Line ${rawLines.length}): Stray ');' after closing class brace '}'`,
+        explainAr: `بالمصري: في السطر الأخير قفلت الكلاس بـ '});' بدل '}' لوحدها، وفيه قوس ناقص في جملة الطباعة فوق!`,
+        explainEn: `Unexpected ');' after class closing brace '}'.`,
+        suggestionAr: `حذف ');' الزائدة من نهاية الكلاس وإغلاق قوس الطباعة ')' في مكانه الصحيح قبل الفصلة المنقوطة.`,
+        fixedCode: smartFixedAll
+      });
+    }
+
+    // ب) فحص الأقواس الدائرية ( ) وعلامات التنصيص سطراً بسطر!
+    rawLines.forEach((rawLine, idx) => {
+      const withoutComment = rawLine.replace(/\/\/.*$/, '').replace(/#.*$/, '');
+      if (!withoutComment.trim()) return;
+
+      // فحص علامات التنصيص غير المغلقة في السطر
+      const quotesCount = (withoutComment.match(/(?<!\\)"/g) || []).length;
+      if (quotesCount % 2 !== 0) {
+        diagnostics.push({
+          file: state.activePlaygroundFile,
+          severity: 'error',
+          line: idx + 1,
+          title: `SyntaxError (Line ${idx + 1}): Unclosed string literal '"'`,
+          explainAr: `بالمصري: في السطر رقم ${idx + 1} فتحت علامة تنصيص '"' للنص بس نسيت تقفلها قبل نهاية السطر!`,
+          explainEn: `Unclosed string quote '"' on line ${idx + 1}.`,
+          suggestionAr: `إغلاق علامة التنصيص '"' في السطر رقم ${idx + 1}.`,
+          fixedCode: smartFixedAll
+        });
+      }
+
+      // فحص قوس '(' مفتوح في السطر بدون ')' قبل الفصلة المنقوطة (مثل System.out.println("Total salary: " ;)
+      const cleanLine = withoutComment.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
+      const lineOpenP = (cleanLine.match(/\(/g) || []).length;
+      const lineCloseP = (cleanLine.match(/\)/g) || []).length;
+      if (lineOpenP > lineCloseP) {
+        diagnostics.push({
+          file: state.activePlaygroundFile,
+          severity: 'error',
+          line: idx + 1,
+          title: `SyntaxError (Line ${idx + 1}): missing ')' before ';' in argument list`,
+          explainAr: `بالمصري: في السطر رقم ${idx + 1} فتحت قوس '(' في جملة (${ withoutComment.trim() }) بس نسيت تقفله بـ ')' قبل الفصلة المنقوطة!`,
+          explainEn: `Missing closing parenthesis ')' on line ${idx + 1}.`,
+          suggestionAr: `إضافة القوس ')' قبل الفصلة المنقوطة ';' في السطر رقم ${idx + 1}.`,
+          fixedCode: smartFixedAll
+        });
+      } else if (lineCloseP > lineOpenP) {
+        diagnostics.push({
+          file: state.activePlaygroundFile,
+          severity: 'error',
+          line: idx + 1,
+          title: `SyntaxError (Line ${idx + 1}): extra closing parenthesis ')'`,
+          explainAr: `بالمصري: في السطر رقم ${idx + 1} فيه قوس إغلاق ')' زيادة ملوش قوس فتح مقابله في نفس السطر.`,
+          explainEn: `Unmatched closing parenthesis ')' on line ${idx + 1}.`,
+          suggestionAr: `موازنة الأقواس في السطر رقم ${idx + 1}.`,
+          fixedCode: smartFixedAll
+        });
+      }
+    });
+
+    // ج) فحص توازن أقواس المجموعة { } في الملف كله
+    let openCurly = 0, closeCurly = 0;
     rawLines.forEach((l) => {
       const clean = l.replace(/\/\/.*$/, '').replace(/#.*$/, '').replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
       openCurly += (clean.match(/\{/g) || []).length;
       closeCurly += (clean.match(/\}/g) || []).length;
-      openParen += (clean.match(/\(/g) || []).length;
-      closeParen += (clean.match(/\)/g) || []).length;
     });
 
     if (openCurly > closeCurly) {
@@ -3607,10 +3697,10 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
         file: state.activePlaygroundFile,
         severity: 'error',
         title: `SyntaxError: Missing ${openCurly - closeCurly} closing curly brace(s) '}'`,
-        explainAr: `بالمصري: فتحت قوس مجموعة '{' في الكود ونسيت تقفله بـ '}' (ناقص ${openCurly - closeCurly} قوس إغلاق). الكود مش هيشتغل غير لما الأقواس تتقفل صح.`,
+        explainAr: `بالمصري: فتحت قوس مجموعة '{' في الكود ونسيت تقفله بـ '}' (ناقص ${openCurly - closeCurly} قوس إغلاق).`,
         explainEn: `Unbalanced curly braces: ${openCurly} '{' opened vs ${closeCurly} '}' closed.`,
         suggestionAr: `إضافة '${'}'.repeat(openCurly - closeCurly)}' في نهاية الكود لقفل البلوكات المفتوحة.`,
-        fixedCode: code + '\n' + '}\n'.repeat(openCurly - closeCurly)
+        fixedCode: smartFixedAll
       });
     } else if (closeCurly > openCurly) {
       diagnostics.push({
@@ -3624,19 +3714,7 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       });
     }
 
-    if (openParen > closeParen) {
-      diagnostics.push({
-        file: state.activePlaygroundFile,
-        severity: 'error',
-        title: `SyntaxError: Missing closing parenthesis ')'`,
-        explainAr: `بالمصري: فتحت قوس عادي '(' ونسيت تقفله بـ ')'. راجع أقواس الدوال أو الطباعة.`,
-        explainEn: `Unclosed parenthesis '(' detected.`,
-        suggestionAr: `إغلاق القوس المفتوح ')'.`,
-        fixedCode: code + ')'.repeat(openParen - closeParen)
-      });
-    }
-
-    // ب) فحص أخطاء Python
+    // د) فحص أخطاء Python
     if (lang === 'python') {
       rawLines.forEach((rawLine, idx) => {
         const trimmed = rawLine.replace(/#.*$/, '').trim();
@@ -3668,13 +3746,12 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       });
     }
 
-    // ج) فحص أخطاء Java / C++ / C / C#
+    // هـ) فحص أخطاء Java / C++ / C / C#
     if (lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') {
       rawLines.forEach((rawLine, idx) => {
         const clean = rawLine.replace(/\/\/.*$/, '').trim();
         if (!clean || clean.startsWith('#') || clean.startsWith('@') || clean.startsWith('/*') || clean.startsWith('*')) return;
 
-        // فحص الأخطاء الإملائية المشهورة في Java
         if (lang === 'java') {
           if (/\bsystem\.out\./.test(clean)) {
             diagnostics.push({
@@ -3702,21 +3779,19 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
           }
         }
 
-        // فحص cout >> الغلط في C++
         if (lang === 'cpp' && /\bcout\s*>>/.test(clean)) {
           diagnostics.push({
             file: state.activePlaygroundFile,
             severity: 'error',
             line: idx + 1,
             title: `Compiler Error (Line ${idx + 1}): invalid operands to binary expression ('ostream' and '>>')`,
-            explainAr: `بالمصري: في السطر ${idx + 1} استخدمت علامة '>>' مع cout، والصح إن cout بتاخد علامة الأصغر من مرتين '<<' (أما cin هي اللي بتاخد '>>').`,
+            explainAr: `بالمصري: في السطر ${idx + 1} استخدمت علامة '>>' مع cout، والصح إن cout بتاخد علامة الأصغر من مرتين '<<'.`,
             explainEn: `Use the insertion operator '<<' with cout instead of '>>'.`,
             suggestionAr: `تغيير 'cout >>' إلى 'cout <<'.`,
             fixedCode: code.replace(/\bcout\s*>>/g, 'cout <<')
           });
         }
 
-        // فحص نسيان الفصلة المنقوطة (;) في نهاية الأسطر التنفيذية
         const isBlockOrHeader =
           clean.endsWith(';') ||
           clean.endsWith('{') ||
@@ -3735,10 +3810,10 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
             severity: 'error',
             line: idx + 1,
             title: `Compiler Error (Line ${idx + 1}): ';' expected at end of statement`,
-            explainAr: `بالمصري: في السطر رقم ${idx + 1} (${clean}) نسيت تقفل الجملة البرمجية بفصلة منقوطة (;)! في لغة ${info.label} أي أمر لازم ينتهي بـ (;).`,
+            explainAr: `بالمصري: في السطر رقم ${idx + 1} (${clean}) نسيت تقفل الجملة البرمجية بفصلة منقوطة (;)!`,
             explainEn: `Missing semicolon ';' at the end of line ${idx + 1}.`,
             suggestionAr: `إضافة فصلة منقوطة ';' في نهاية السطر رقم ${idx + 1}.`,
-            fixedCode: rawLines.map((l, i) => (i === idx ? l.replace(/\s*$/, ';') : l)).join('\n')
+            fixedCode: smartFixedAll
           });
         }
       });
@@ -3753,11 +3828,9 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
 
     if (lang === 'java' || lang === 'csharp') {
       let src = String(code || '');
-      // إزالة التعليقات والـ package والـ import
       src = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       src = src.replace(/^\s*(package|import|using)\s+[^;]+;/gm, '');
 
-      // تتبع الحقول والدوال من نوع double/float لطباعة .0 مطابقة لـ Java الحقيقي
       const doubleMembers = new Set();
       const doubleDeclRegex = /\b(?:double|float)\s+([a-zA-Z_]\w*)\b/g;
       let dm;
@@ -3765,7 +3838,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
         doubleMembers.add(dm[1]);
       }
 
-      // استخراج كل الكلاسات لتحويل الـ Fields والـ Constructors والـ Methods إلى JavaScript Classes حقيقية
       const classRegex = /(?:public\s+|private\s+|protected\s+|abstract\s+|final\s+|static\s+)*class\s+([a-zA-Z_]\w*)(?:\s+(?:extends|:)\s+([a-zA-Z_]\w*))?\s*\{/g;
       const classes = [];
       let match;
@@ -3785,7 +3857,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
         classes.push({ className, parentName, body, fullMatchStart: match.index, fullMatchEnd: i });
       }
 
-      // جمع كل أسماء الحقول والدوال في الكلاسات لربطها بـ this تلقائياً
       const allClassMembers = new Set();
       classes.forEach((cls) => {
         const fRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|var)\s+([a-zA-Z_]\w*)\s*(?:=\s*[^;]+)?;/g;
@@ -3808,7 +3879,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       classes.forEach((cls) => {
         let b = cls.body;
 
-        // فحص هل يحتوي الكلاس على دالة main
         const mainRegex = /(?:public\s+|static\s+)*void\s+(?:main|Main)\s*\([^)]*\)\s*\{/;
         const mainMatch = mainRegex.exec(b);
         if (mainMatch) {
@@ -3823,7 +3893,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
           b = b.slice(0, mainMatch.index) + b.slice(k);
         }
 
-        // استخراج الـ Constructors (التي تحمل نفس اسم الكلاس)
         const constructors = [];
         const ctorRegex = new RegExp(`(?:public|private|protected)?\\s*\\b${cls.className}\\s*\\(([^)]*)\\)\\s*\\{`, 'g');
         let cm;
@@ -3843,12 +3912,10 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
           constructors.push({ paramNames, cBody, start: cm.index, end: k });
         }
 
-        // حذف الـ Constructors من نص الكلاس الأصلي من الخلف للأمام
         for (let idx = constructors.length - 1; idx >= 0; idx--) {
           b = b.slice(0, constructors[idx].start) + b.slice(constructors[idx].end);
         }
 
-        // تحويل الدوال (Methods) داخل الكلاس
         b = b.replace(
           /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:void|String|int|double|float|boolean|bool|char|long|[a-zA-Z_]\w*(?:\[\])?)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g,
           function (_, mName, paramsRaw) {
@@ -3859,7 +3926,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
           }
         );
 
-        // حذف تعريفات الحقول الفارغة وتحويل الحقول ذات القيمة الابتدائية
         const fieldInits = [];
         b = b.replace(
           /^\s*(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long)\s+([a-zA-Z_]\w*)\s*(?:=\s*([^;]+))?;/gm,
@@ -3873,7 +3939,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
           }
         );
 
-        // بناء الـ constructor الموحد للكلاس
         let ctorJS = '';
         if (constructors.length === 1) {
           const c = constructors[0];
@@ -3883,7 +3948,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
           }
           ctorJS = `constructor(${c.paramNames.join(', ')}) {\n${bodyTransformed}\n}`;
         } else if (constructors.length > 1) {
-          // دعم Constructor Overloading في الجافا
           let branches = constructors.map((c) => {
             let bTrans = transformMethodBody(c.cBody, c.paramNames, allClassMembers, doubleMembers);
             const assignArgs = c.paramNames.map((p, i) => `let ${p} = __args[${i}];`).join(' ');
@@ -3894,9 +3958,7 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
           ctorJS = `constructor(...__args) {\n${cls.parentName ? 'super(...__args);\n' : ''}${fieldInits.join('\n')}\n}`;
         }
 
-        // تحويل جسم باقي الدوال في الكلاس
         b = transformMethodBody(b, [], allClassMembers, doubleMembers);
-
         jsClasses.push(`class ${cls.className}${cls.parentName ? ` extends ${cls.parentName}` : ''} {\n${ctorJS}\n${b}\n}`);
       });
 
@@ -3935,13 +3997,11 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       return outputs;
     }
 
-    // 2. تشغيل C++ و C بشكل فعلي (الدوال، المتغيرات، المصفوفات، الحلقات، والـ OOP)
     if (lang === 'cpp' || lang === 'c') {
       let src = String(code || '');
       src = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       src = src.replace(/^\s*#include.*$/gm, '').replace(/^\s*using\s+namespace\s+\w+\s*;/gm, '');
 
-      // تحويل cout << a << b << endl; إلى __cout(a, b, "\n");
       src = src.replace(/(?:std::)?cout\s*<<([^;]+);/g, function (_, expr) {
         const parts = expr.split('<<').map((p) => {
           const clean = p.trim();
@@ -3951,10 +4011,8 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
         return `__cout(${parts.join(', ')});`;
       });
 
-      // تحويل printf في C
       src = src.replace(/\bprintf\s*\(/g, '__printf(');
 
-      // تحويل تعريفات الدوال والمتغيرات إلى JS
       src = src.replace(/\b(?:int|void|double|float|string|std::string|char|bool|long|auto)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g, function (_, fnName, params) {
         const pNames = params.trim()
           ? params.split(',').map(p => p.trim().replace(/&|\*/g, '').split(/\s+/).pop().replace(/\[\]/g, '')).join(', ')
@@ -3984,7 +4042,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       return outputs;
     }
 
-    // 3. تشغيل Python (المتغيرات، الحسابات، الحلقات، الشروط، الدوال، الـ Classes)
     if (lang === 'python') {
       let pyLines = String(code || '').replace(/\r\n/g, '\n').split('\n');
       let jsLines = ['const __out = [];', 'function print(...args) { __out.push(args.join(" ")); }', 'function range(a, b, step = 1) { let arr = []; let start = b === undefined ? 0 : a; let end = b === undefined ? a : b; for (let i = start; i < end; i += step) arr.push(i); return arr; }'];
@@ -4040,7 +4097,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       return Function(jsLines.join('\n'))();
     }
 
-    // 4. تشغيل TypeScript و PHP
     if (lang === 'typescript' || lang === 'php') {
       let src = String(code || '').replace(/<\?php|\?>/g, '');
       src = src.replace(/:\s*(?:string|number|boolean|any|void)(?:\[\])?/g, '');
@@ -4062,7 +4118,6 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
     let s = String(bodyStr || '');
     const localVars = new Set(paramNames || []);
 
-    // استخراج المتغيرات المحلية داخل الدالة وتحويل أنواعها إلى let
     s = s.replace(
       /\b(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|[A-Z][a-zA-Z0-9_]*)\s+([a-zA-Z_]\w*)\s*=/g,
       function (_, vName) {
@@ -4075,16 +4130,13 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       return `for (let ${vName}`;
     });
 
-    // إذا كان هناك super(...) في السطر الأول أو الثاني، نضمن تهيئة الحقول بعد super()
     classMembers.forEach((member) => {
       if (!localVars.has(member)) {
-        // استبدال اسم الحقل أو الدالة غير المسبوق بنقطة أو كلمة مفتاحية بـ this.member
         const reg = new RegExp(`(?<!\\.|this\\.|new\\s+|function\\s+)\\b${member}\\b(?!\\s*:)`, 'g');
         s = s.replace(reg, `this.${member}`);
       }
     });
 
-    // تنسيق الأرقام العشرية (double) لتظهر بـ .0 عند الطباعة كما في Java تماماً
     doubleMembers.forEach((dName) => {
       const dReg = new RegExp(`(\\+\\s*)(this\\.${dName}|[a-zA-Z_]\\w*\\.${dName}\\s*\\([^)]*\\)|${dName}\\s*\\([^)]*\\)|${dName})(?!\\s*[+\\-*/])`, 'g');
       s = s.replace(dReg, `$1__fmt($2, true)`);
@@ -4106,12 +4158,12 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       typescript: `ts-node ${info.displayName}`
     };
 
-    // 1. فحص الأخطاء البرمجية أولاً: إذا وُجد خطأ، نوقف التشغيل تماماً ونعرض سبب الخطأ والحل المقترح!
+    // 1. فحص الأخطاء البرمجية أولاً: إذا وُجد خطأ، نوقف التشغيل تماماً ونعرض سبب الخطأ والحل المقترح مع زر الإصلاح!
     const syntaxDiagnostics = checkTerminalSyntaxAndSuggestFix(code, info);
     if (syntaxDiagnostics.length > 0) {
       syntaxDiagnostics.forEach(d => appendDiagnosticToConsole(d));
       const firstErr = syntaxDiagnostics[0];
-      const encodedFix = encodeURIComponent(firstErr.fixedCode || '');
+      const encodedFix = encodeURIComponent(firstErr.fixedCode || buildSmartAutoFixedCode(code, lang));
       return `<!DOCTYPE html>
 <html>
 <head>
@@ -4144,7 +4196,7 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       <div class="solution-box">
         <b>💡 الحل المقترح:</b><br>
         ${escapeHtml(firstErr.suggestionAr || 'راجع السطر المذكور وصحح القوس أو الفصلة المنقوطة.')}
-        ${firstErr.fixedCode ? `<br><button class="fix-btn" onclick="parent.postMessage({ source: 'codemasr-autofix', fileKey: '${escapeHtml(state.activePlaygroundFile)}', fixedCode: decodeURIComponent('${encodedFix}') }, '*')">⚡ صلح الخطأ تلقائياً وشغّل الكود</button>` : ''}
+        <br><button class="fix-btn" onclick="parent.postMessage({ source: 'codemasr-autofix', fileKey: '${escapeHtml(state.activePlaygroundFile)}', fixedCode: decodeURIComponent('${encodedFix}') }, '*')">⚡ صلح الخطأ تلقائياً وشغّل الكود</button>
       </div>
     </div>
   </div>
@@ -4180,12 +4232,15 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
       }
     } catch (runtimeErr) {
       const explained = explainRuntimeError(runtimeErr.message);
+      const fallbackFixed = buildSmartAutoFixedCode(code, lang);
+      const encodedFallbackFix = encodeURIComponent(fallbackFixed);
       appendDiagnosticToConsole({
         file: state.activePlaygroundFile,
         severity: 'error',
         title: `Runtime / Compilation Error: ${runtimeErr.message}`,
         explainAr: explained.explainAr,
-        explainEn: explained.explainEn
+        explainEn: explained.explainEn,
+        fixedCode: fallbackFixed
       });
       return `<!DOCTYPE html>
 <html>
@@ -4195,7 +4250,8 @@ function executeInLessonCode(course, lesson, isInitialLoad) {
     <h3 style="margin:0 0 10px;color:#ff7b72;">⛔ توقف التشغيل بسبب خطأ برمجي (Error Detected)</h3>
     <div style="direction:ltr;text-align:left;background:#0d1117;padding:10px;border-radius:8px;color:#ffa198;font-family:monospace;margin-bottom:10px;">✖ ${escapeHtml(runtimeErr.toString())}</div>
     <p style="margin:0 0 8px;"><b>الشرح:</b> ${escapeHtml(explained.explainAr)}</p>
-    <p style="margin:0;color:#34d399;"><b>💡 الحل المقترح:</b> تأكد من تعريف جميع المتغيرات والدوال بنفس حالة الأحرف (Capital / Small) قبل استدعائها.</p>
+    <p style="margin:0 0 12px;color:#34d399;"><b>💡 الحل المقترح:</b> اضغط على الزر بالأسفل لإصلاح الأقواس والفصلات المنقوطة تلقائياً أو تأكد من أسماء المتغيرات.</p>
+    <button style="background:#10b981;color:#052e16;border:0;padding:9px 16px;border-radius:8px;font-weight:800;cursor:pointer;font-size:12px;" onclick="parent.postMessage({ source: 'codemasr-autofix', fileKey: '${escapeHtml(state.activePlaygroundFile)}', fixedCode: decodeURIComponent('${encodedFallbackFix}') }, '*')">⚡ صلح الخطأ تلقائياً وشغّل الكود</button>
   </div>
 </body>
 </html>`;
@@ -5138,45 +5194,297 @@ window.refreshAllEditorTabs = renderStudioTabs;
       );
     });
 
-    function registerMultiLangSnippets() {
-      if (!window.monaco || window._multiLangSnippetsRegistered) return;
-      window._multiLangSnippetsRegistered = true;
+// =========================================================================
+    // موسوعة الاختصارات الذكية الشاملة لكل اللغات (IntelliSense & Tab Snippets)
+    // =========================================================================
+    const CODE_SNIPPETS_LIBRARY = {
+      java: [
+        { trigger: 'sout', title: 'طباعة سطر في الجافا (System.out.println)', desc: 'يكتب جملة الطباعة الكاملة في الجافا بضغطة Tab', snippet: 'System.out.println("${1:Hello World}");$0', plain: 'System.out.println("Hello World");' },
+        { trigger: 'souf', title: 'طباعة منسقة (System.out.printf)', desc: 'طباعة نص منسق مع متغيرات في الجافا', snippet: 'System.out.printf("${1:Value = %d}\\n", ${2:value});$0', plain: 'System.out.printf("Value = %d\\n", value);' },
+        { trigger: 'psvm', title: 'الدالة الرئيسية (public static void main)', desc: 'يبني دالة التشغيل الرئيسية main في الجافا', snippet: 'public static void main(String[] args) {\n    ${1:System.out.println("Hello Java!");}\n}$0', plain: 'public static void main(String[] args) {\n    System.out.println("Hello Java!");\n}' },
+        { trigger: 'main', title: 'هيكل كلاس جافا كامل مع main', desc: 'يبني كلاس Main كامل جاهز للتشغيل', snippet: 'public class ${1:Main} {\n    public static void main(String[] args) {\n        ${2:System.out.println("Welcome to CodeMasr Java!");}\n    }\n}$0', plain: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Welcome to CodeMasr Java!");\n    }\n}' },
+        { trigger: 'class', title: 'إنشاء كلاس OOP كامل مع Constructor', desc: 'يبني كلاس جافا مع الحقول والـ Constructor ودالة عرض', snippet: 'class ${1:Employee} {\n    protected String name;\n    protected double salary;\n\n    public ${1:Employee}(String name, double salary) {\n        this.name = name;\n        this.salary = salary;\n    }\n\n    public void displayInfo() {\n        System.out.println("Name: " + name + " | Salary: " + salary);\n    }\n}$0', plain: 'class Employee {\n    protected String name;\n    protected double salary;\n\n    public Employee(String name, double salary) {\n        this.name = name;\n        this.salary = salary;\n    }\n\n    public void displayInfo() {\n        System.out.println("Name: " + name + " | Salary: " + salary);\n    }\n}' },
+        { trigger: 'ext', title: 'وراثة كلاس (Inheritance extends + super)', desc: 'يبني كلاس فرعي يرث من كلاس أب باستخدام extends و super', snippet: 'class ${1:Manager} extends ${2:Employee} {\n    private double bonus;\n\n    public ${1:Manager}(String name, double salary, double bonus) {\n        super(name, salary);\n        this.bonus = bonus;\n    }\n\n    public double getTotalSalary() {\n        return salary + bonus;\n    }\n}$0', plain: 'class Manager extends Employee {\n    private double bonus;\n\n    public Manager(String name, double salary, double bonus) {\n        super(name, salary);\n        this.bonus = bonus;\n    }\n\n    public double getTotalSalary() {\n        return salary + bonus;\n    }\n}' },
+        { trigger: 'fori', title: 'حلقة تكرار (for loop)', desc: 'حلقة for قياسية بالعداد i', snippet: 'for (int ${1:i} = 0; ${1:i} < ${2:10}; ${1:i}++) {\n    System.out.println(${1:i});\n}$0', plain: 'for (int i = 0; i < 10; i++) {\n    System.out.println(i);\n}' },
+        { trigger: 'fore', title: 'حلقة تكرار للمصفوفات (for-each)', desc: 'يمر على جميع عناصر المصفوفة أو القائمة', snippet: 'for (${1:String} ${2:item} : ${3:items}) {\n    System.out.println(${2:item});\n}$0', plain: 'for (String item : items) {\n    System.out.println(item);\n}' },
+        { trigger: 'ifelse', title: 'شرط (if / else)', desc: 'جملة شرطية كاملة if-else', snippet: 'if (${1:score >= 50}) {\n    System.out.println("${2:Passed}");\n} else {\n    System.out.println("${3:Failed}");\n}$0', plain: 'if (score >= 50) {\n    System.out.println("Passed");\n} else {\n    System.out.println("Failed");\n}' },
+        { trigger: 'while', title: 'حلقة (while loop)', desc: 'حلقة تكرار طالما الشرط محقق', snippet: 'while (${1:count < 5}) {\n    System.out.println(${2:count});\n    count++;\n}$0', plain: 'while (count < 5) {\n    System.out.println(count);\n    count++;\n}' },
+        { trigger: 'switch', title: 'جملة (switch / case)', desc: 'بنية switch متعددة الحالات', snippet: 'switch (${1:day}) {\n    case 1:\n        System.out.println("Saturday");\n        break;\n    default:\n        System.out.println("Other day");\n        break;\n}$0', plain: 'switch (day) {\n    case 1:\n        System.out.println("Saturday");\n        break;\n    default:\n        System.out.println("Other day");\n        break;\n}' },
+        { trigger: 'try', title: 'معالجة الأخطاء (try / catch)', desc: 'كتلة try-catch لالتقاط الاستثناءات', snippet: 'try {\n    ${1:int res = 10 / 2;}\n} catch (Exception e) {\n    System.out.println("Error: " + e.getMessage());\n}$0', plain: 'try {\n    int res = 10 / 2;\n} catch (Exception e) {\n    System.out.println("Error: " + e.getMessage());\n}' }
+      ],
+      cpp: [
+        { trigger: 'main', title: 'هيكل برنامج C++ كامل', desc: 'يبني برنامج C++ مع مكتبة iostream ودالة main', snippet: '#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    ${1:cout << "Hello C++ World!" << endl;}\n    return 0;\n}$0', plain: '#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    cout << "Hello C++ World!" << endl;\n    return 0;\n}' },
+        { trigger: 'cout', title: 'طباعة سطر في C++ (cout << ... << endl)', desc: 'يطبع نص أو متغير متبوعاً بسطر جديد', snippet: 'cout << "${1:Message}" << endl;$0', plain: 'cout << "Message" << endl;' },
+        { trigger: 'cin', title: 'استقبال مدخلات (cin >>)', desc: 'قراءة قيمة متغير من المستخدم', snippet: 'cin >> ${1:variable};$0', plain: 'cin >> variable;' },
+        { trigger: 'fori', title: 'حلقة تكرار (for loop)', desc: 'حلقة for قياسية في C++', snippet: 'for (int ${1:i} = 0; ${1:i} < ${2:10}; ${1:i}++) {\n    cout << ${1:i} << endl;\n}$0', plain: 'for (int i = 0; i < 10; i++) {\n    cout << i << endl;\n}' },
+        { trigger: 'ifelse', title: 'جملة شرطية (if / else)', desc: 'قاعدة شرطية if-else في C++', snippet: 'if (${1:x > 0}) {\n    cout << "${2:Positive}" << endl;\n} else {\n    cout << "${3:Non-positive}" << endl;\n}$0', plain: 'if (x > 0) {\n    cout << "Positive" << endl;\n} else {\n    cout << "Non-positive" << endl;\n}' },
+        { trigger: 'class', title: 'كلاس C++ متكامل', desc: 'تعريف كلاس في C++ مع خصائص ودالة', snippet: 'class ${1:Student} {\npublic:\n    string name;\n    int grade;\n\n    ${1:Student}(string n, int g) {\n        name = n;\n        grade = g;\n    }\n\n    void printInfo() {\n        cout << name << ": " << grade << endl;\n    }\n};$0', plain: 'class Student {\npublic:\n    string name;\n    int grade;\n\n    Student(string n, int g) {\n        name = n;\n        grade = g;\n    }\n\n    void printInfo() {\n        cout << name << ": " << grade << endl;\n    }\n};' },
+        { trigger: 'func', title: 'تعريف دالة في C++', desc: 'دالة تستقبل معاملات وتعيد قيمة', snippet: '${1:int} ${2:addNumbers}(int a, int b) {\n    return a + b;\n}$0', plain: 'int addNumbers(int a, int b) {\n    return a + b;\n}' }
+      ],
+      c: [
+        { trigger: 'main', title: 'هيكل برنامج لغة C كامل', desc: 'يتضمن stdio.h ودالة main', snippet: '#include <stdio.h>\n\nint main() {\n    printf("${1:Hello C World!}\\n");\n    return 0;\n}$0', plain: '#include <stdio.h>\n\nint main() {\n    printf("Hello C World!\\n");\n    return 0;\n}' },
+        { trigger: 'pf', title: 'طباعة في لغة C (printf)', desc: 'دالة الطباعة المنسقة printf', snippet: 'printf("${1:Result = %d}\\n", ${2:value});$0', plain: 'printf("Result = %d\\n", value);' },
+        { trigger: 'sf', title: 'قراءة مدخل في C (scanf)', desc: 'دالة الإدخال scanf', snippet: 'scanf("%d", &${1:num});$0', plain: 'scanf("%d", &num);' },
+        { trigger: 'fori', title: 'حلقة تكرار (for loop)', desc: 'حلقة for في لغة C', snippet: 'for (int ${1:i} = 0; ${1:i} < ${2:10}; ${1:i}++) {\n    printf("%d\\n", ${1:i});\n}$0', plain: 'for (int i = 0; i < 10; i++) {\n    printf("%d\\n", i);\n}' }
+      ],
+      python: [
+        { trigger: 'pr', title: 'طباعة في بايثون (print)', desc: 'دالة الطباعة السريعة في بايثون', snippet: 'print("${1:Hello Python!}")$0', plain: 'print("Hello Python!")' },
+        { trigger: 'fstr', title: 'طباعة منسقة (f-string print)', desc: 'طباعة نص مدمج بالمتغيرات في بايثون', snippet: 'print("Name:", ${1:name}, "| Score:", ${2:score})$0', plain: 'print("Name:", name, "| Score:", score)' },
+        { trigger: 'def', title: 'تعريف دالة (def function)', desc: 'إنشاء دالة بايثون واستدعاؤها', snippet: 'def ${1:calculate_sum}(${2:a, b}):\n    return ${3:a + b}\n\nprint(${1:calculate_sum}(10, 20))$0', plain: 'def calculate_sum(a, b):\n    return a + b\n\nprint(calculate_sum(10, 20))' },
+        { trigger: 'for', title: 'حلقة تكرار (for i in range)', desc: 'حلقة تكرار رقمية في بايثون', snippet: 'for ${1:i} in range(${2:5}):\n    print("Step:", ${1:i})$0', plain: 'for i in range(5):\n    print("Step:", i)' },
+        { trigger: 'ifelse', title: 'شرط كامل (if / elif / else)', desc: 'قاعدة شرطية متعددة في بايثون', snippet: 'if ${1:score >= 90}:\n    print("Excellent")\nelif ${2:score >= 50}:\n    print("Passed")\nelse:\n    print("Try Again")$0', plain: 'if score >= 90:\n    print("Excellent")\nelif score >= 50:\n    print("Passed")\nelse:\n    print("Try Again")' },
+        { trigger: 'while', title: 'حلقة (while loop)', desc: 'حلقة while في بايثون', snippet: 'count = 0\nwhile count < ${1:5}:\n    print(count)\n    count = count + 1$0', plain: 'count = 0\nwhile count < 5:\n    print(count)\n    count = count + 1' }
+      ],
+      csharp: [
+        { trigger: 'cw', title: 'طباعة سطر في C# (Console.WriteLine)', desc: 'جملة الطباعة المباشرة في C#', snippet: 'Console.WriteLine("${1:Hello C#!}");$0', plain: 'Console.WriteLine("Hello C#!");' },
+        { trigger: 'svm', title: 'دالة التشغيل (static void Main)', desc: 'الدالة الرئيسية في C#', snippet: 'using System;\n\nclass Program {\n    static void Main(string[] args) {\n        Console.WriteLine("${1:Welcome to C#!}");\n    }\n}$0', plain: 'using System;\n\nclass Program {\n    static void Main(string[] args) {\n        Console.WriteLine("Welcome to C#!");\n    }\n}' },
+        { trigger: 'fori', title: 'حلقة تكرار في C# (for loop)', desc: 'حلقة تكرار رقمية في C#', snippet: 'for (int ${1:i} = 0; ${1:i} < ${2:10}; ${1:i}++) {\n    Console.WriteLine(${1:i});\n}$0', plain: 'for (int i = 0; i < 10; i++) {\n    Console.WriteLine(i);\n}' }
+      ],
+      javascript: [
+        { trigger: 'clg', title: 'طباعة في الكونسول (console.log)', desc: 'طباعة رسالة أو متغير في الكونسول', snippet: 'console.log("${1:Debug message:}", ${2:data});$0', plain: 'console.log("Debug message:", data);' },
+        { trigger: 'gid', title: 'اختيار عنصر بالـ ID (getElementById)', desc: 'جلب عنصر HTML عبر المعرف الخاص به', snippet: 'const ${1:el} = document.getElementById("${2:element-id}");$0', plain: 'const el = document.getElementById("element-id");' },
+        { trigger: 'qs', title: 'اختيار عنصر بـ CSS (querySelector)', desc: 'جلب أول عنصر يطابق المحدد', snippet: 'const ${1:el} = document.querySelector("${2:.my-class}");$0', plain: 'const el = document.querySelector(".my-class");' },
+        { trigger: 'ael', title: 'حدث نقر (addEventListener click)', desc: 'تشغيل كود عند الضغط على زر أو عنصر', snippet: '${1:btn}.addEventListener("click", () => {\n  ${2:console.log("Button clicked!");}\n});$0', plain: 'btn.addEventListener("click", () => {\n  console.log("Button clicked!");\n});' },
+        { trigger: 'fn', title: 'تعريف دالة (function)', desc: 'دالة جافاسكريبت قياسية', snippet: 'function ${1:handleAction}(${2:param}) {\n  ${3:return param;}\n}$0', plain: 'function handleAction(param) {\n  return param;\n}' },
+        { trigger: 'afn', title: 'دالة سهمية (Arrow Function)', desc: 'تعريف دالة حديثة ES6', snippet: 'const ${1:compute} = (${2:a, b}) => {\n  return ${3:a + b};\n};$0', plain: 'const compute = (a, b) => {\n  return a + b;\n};' },
+        { trigger: 'fore', title: 'تكرار مصفوفة (forEach)', desc: 'المرور على كل عنصر في المصفوفة', snippet: '${1:items}.forEach((${2:item}, index) => {\n  console.log(index, ${2:item});\n});$0', plain: 'items.forEach((item, index) => {\n  console.log(index, item);\n});' },
+        { trigger: 'fetch', title: 'جلب بيانات من API (async fetch)', desc: 'طلب بيانات JSON من السيرفر', snippet: 'async function ${1:loadData}() {\n  try {\n    const res = await fetch("${2:https://api.example.com/data}");\n    const data = await res.json();\n    console.log(data);\n  } catch (err) {\n    console.error("Fetch error:", err);\n  }\n}$0', plain: 'async function loadData() {\n  try {\n    const res = await fetch("https://api.example.com/data");\n    const data = await res.json();\n    console.log(data);\n  } catch (err) {\n    console.error("Fetch error:", err);\n  }\n}' }
+      ],
+      html: [
+        { trigger: 'ht', title: 'هيكل صفحة HTML5 متكامل بالعربية', desc: 'يبني صفحة HTML5 قياسية بترميز UTF-8 واتجاه RTL', snippet: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>${1:عنوان الصفحة}</title>\n</head>\n<body>\n  <h1>${2:مرحباً بك في موقعي}</h1>\n  <p>${3:ابدأ الكتابة هنا...}</p>\n</body>\n</html>$0', plain: '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>عنوان الصفحة</title>\n</head>\n<body>\n  <h1>مرحباً بك في موقعي</h1>\n  <p>ابدأ الكتابة هنا...</p>\n</body>\n</html>' },
+        { trigger: 'navbar', title: 'شريط تنقل احترافي (Semantic Header & Nav)', desc: 'رأس صفحة مع شعار وقائمة روابط', snippet: '<header class="site-header">\n  <h1>${1:شعار الموقع}</h1>\n  <nav>\n    <ul>\n      <li><a href="#home">الرئيسية</a></li>\n      <li><a href="#services">الخدمات</a></li>\n      <li><a href="#contact">تواصل معنا</a></li>\n    </ul>\n  </nav>\n</header>$0', plain: '<header class="site-header">\n  <h1>شعار الموقع</h1>\n  <nav>\n    <ul>\n      <li><a href="#home">الرئيسية</a></li>\n      <li><a href="#services">الخدمات</a></li>\n      <li><a href="#contact">تواصل معنا</a></li>\n    </ul>\n  </nav>\n</header>' },
+        { trigger: 'card', title: 'بطاقة منتج أو مقال (Card Component)', desc: 'كارت يحتوي صورة وعنوان ووصف وزر', snippet: '<article class="card">\n  <img src="${1:image.jpg}" alt="${2:وصف الصورة}" width="320" height="200" loading="lazy">\n  <div class="card-body">\n    <h3>${3:عنوان البطاقة}</h3>\n    <p>${4:وصف مختصر للمحتوى يوضح الفكرة الأساسية.}</p>\n    <button type="button">${5:اقرأ المزيد}</button>\n  </div>\n</article>$0', plain: '<article class="card">\n  <img src="image.jpg" alt="وصف الصورة" width="320" height="200" loading="lazy">\n  <div class="card-body">\n    <h3>عنوان البطاقة</h3>\n    <p>وصف مختصر للمحتوى يوضح الفكرة الأساسية.</p>\n    <button type="button">اقرأ المزيد</button>\n  </div>\n</article>' },
+        { trigger: 'form', title: 'نموذج تسجيل متكامل (Accessible Form)', desc: 'نموذج يحتوي حقول الاسم والبريد وكلمة المرور وزر إرسال', snippet: '<form action="${1:/submit}" method="post">\n  <div>\n    <label for="user-name">الاسم الكامل:</label>\n    <input type="text" id="user-name" name="username" required placeholder="أدخل اسمك">\n  </div>\n  <div>\n    <label for="user-email">البريد الإلكتروني:</label>\n    <input type="email" id="user-email" name="email" required placeholder="name@example.com">\n  </div>\n  <button type="submit">إرسال البيانات ✓</button>\n</form>$0', plain: '<form action="/submit" method="post">\n  <div>\n    <label for="user-name">الاسم الكامل:</label>\n    <input type="text" id="user-name" name="username" required placeholder="أدخل اسمك">\n  </div>\n  <div>\n    <label for="user-email">البريد الإلكتروني:</label>\n    <input type="email" id="user-email" name="email" required placeholder="name@example.com">\n  </div>\n  <button type="submit">إرسال البيانات ✓</button>\n</form>' },
+        { trigger: 'table', title: 'جدول بيانات قياسي (Full Semantic Table)', desc: 'جدول منظم بـ caption و thead و tbody و tfoot', snippet: '<table border="1" cellpadding="8">\n  <caption>${1:عنوان الجدول}</caption>\n  <thead>\n    <tr>\n      <th scope="col">${2:الاسم}</th>\n      <th scope="col">${3:التخصص}</th>\n      <th scope="col">${4:التقدير}</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>أحمد حسني</td>\n      <td>هندسة البرمجيات</td>\n      <td>امتياز</td>\n    </tr>\n  </tbody>\n</table>$0', plain: '<table border="1" cellpadding="8">\n  <caption>عنوان الجدول</caption>\n  <thead>\n    <tr>\n      <th scope="col">الاسم</th>\n      <th scope="col">التخصص</th>\n      <th scope="col">التقدير</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>أحمد حسني</td>\n      <td>هندسة البرمجيات</td>\n      <td>امتياز</td>\n    </tr>\n  </tbody>\n</table>' }
+      ],
+      css: [
+        { trigger: 'flex', title: 'تخطيط Flexbox متكامل', desc: 'ترتيب العناصر أفقياً مع مسافات ومحاذاة', snippet: 'display: flex;\njustify-content: ${1:space-between};\nalign-items: ${2:center};\ngap: ${3:16px};\nflex-wrap: wrap;$0', plain: 'display: flex;\njustify-content: space-between;\nalign-items: center;\ngap: 16px;\nflex-wrap: wrap;' },
+        { trigger: 'center', title: 'توسيط عنصر أفقياً وعمودياً (Grid Center)', desc: 'أسرع طريقة لتوسيط أي عنصر في منتصف الشاشة', snippet: 'display: grid;\nplace-items: center;\nmin-height: ${1:100vh};$0', plain: 'display: grid;\nplace-items: center;\nmin-height: 100vh;' },
+        { trigger: 'grid', title: 'شبكة كروت متجاوبة (Responsive Auto-Grid)', desc: 'شبكة CSS Grid تتكيف تلقائياً مع الموبايل والكمبيوتر بدون ميديا كويري', snippet: 'display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(${1:260px}, 1fr));\ngap: ${2:20px};$0', plain: 'display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(260px, 1fr));\ngap: 20px;' },
+        { trigger: 'card', title: 'تصميم بطاقة عصرية (Modern Card CSS)', desc: 'حواف دائرية وظل ناعم ومسافات داخلية', snippet: '.card {\n  background: #ffffff;\n  border: 1px solid #e9ebf3;\n  border-radius: 16px;\n  padding: 24px;\n  box-shadow: 0 12px 30px rgba(34, 35, 74, 0.08);\n  transition: transform 0.2s ease;\n}\n.card:hover {\n  transform: translateY(-4px);\n}$0', plain: '.card {\n  background: #ffffff;\n  border: 1px solid #e9ebf3;\n  border-radius: 16px;\n  padding: 24px;\n  box-shadow: 0 12px 30px rgba(34, 35, 74, 0.08);\n  transition: transform 0.2s ease;\n}\n.card:hover {\n  transform: translateY(-4px);\n}' },
+        { trigger: 'btn', title: 'تصميم زر احترافي (Primary Button)', desc: 'تنسيق زر متكامل مع تأثير Hover', snippet: '.btn {\n  background: #6c5ce7;\n  color: #ffffff;\n  border: none;\n  border-radius: 10px;\n  padding: 10px 20px;\n  font-weight: 700;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n.btn:hover {\n  background: #5b4bc4;\n  transform: translateY(-2px);\n}$0', plain: '.btn {\n  background: #6c5ce7;\n  color: #ffffff;\n  border: none;\n  border-radius: 10px;\n  padding: 10px 20px;\n  font-weight: 700;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n.btn:hover {\n  background: #5b4bc4;\n  transform: translateY(-2px);\n}' },
+        { trigger: 'media', title: 'استعلام شاشات الموبايل (@media query)', desc: 'تخصيص التنسيقات للشاشات الصغيرة', snippet: '@media (max-width: ${1:768px}) {\n  ${2:.container} {\n    padding: 12px;\n  }\n}$0', plain: '@media (max-width: 768px) {\n  .container {\n    padding: 12px;\n  }\n}' }
+      ],
+      sql: [
+        { trigger: 'crt', title: 'إنشاء جدول (CREATE TABLE)', desc: 'إنشاء جدول جديد في قاعدة البيانات', snippet: 'CREATE TABLE ${1:Students} (\n  id INT PRIMARY KEY,\n  name TEXT,\n  grade INT\n);$0', plain: 'CREATE TABLE Students (\n  id INT PRIMARY KEY,\n  name TEXT,\n  grade INT\n);' },
+        { trigger: 'ins', title: 'إدخال صف بيانات (INSERT INTO)', desc: 'إضافة سجل جديد في الجدول', snippet: "INSERT INTO ${1:Students} VALUES (${2:1}, '${3:Ahmed Hosny}', ${4:100});$0", plain: "INSERT INTO Students VALUES (1, 'Ahmed Hosny', 100);" },
+        { trigger: 'sel', title: 'استعلام البيانات (SELECT * FROM)', desc: 'عرض البيانات من الجدول', snippet: 'SELECT * FROM ${1:Students};$0', plain: 'SELECT * FROM Students;' }
+      ]
+    };
+
+    window.registerAllCodeMasrSnippets = function () {
+      if (!window.monaco || window._codeMasrSnippetsRegistered) return;
+      window._codeMasrSnippetsRegistered = true;
 
       const K = window.monaco.languages.CompletionItemKind.Snippet;
-      const R = window.monaco.languages.CompletionItemInsertValueRule.InsertAsSnippet;
+      // استخدام الاسم الصحيح في Monaco Editor لمنع أي خطأ في الكونسول
+      const R = window.monaco.languages.CompletionItemInsertTextRule
+        ? window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+        : 4;
 
-      window.monaco.languages.registerCompletionItemProvider('python', {
-        provideCompletionItems: function () {
-          if (!state.autoCompleteEnabled) return { suggestions: [] };
-          return {
-            suggestions: [
-              { label: 'pr', kind: K, documentation: 'Python print()', insertText: 'print("${1:Hello World}")$0', insertTextRules: R },
-              { label: 'def', kind: K, documentation: 'Define Python function', insertText: 'def ${1:func_name}(${2:arg}):\n    ${3:print(arg)}\n$0', insertTextRules: R },
-              { label: 'for', kind: K, documentation: 'Python for loop', insertText: 'for ${1:i} in range(${2:10}):\n    print(${1:i})\n$0', insertTextRules: R },
-              { label: 'if', kind: K, documentation: 'Python if / else', insertText: 'if ${1:x > 0}:\n    print("${2:Positive}")\nelse:\n    print("${3:Negative}")$0', insertTextRules: R }
-            ]
-          };
+      Object.keys(CODE_SNIPPETS_LIBRARY).forEach((langKey) => {
+        window.monaco.languages.registerCompletionItemProvider(langKey, {
+          provideCompletionItems: function (model, position) {
+            if (!state.autoCompleteEnabled) return { suggestions: [] };
+            const word = model.getWordUntilPosition(position);
+            const range = {
+              startLineNumber: position.lineNumber,
+              endLineNumber: position.lineNumber,
+              startColumn: word.startColumn,
+              endColumn: word.endColumn
+            };
+
+            const list = CODE_SNIPPETS_LIBRARY[langKey] || [];
+            return {
+              suggestions: list.map((item) => ({
+                label: item.trigger,
+                kind: K,
+                detail: `⚡ ${item.title}`,
+                documentation: `${item.desc}\n\nالكود:\n${item.plain}`,
+                insertText: item.snippet,
+                insertTextRules: R,
+                range: range
+              }))
+            };
+          }
+        });
+      });
+    };
+
+    if (window.monaco) {
+      window.registerAllCodeMasrSnippets();
+    }
+
+    // نافذة قاموس الاختصارات والأكواد الجاهزة (Snippets Explorer Modal)
+    function insertSnippetIntoActiveEditor(plainCode) {
+      if (usingMonaco && monacoEditorInstance && window.monaco) {
+        const selection = monacoEditorInstance.getSelection();
+        const op = {
+          range: selection || new window.monaco.Range(1, 1, 1, 1),
+          text: plainCode + '\n',
+          forceMoveMarkers: true
+        };
+        monacoEditorInstance.executeEdits('snippet-insert', [op]);
+        monacoEditorInstance.focus();
+      } else {
+        const fallbackEl = document.getElementById('fallback-editor');
+        if (fallbackEl) {
+          const start = fallbackEl.selectionStart || 0;
+          const end = fallbackEl.selectionEnd || 0;
+          fallbackEl.value = fallbackEl.value.substring(0, start) + plainCode + '\n' + fallbackEl.value.substring(end);
+          state.playgroundFiles[state.activePlaygroundFile] = fallbackEl.value;
+          saveState();
         }
+      }
+      showToast('✨ تم إدراج الكود الجاهز مباشرة في المحرر!');
+    }
+
+    function openSnippetsExplorerModal() {
+      const currentInfo = getFileExtensionInfo(state.activePlaygroundFile);
+      const initialLang = CODE_SNIPPETS_LIBRARY[currentInfo.lang] ? currentInfo.lang : 'java';
+
+      const langTabs = [
+        { key: 'java', label: '☕ Java' },
+        { key: 'cpp', label: '⚙️ C++' },
+        { key: 'python', label: '🐍 Python' },
+        { key: 'c', label: '🛠️ C' },
+        { key: 'csharp', label: '🎯 C#' },
+        { key: 'html', label: '🌐 HTML5' },
+        { key: 'css', label: '🎨 CSS3' },
+        { key: 'javascript', label: '⚡ JS' },
+        { key: 'sql', label: '🗄️ SQL' }
+      ];
+
+      const modalHtml = `
+        <div dir="rtl" style="text-align:right; font-family:'Cairo',sans-serif;">
+          <p style="margin:0 0 10px; font-size:12px; color:var(--muted);">
+            اكتب الاختصار في المحرر واضغط <b>Tab</b> أو <b>Enter</b> ليكتمل الكود تلقائياً، أو اضغط على <b>➕ أدرج الكود</b> لإضافته فوراً:
+          </p>
+          <input id="snippet-search-box" type="search" placeholder="ابحث عن اختصار مثل: sout, psvm, cout, class, flex, form..." style="width:100%; padding:9px 12px; border:1px solid var(--purple); border-radius:9px; font-size:12px; margin-bottom:10px;" />
+          <div id="snippet-lang-tabs" style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:12px;">
+            ${langTabs.map(t => `<button type="button" class="quick-ext-chip ${t.key === initialLang ? 'active-chip' : ''}" data-snip-lang="${t.key}" style="${t.key === initialLang ? 'background:var(--purple);color:#fff;' : ''}">${t.label}</button>`).join('')}
+          </div>
+          <div id="snippets-list-container" style="max-height:320px; overflow-y:auto; display:grid; gap:8px; padding-left:4px;"></div>
+        </div>
+      `;
+
+      openModal('⚡', 'موسوعة اختصارات الكود الذكية (Snippets Guide)', modalHtml, 'إغلاق النافذة');
+      const modalBox = document.querySelector('#modal-backdrop .modal');
+      if (modalBox) modalBox.style.width = 'min(100%, 640px)';
+
+      let selectedLang = initialLang;
+      const listContainer = document.getElementById('snippets-list-container');
+      const searchBox = document.getElementById('snippet-search-box');
+
+      function renderSnippetsList() {
+        if (!listContainer) return;
+        const q = (searchBox ? searchBox.value : '').trim().toLowerCase();
+        let items = [];
+
+        if (q) {
+          Object.keys(CODE_SNIPPETS_LIBRARY).forEach((lk) => {
+            CODE_SNIPPETS_LIBRARY[lk].forEach((s) => {
+              if (`${s.trigger} ${s.title} ${s.desc} ${s.plain}`.toLowerCase().includes(q)) {
+                items.push(Object.assign({ lang: lk.toUpperCase() }, s));
+              }
+            });
+          });
+        } else {
+          items = (CODE_SNIPPETS_LIBRARY[selectedLang] || []).map(s => Object.assign({ lang: selectedLang.toUpperCase() }, s));
+        }
+
+        if (!items.length) {
+          listContainer.innerHTML = `<div style="padding:16px;text-align:center;color:var(--muted);">لا توجد اختصارات مطابقة لبحثك.</div>`;
+          return;
+        }
+
+        listContainer.innerHTML = items.map((item, idx) => `
+          <div style="border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--surface-2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">
+              <div>
+                <span style="background:var(--purple); color:#fff; font:800 11px 'DM Mono',monospace; padding:2px 8px; border-radius:6px; margin-left:6px;">${escapeHtml(item.trigger)} + Tab</span>
+                <b style="font-size:12px; color:var(--text);">${escapeHtml(item.title)}</b>
+              </div>
+              <button type="button" class="primary-button btn-insert-snip" data-snip-idx="${idx}" style="padding:4px 10px; font-size:10px;">➕ أدرج الكود في المحرر</button>
+            </div>
+            <div style="font-size:11px; color:var(--muted); margin-bottom:6px;">${escapeHtml(item.desc)}</div>
+            <pre style="margin:0; padding:8px 10px; background:#121322; color:#8ee4b7; border-radius:7px; font:11px/1.5 'DM Mono',monospace; direction:ltr; text-align:left; overflow-x:auto;">${escapeHtml(item.plain)}</pre>
+          </div>
+        `).join('');
+
+        listContainer.querySelectorAll('.btn-insert-snip').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const item = items[Number(btn.getAttribute('data-snip-idx'))];
+            if (item) {
+              closeModal();
+              if (modalBox) modalBox.style.width = '';
+              insertSnippetIntoActiveEditor(item.plain);
+            }
+          });
+        });
+      }
+
+      document.querySelectorAll('[data-snip-lang]').forEach((tabBtn) => {
+        tabBtn.addEventListener('click', () => {
+          selectedLang = tabBtn.getAttribute('data-snip-lang');
+          document.querySelectorAll('[data-snip-lang]').forEach((b) => {
+            const active = b.getAttribute('data-snip-lang') === selectedLang;
+            b.style.background = active ? 'var(--purple)' : '';
+            b.style.color = active ? '#fff' : '';
+          });
+          if (searchBox) searchBox.value = '';
+          renderSnippetsList();
+        });
       });
 
-      window.monaco.languages.registerCompletionItemProvider('cpp', {
-        provideCompletionItems: function () {
-          if (!state.autoCompleteEnabled) return { suggestions: [] };
-          return {
-            suggestions: [
-              { label: 'main', kind: K, documentation: 'C++ main boilerplate', insertText: '#include <iostream>\nusing namespace std;\n\nint main() {\n    ${1:cout << "Hello C++!" << endl;}\n    return 0;\n}$0', insertTextRules: R },
-              { label: 'cout', kind: K, documentation: 'std::cout output', insertText: 'cout << "${1:Message}" << endl;$0', insertTextRules: R },
-              { label: 'for', kind: K, documentation: 'C++ for loop', insertText: 'for (int ${1:i} = 0; ${1:i} < ${2:10}; ${1:i}++) {\n    ${3:cout << i << endl;}\n}$0', insertTextRules: R }
-            ]
-          };
-        }
+      searchBox?.addEventListener('input', renderSnippetsList);
+      renderSnippetsList();
+    }
+
+    document.getElementById('open-snippets-top-btn')?.addEventListener('click', openSnippetsExplorerModal);
+    document.getElementById('pg-snippets-btn')?.addEventListener('click', openSnippetsExplorerModal);
+    document.getElementById('studio-snippets-btn')?.addEventListener('click', openSnippetsExplorerModal);
+
+    // =========================================================================
+    // تفعيل الـ Offline Service Worker (`sw.js`) وزر تثبيت التطبيق (`Install App`)
+    // =========================================================================
+    let deferredInstallPrompt = null;
+    const installPwaBtn = document.getElementById('install-pwa-btn');
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(() => {
+          console.log('✓ CodeMasr Offline Service Worker registered successfully.');
+        }).catch((err) => {
+          console.warn('Service Worker registration note:', err);
+        });
       });
     }
 
-    setTimeout(() => {
-      registerMultiLangSnippets();
-      applyAutoCompleteSetting(state.autoCompleteEnabled);
-    }, 1000);
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (installPwaBtn) installPwaBtn.hidden = false;
+    });
+
+    installPwaBtn?.addEventListener('click', async () => {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          showToast('🎉 جاري تثبيت تطبيق CodeMasr على جهازك!');
+          installPwaBtn.hidden = true;
+        }
+        deferredInstallPrompt = null;
+      } else {
+        showToast('💡 يمكنك تثبيت التطبيق مباشرة من أيقونة التثبيت في شريط عنوان المتصفح بالأعلى!');
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      if (installPwaBtn) installPwaBtn.hidden = true;
+      showToast('🚀 تم تثبيت تطبيق CodeMasr بنجاح! يعمل الآن أوفلاين بالكامل.');
+    });
 
     function deleteCustomFile(fileKey) {
       if (['html', 'css', 'js'].includes(fileKey)) return;

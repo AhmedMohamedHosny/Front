@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+<head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <meta name="theme-color" content="#0b1020"/>
+        <meta name="theme-color" content="#6c5ce7"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
         <title>CodeMasr — Learn by Building</title>
+        <link rel="icon" type="image/png" href="CM.png"/>
+        <link rel="apple-touch-icon" href="CM.png"/>
+        <link rel="manifest" href="manifest.json"/>
         <link rel="stylesheet" href="style.css"/>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     </head>
     <body>
         <div class="app-shell">
@@ -105,12 +110,14 @@
                         <span class="crumb-slash">/</span>
                         <b id="breadcrumb-current">Learning Hub</b>
                     </div>
-                    <div class="topbar-actions">
+<div class="topbar-actions">
                         <div class="search-box">
                             <span>⌕</span>
                             <input id="global-search" type="search" placeholder="Search lessons, topics..." aria-label="Search lessons"/>
                             <kbd>⌘ K</kbd>
                         </div>
+                        <button class="secondary-button" id="install-pwa-btn" type="button" hidden style="padding: 6px 12px; font-size: 11px; border-color: #18a878; color: #18a878;" title="تثبيت المنصة كتطبيق يعمل بدون إنترنت">📲 Install App</button>
+                        <button class="secondary-button" id="open-snippets-top-btn" type="button" style="padding: 6px 12px; font-size: 11px;" title="عرض كل اختصارات الكود الجاهزة لكل اللغات">⚡ Snippets</button>
                         <button class="primary-button" id="open-studio-btn" style="padding: 6px 12px; font-size: 11px;" title="فتح محرر فيجوال استوديو كامل ملء الشاشة"><span>⛶</span> VS Code Studio</button>
                         <button class="icon-button theme-toggle" id="theme-toggle" aria-label="Toggle theme">☼</button>
                         <button class="help-button" id="help-button">
@@ -430,6 +437,7 @@
               </div>
 <div class="editor-tools">
                 <span class="save-state" id="save-state">● Saved locally</span>
+                <button class="secondary-button" id="pg-snippets-btn" type="button" style="padding: 5px 10px; font-size: 11px; font-weight: 700;" title="قاموس الاختصارات والأكواد الجاهزة">⚡ Snippets</button>
                 <button class="secondary-button" id="format-code" type="button" style="padding: 5px 12px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;" title="تنظيف وتنسيق الكود تلقائياً">✨ Clean Code</button>
               </div>
             </div>
@@ -801,7 +809,8 @@
   💡 Auto-Complete: <b id="autocomplete-status-text">ON</b>
 </button>
 
-        <button class="vscode-action-btn" id="studio-clean-code" type="button" title="تنظيف وتنسيق الكود وجعله متناسقاً"> Clean Code</button>
+        <button class="vscode-action-btn" id="studio-snippets-btn" type="button" title="فتح قاموس الاختصارات والأكواد الجاهزة (مثل sout و psvm و cout)">⚡ Snippets Guide</button>
+        <button class="vscode-action-btn" id="studio-clean-code" type="button" title="تنظيف وتنسيق الكود وجعله متناسقاً">✨ Clean Code</button>
         <button class="vscode-action-btn primary" id="studio-run-code">▶ Run Code (Ctrl+Enter)</button>
         <button class="vscode-close-btn" id="close-studio-btn">✕ Exit Fullscreen</button>
       </div>
