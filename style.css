@@ -6,3 +6,719 @@
 @media(max-width:900px){:root{--sidebar:245px}.sidebar{transform:translateX(-102%);transition:transform .25s;box-shadow:none}.sidebar.mobile-open{transform:translateX(0);box-shadow:15px 0 50px #18172a25}.main-area{margin-left:0}.mobile-menu{display:inline-flex}.topbar{gap:12px;padding:0 20px}.breadcrumb{margin-right:auto}.search-box{width:190px}.view{padding:26px 22px}.welcome-row{grid-template-columns:1fr .8fr}.hero-art{transform:scale(.8);margin-left:-20px;margin-right:-25px}.stats-grid{gap:10px}.stat-card{padding:15px}.course-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.learning-card:last-child{display:none}.bottom-grid{grid-template-columns:1fr 1fr}.project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.project-card:last-child{display:none}.lesson-layout{grid-template-columns:minmax(0,1fr) 220px}.achievement-list{grid-template-columns:1fr}.achievement{max-width:none}}
 @media(max-width:640px){.topbar{height:61px;padding:0 13px}.breadcrumb{font-size:10px;gap:6px}.topbar-actions{gap:5px}.search-box{width:36px;padding:0 8px;border:0;background:transparent}.search-box input,.search-box kbd{display:none}.search-box>span{font-size:21px}.help-button{padding:7px 8px}.help-button span{display:none}.view{padding:23px 14px}.welcome-row{display:block;min-height:0}.welcome-row h1{font-size:31px}.hero-description{font-size:11px}.hero-art{height:210px;margin:4px 0 0;transform:scale(.88)}.stats-grid{grid-template-columns:1fr 1fr;margin:10px 0 28px}.stats-grid .stat-card:last-child{grid-column:1/-1}.stat-card{padding:14px}.stat-number b{font-size:23px}.section-heading h2,.panel-heading h2{font-size:17px}.section-heading{align-items:flex-end}.section-heading .text-button{font-size:9px}.course-grid{grid-template-columns:1fr}.learning-card:last-child{display:block}.course-illustration{height:95px}.learning-card>p{min-height:0}.bottom-grid{grid-template-columns:1fr}.footer{gap:9px;flex-wrap:wrap}.footer span:nth-child(2){display:none}.page-title-row{display:block;margin-bottom:20px}.page-title-row h1{font-size:29px}.page-title-actions{margin-top:16px}.playground-layout{gap:12px}.editor-toolbar{padding:0 5px}.file-tabs{gap:0}.file-tab{font-size:9px;padding:0 7px}.editor-tools{gap:2px}.save-state{display:none}.editor-panel{min-height:480px}.editor-host{height:410px}.preview-panel{min-height:540px}.preview-toolbar{padding:0 9px}.editor-hint{align-items:flex-start;line-height:1.7}.project-grid{grid-template-columns:1fr}.project-card:last-child{display:block}.project-preview{height:180px}.progress-summary-grid{grid-template-columns:1fr}.progress-summary-grid .stat-card{min-height:0}.progress-course-row{gap:8px}.progress-course-bar{width:25%;min-width:58px}.progress-course-row>button{padding:7px}.lesson-back-row{align-items:flex-start;gap:10px}.lesson-content{padding:22px 17px}.lesson-content h1{font-size:28px}.lesson-lead{font-size:12px}.lesson-layout{grid-template-columns:1fr}.lesson-sidebar{position:static;grid-row:1}.lesson-list{display:grid;grid-template-columns:1fr 1fr;gap:3px}.lesson-sidebar h3{margin-bottom:10px}.lesson-actions>*{flex:1}.modal{padding:24px}.search-results{max-height:50vh;overflow:auto}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* ==========================================================================
+   1. تصحيح اتجاه النصوص العربية وعزل الأكواد البرمجية عن النص لمنع لخبطة الأقواس
+   ========================================================================== */
+.ar-expl, .lesson-ar-content, #in-lesson-prompt {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: 'Cairo', system-ui, -apple-system, sans-serif !important;
+  line-height: 1.85 !important;
+  font-size: 13.5px !important;
+  color: var(--text) !important;
+}
+
+/* عزل الكلمات الإنجليزية والوسوم وسط العربي */
+.code-badge {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  display: inline-block !important;
+  font-family: 'DM Mono', monospace !important;
+  font-size: 11.5px !important;
+  background: rgba(108, 92, 231, 0.12) !important;
+  color: #5b4bc4 !important;
+  padding: 1px 7px !important;
+  border-radius: 5px !important;
+  border: 1px solid rgba(108, 92, 231, 0.22) !important;
+  font-weight: 600 !important;
+  margin: 0 4px !important;
+}
+
+.dark-mode .code-badge {
+  background: rgba(135, 120, 255, 0.18) !important;
+  color: #c4b8ff !important;
+  border-color: rgba(135, 120, 255, 0.3) !important;
+}
+
+/* تصحيح حجم نصوص بنر التحدي في صفحة الدرس لمنع الخط الضخم الموضح بالصورة */
+#in-lesson-prompt {
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.6 !important;
+}
+
+/* ==========================================================================
+   2. شريط السحب لتقسيم مساحة الكود والمعاينة (Draggable Splitter)
+   ========================================================================== */
+.playground-layout.resizable {
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  min-height: 620px;
+}
+
+.playground-layout.resizable .editor-panel {
+  flex: 1 1 50%;
+  min-width: 260px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.playground-layout.resizable .preview-panel {
+  flex: 1 1 50%;
+  min-width: 260px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.workbench-resizer {
+  width: 10px;
+  background: var(--line);
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: background 0.18s;
+  z-index: 10;
+  position: relative;
+}
+
+.workbench-resizer:hover, .workbench-resizer.is-dragging {
+  background: var(--purple);
+  color: #fff;
+}
+
+.resizer-handle {
+  font-size: 13px;
+  color: #9da0b2;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   3. استوديو فيجوال كود ملء الشاشة (VS Code Fullscreen Studio)
+   ========================================================================== */
+.vscode-studio-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: #1e1e1e;
+  color: #cccccc;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.vscode-studio-overlay[hidden] { display: none !important; }
+
+.vscode-studio-topbar {
+  height: 40px;
+  background: #323233;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid #252526;
+}
+.vscode-brand { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.vscode-tag { background: #0e639c; color: #fff; padding: 2px 7px; border-radius: 3px; font-size: 10px; }
+.vscode-top-actions { display: flex; align-items: center; gap: 8px; }
+.vscode-action-btn { background: #3c3c3c; border: 1px solid #4a4a4a; color: #ccc; padding: 5px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+.vscode-action-btn:hover { background: #4a4a4a; color: #fff; }
+.vscode-action-btn.primary { background: #0e639c; border-color: #1177bb; color: #fff; }
+.vscode-close-btn { background: #d9534f; border: 0; color: #fff; padding: 5px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+
+.vscode-studio-body { flex: 1; display: flex; overflow: hidden; }
+.vscode-activity-bar { width: 48px; background: #333333; display: flex; flex-direction: column; align-items: center; padding-top: 10px; gap: 14px; }
+.activity-btn { background: transparent; border: 0; font-size: 20px; cursor: pointer; opacity: 0.6; padding: 6px; border-radius: 6px; }
+.activity-btn:hover, .activity-btn.active { opacity: 1; background: rgba(255,255,255,0.1); }
+
+.vscode-explorer { width: 220px; background: #252526; border-right: 1px solid #1e1e1e; display: flex; flex-direction: column; }
+.explorer-header { padding: 10px 12px; font-size: 11px; font-weight: 700; display: flex; justify-content: space-between; border-bottom: 1px solid #1e1e1e; }
+.explorer-tree { flex: 1; overflow-y: auto; padding: 6px 0; }
+.tree-file-item { display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-size: 12px; cursor: pointer; color: #ccc; }
+.tree-file-item:hover { background: #2a2d2e; }
+.tree-file-item.active { background: #37373d; color: #fff; }
+
+.vscode-workbench-split { flex: 1; display: flex; overflow: hidden; }
+.vscode-editor-pane { flex: 1 1 50%; min-width: 250px; display: flex; flex-direction: column; background: #1e1e1e; }
+.vscode-tabs { height: 35px; background: #252526; display: flex; overflow-x: auto; }
+.vscode-tab { display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #2d2d2d; border-right: 1px solid #252526; font-size: 12px; cursor: pointer; }
+.vscode-tab.active { background: #1e1e1e; color: #fff; border-top: 2px solid #007acc; }
+
+.vscode-editor-container { flex: 1; position: relative; }
+.vscode-splitter { width: 8px; background: #2d2d2d; cursor: col-resize; display: flex; align-items: center; justify-content: center; }
+.vscode-splitter:hover, .vscode-splitter.is-dragging { background: #007acc; }
+
+.vscode-preview-pane { flex: 1 1 50%; min-width: 250px; display: flex; flex-direction: column; background: #fff; }
+.vscode-preview-bar { height: 35px; background: #252526; color: #ccc; display: flex; align-items: center; gap: 10px; padding: 0 12px; font-size: 11px; }
+#vscode-preview-frame { flex: 1; border: 0; background: #fff; }
+
+.vscode-statusbar { height: 22px; background: #007acc; color: #fff; display: flex; align-items: center; padding: 0 12px; gap: 16px; font-size: 11px; }
+/* ==========================================================================
+   1. أزرار التحكم في التكبير والتصغير المستقل لكل شاشة
+   ========================================================================== */
+.pane-zoom-ctrls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+.zoom-btn {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.zoom-btn:hover {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+.zoom-level {
+  font-size: 9px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text);
+  min-width: 32px;
+  text-align: center;
+}
+.iframe-viewport-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  background: #ffffff;
+  display: flex;
+}
+#preview-frame, #vscode-preview-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+  border: 0;
+  transform-origin: top left;
+  transition: transform 0.15s ease-out;
+}
+
+/* ==========================================================================
+   2. شريط السحب الفاصل بالماوس
+   ========================================================================== */
+.playground-layout.resizable {
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  min-height: 620px;
+}
+.playground-layout.resizable .editor-panel {
+  flex: 1 1 50%;
+  min-width: 250px;
+}
+.playground-layout.resizable .preview-panel {
+  flex: 1 1 50%;
+  min-width: 250px;
+}
+.workbench-resizer {
+  width: 10px;
+  background: var(--line);
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: background 0.2s;
+  z-index: 10;
+}
+.workbench-resizer:hover, .workbench-resizer.is-dragging {
+  background: var(--purple);
+}
+.workbench-resizer:hover .resizer-handle {
+  color: #fff;
+}
+.resizer-handle {
+  font-size: 13px;
+  color: #9da0b2;
+}
+
+/* ==========================================================================
+   3. نافذة الفول سكرين ووضع الكود فقط / المعاينة فقط
+   ========================================================================== */
+.vscode-studio-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #141624;
+  color: #d1d5db;
+  display: flex;
+  flex-direction: column;
+}
+.vscode-studio-overlay[hidden] { display: none !important; }
+
+.vscode-studio-topbar {
+  height: 44px;
+  background: #1e2030;
+  border-bottom: 1px solid #2d3047;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.vscode-brand { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.vscode-tag { background: #6c5ce7; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+
+.studio-view-modes {
+  display: flex;
+  background: #141624;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #2d3047;
+  gap: 4px;
+}
+.studio-mode-btn {
+  background: transparent;
+  border: 0;
+  color: #9a9daf;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.studio-mode-btn:hover { color: #fff; }
+.studio-mode-btn.active {
+  background: #6c5ce7;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.4);
+}
+
+.vscode-top-actions { display: flex; align-items: center; gap: 10px; }
+.vscode-action-btn.primary { background: #18a878; color: #fff; border: 0; padding: 6px 14px; border-radius: 6px; font-weight: 800; cursor: pointer; }
+.vscode-close-btn { background: #d54f59; color: #fff; border: 0; padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+
+.vscode-studio-body { flex: 1; display: flex; overflow: hidden; }
+.vscode-workbench-split { flex: 1; display: flex; }
+.vscode-editor-pane { flex: 1 1 50%; min-width: 0; display: flex; flex-direction: column; background: #161827; }
+.vscode-tabs-header { height: 36px; background: #1e2030; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-bottom: 1px solid #2a2d42; }
+.vscode-tab { padding: 8px 14px; background: #161827; color: #6c5ce7; border-top: 2px solid #6c5ce7; font-size: 12px; font-family: 'DM Mono', monospace; }
+.vscode-editor-container { flex: 1; position: relative; }
+
+.vscode-splitter { width: 8px; background: #1e2030; cursor: col-resize; display: flex; align-items: center; justify-content: center; user-select: none; }
+.vscode-splitter:hover, .vscode-splitter.is-dragging { background: #6c5ce7; }
+
+.vscode-preview-pane { flex: 1 1 50%; min-width: 0; display: flex; flex-direction: column; background: #fff; }
+.vscode-preview-bar { height: 36px; background: #1e2030; color: #ccc; display: flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 11px; }
+
+/* أوضاع الإخفاء التام للكود أو المعاينة */
+.hide-pane { display: none !important; }
+.maximize-pane { flex: 1 1 100% !important; }
+
+/* ==========================================================================
+   4. شريط التوقيع المنور العالمي (Neon Glowing Signature Bar)
+   ========================================================================== */
+.vscode-glowing-footer {
+  height: 32px;
+  background: linear-gradient(90deg, #0e101d, #17152b 50%, #0e101d);
+  border-top: 1px solid rgba(108, 92, 231, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  font-size: 11px;
+  box-shadow: 0 -4px 20px rgba(108, 92, 231, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.vscode-glowing-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #00f2fe, #4facfe, #6c5ce7, #ff0844, transparent);
+  animation: neon-flow 4s linear infinite;
+}
+
+@keyframes neon-flow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.neon-status-left, .neon-status-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #7d829e;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+}
+
+.neon-pulsing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00f2fe;
+  box-shadow: 0 0 8px #00f2fe, 0 0 14px #00f2fe;
+  animation: pulse-glow 1.8s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.neon-signature {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: 0.5px;
+}
+
+.neon-credit {
+  color: #b3b7d1;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.neon-author-name {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-shadow: 
+    0 0 5px rgba(255, 255, 255, 0.9),
+    0 0 12px #6c5ce7,
+    0 0 24px #4facfe,
+    0 0 35px #00f2fe;
+}
+
+.neon-sparkle {
+  color: #00f2fe;
+  font-size: 11px;
+  text-shadow: 0 0 8px #00f2fe;
+  animation: spin-pulse 3s infinite;
+}
+
+@keyframes spin-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.25); opacity: 1; filter: drop-shadow(0 0 8px #4facfe); }
+}
+/* ==========================================================================
+   5 ثيمات احترافية متكاملة لبيئة VS Code Studio مع Animations وتوهج نيون
+   ========================================================================== */
+
+/* المتغيرات الافتراضية (Cyberpunk Neon) */
+.vscode-studio-overlay,
+.vscode-studio-overlay[data-studio-theme="cyberpunk-neon"] {
+  --st-bg-main: #0b0c1b;
+  --st-bg-bar: #121329;
+  --st-bg-tab: #181a36;
+  --st-border: #2a2d5c;
+  --st-accent: #00f2fe;
+  --st-accent-2: #ff0844;
+  --st-text: #e2e8f0;
+  --st-laser: linear-gradient(90deg, transparent, #00f2fe, #ff0844, #6c5ce7, transparent);
+}
+
+/* 2. ثيم Dracula Pro */
+.vscode-studio-overlay[data-studio-theme="dracula-pro"] {
+  --st-bg-main: #282a36;
+  --st-bg-bar: #1e1f29;
+  --st-bg-tab: #21222c;
+  --st-border: #44475a;
+  --st-accent: #bd93f9;
+  --st-accent-2: #ff79c6;
+  --st-text: #f8f8f2;
+  --st-laser: linear-gradient(90deg, transparent, #bd93f9, #ff79c6, #50fa7b, transparent);
+}
+
+/* 3. ثيم Synthwave '84 */
+.vscode-studio-overlay[data-studio-theme="synthwave-84"] {
+  --st-bg-main: #1a1025;
+  --st-bg-bar: #12091c;
+  --st-bg-tab: #241734;
+  --st-border: #49296b;
+  --st-accent: #ff7edb;
+  --st-accent-2: #36f9f6;
+  --st-text: #fff5f9;
+  --st-laser: linear-gradient(90deg, transparent, #ff7edb, #fede5d, #36f9f6, transparent);
+}
+
+/* 4. ثيم Emerald Matrix */
+.vscode-studio-overlay[data-studio-theme="emerald-matrix"] {
+  --st-bg-main: #06110c;
+  --st-bg-bar: #040b08;
+  --st-bg-tab: #0a1c14;
+  --st-border: #133926;
+  --st-accent: #00ff9d;
+  --st-accent-2: #10b981;
+  --st-text: #d1fae5;
+  --st-laser: linear-gradient(90deg, transparent, #00ff9d, #10b981, #34d399, transparent);
+}
+
+/* 5. ثيم Aurora Light */
+.vscode-studio-overlay[data-studio-theme="aurora-light"] {
+  --st-bg-main: #f8fafc;
+  --st-bg-bar: #ffffff;
+  --st-bg-tab: #f1f5f9;
+  --st-border: #e2e8f0;
+  --st-accent: #6c5ce7;
+  --st-accent-2: #ec4899;
+  --st-text: #1e293b;
+  --st-laser: linear-gradient(90deg, transparent, #6c5ce7, #ec4899, #3b82f6, transparent);
+}
+
+/* تطبيق المتغيرات والـ Animations السلسة على عناصر الاستوديو */
+.vscode-studio-overlay {
+  background: var(--st-bg-main) !important;
+  color: var(--st-text) !important;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+.vscode-studio-topbar,
+.vscode-tabs-header,
+.vscode-preview-bar {
+  background: var(--st-bg-bar) !important;
+  border-color: var(--st-border) !important;
+  color: var(--st-text) !important;
+  transition: all 0.35s ease;
+}
+
+.vscode-studio-topbar {
+  position: relative;
+  overflow: hidden;
+}
+
+/* خيط ليزر متحرك أعلى شريط الاستوديو */
+.vscode-studio-topbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--st-laser);
+  background-size: 200% 100%;
+  animation: studio-laser-sweep 3.5s linear infinite;
+}
+
+@keyframes studio-laser-sweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.vscode-editor-pane,
+#vscode-editor-container,
+#vscode-editor-container #editor-host,
+#vscode-editor-container #monaco-editor,
+#vscode-editor-container .monaco-editor,
+#vscode-editor-container .monaco-editor-background,
+#vscode-editor-container .margin {
+  background-color: var(--st-bg-main) !important;
+  transition: background-color 0.3s ease;
+}
+
+.vscode-tab {
+  background: var(--st-bg-tab) !important;
+  color: var(--st-text) !important;
+  opacity: 0.7;
+  transition: all 0.25s ease;
+}
+
+.vscode-tab.active {
+  background: var(--st-bg-main) !important;
+  color: var(--st-accent) !important;
+  border-top: 2px solid var(--st-accent) !important;
+  opacity: 1;
+  box-shadow: 0 -4px 12px rgba(0, 242, 254, 0.12);
+}
+
+.vscode-splitter {
+  background: var(--st-bg-bar) !important;
+  border-left: 1px solid var(--st-border);
+  border-right: 1px solid var(--st-border);
+  color: var(--st-accent);
+  transition: all 0.25s ease;
+}
+
+.vscode-splitter:hover,
+.vscode-splitter.is-dragging {
+  background: var(--st-accent) !important;
+  color: #000 !important;
+  box-shadow: 0 0 18px var(--st-accent);
+}
+
+/* تصميم زر اختيار الثيم المتوهج */
+.studio-theme-picker-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--st-bg-tab);
+  border: 1px solid var(--st-accent);
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(108, 92, 231, 0.25);
+  transition: all 0.3s ease;
+}
+
+.studio-theme-picker-wrap:hover {
+  box-shadow: 0 0 18px var(--st-accent);
+  transform: translateY(-1px);
+}
+
+.theme-palette-icon {
+  font-size: 13px;
+  animation: float-icon 2.5s ease-in-out infinite;
+}
+
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px) rotate(8deg); }
+}
+
+.studio-theme-select {
+  background: transparent;
+  border: 0;
+  color: var(--st-text);
+  font-weight: 800;
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+}
+
+.studio-theme-select option {
+  background: #181a29;
+  color: #ffffff;
+  padding: 8px;
+}
+
+/* تحديث الشريط السفلي المضيء ليتلون مع الثيم المختار */
+.vscode-glowing-footer {
+  background: var(--st-bg-bar) !important;
+  border-top: 1px solid var(--st-border) !important;
+}
+
+.vscode-glowing-footer::before {
+  background: var(--st-laser) !important;
+  height: 2px !important;
+}
+
+.neon-pulsing-dot {
+  background: var(--st-accent) !important;
+  box-shadow: 0 0 8px var(--st-accent), 0 0 16px var(--st-accent) !important;
+}
+
+.neon-author-name {
+  text-shadow:
+    0 0 5px rgba(255, 255, 255, 0.8),
+    0 0 12px var(--st-accent),
+    0 0 24px var(--st-accent-2) !important;
+}
+/* تصميم زر (+) لإضافة ملف جديد بجانب التبويبات */
+.vscode-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+}
+
+.vscode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+}
+
+.vscode-add-tab-btn,
+.pg-plus-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 4px;
+  border-radius: 6px;
+  border: 1px dashed var(--st-accent, #6c5ce7);
+  background: rgba(108, 92, 231, 0.12);
+  color: var(--st-accent, #6c5ce7);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vscode-add-tab-btn:hover,
+.pg-plus-tab-btn:hover {
+  background: var(--st-accent, #6c5ce7);
+  color: #000;
+  transform: scale(1.08);
+  box-shadow: 0 0 12px var(--st-accent, #6c5ce7);
+}
+
+.tab-close-x {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  opacity: 0.55;
+  font-size: 13px;
+  padding: 0 3px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tab-close-x:hover {
+  opacity: 1;
+  background: rgba(248, 81, 73, 0.25);
+  color: #ff5f56;
+}
+
+.py-dot {
+  background: #168f6a;
+}
+
+.quick-ext-chip {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--purple);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font: 600 11px 'DM Mono', monospace;
+  cursor: pointer;
+}
+
+.quick-ext-chip:hover {
+  background: var(--purple);
+  color: #fff;
+}
+
+/* رفع النافذة المنبثقة لتظهر فوق الفول سكرين عند الضغط على (+) */
+.modal-backdrop {
+  z-index: 10005 !important;
+}
+/* تلوين زرار التحكم في الاقتراح التلقائي وأيقونات اللغات */
+.autocomplete-toggle-btn {
+  border: 1px solid var(--st-border) !important;
+  transition: all 0.25s ease;
+}
+
+.autocomplete-toggle-btn.active {
+  background: rgba(0, 242, 254, 0.14) !important;
+  border-color: var(--st-accent) !important;
+  color: var(--st-accent) !important;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+}
+
+.cpp-dot {
+  background: #00599c;
+  box-shadow: 0 0 6px #00599c;
+}
