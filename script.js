@@ -2283,32 +2283,52 @@ if (btn) {
   /* ==========================================================================
    * 5. SMART ERROR DETECTOR & AUTO-FIX DIAGNOSTICS ENGINE (ARABIC + ENGLISH)
    * ========================================================================== */
-  function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
+function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
     const diagnostics = [];
 
     if (mode === 'python') {
-      const lines = htmlCode.split('\n');
+      const lines = String(htmlCode || '').split('\n');
       lines.forEach((line, idx) => {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith('#')) return;
-        if (/^(if|else|elif|def|for|while)\b/.test(trimmed) && !trimmed.endsWith(':')) {
+        const withoutComment = line.replace(/#.*$/, '');
+        const trimmed = withoutComment.trim();
+        if (!trimmed) return;
+
+        // فحص علامات التنصيص غير المغلقة
+        const dblQuotes = (withoutComment.match(/(?<!\\)"/g) || []).length;
+        const sglQuotes = (withoutComment.match(/(?<!\\)'/g) || []).length;
+        if (dblQuotes % 2 !== 0 || sglQuotes % 2 !== 0) {
+          const qChar = dblQuotes % 2 !== 0 ? '"' : "'";
+          diagnostics.push({
+            severity: 'error',
+            line: idx + 1,
+            title: `SyntaxError (Line ${idx + 1}): Unclosed string literal ${qChar}`,
+            explainAr: `بالمصري: في السطر ${idx + 1} فتحت علامة تنصيص (${qChar}) للنص بس نسيت تقفلها في آخر السطر.`,
+            explainEn: `Unclosed string quote ${qChar} on line ${idx + 1}.`,
+            fixedCode: lines.map((l, i) => (i === idx ? l + qChar : l)).join('\n')
+          });
+        }
+
+        // فحص النقطتين (:) بعد الجمل الشرطية والدوال والحلقات
+        if (/^(if|else|elif|def|for|while|class|try|except|finally)\b/.test(trimmed) && !trimmed.endsWith(':')) {
           diagnostics.push({
             severity: 'error',
             line: idx + 1,
             title: `SyntaxError (Line ${idx + 1}): Missing colon ':'`,
-            explainAr: `بالمصري: في السطر ${idx + 1} نسيت تحط النقطتين فوق بعض (:) في آخر جملة الـ ${trimmed.split(/\s+/)[0]}. في لغة بايثون أي جملة شرط أو دالة لازم تنتهي بـ (:).`,
+            explainAr: `بالمصري: في السطر ${idx + 1} نسيت تحط النقطتين فوق بعض (:) في آخر جملة الـ ${trimmed.split(/\s+/)[0]}. في لغة بايثون أي جملة شرط أو دالة أو حلقة لازم تنتهي بـ (:).`,
             explainEn: `Python requires a colon ':' at the end of '${trimmed.split(/\s+/)[0]}' statements.`,
-            fixedCode: lines.map((l, i) => (i === idx ? l + ':' : l)).join('\n')
+            fixedCode: lines.map((l, i) => (i === idx ? l.replace(/\s*$/, ':') : l)).join('\n')
           });
         }
-        if (/\bpritn\s*\(|\bpirnt\s*\(|\bprnt\s*\(/i.test(trimmed)) {
+
+        // فحص الأخطاء الإملائية لدالة print
+        if (/\b(pritn|pirnt|prnt|Pint|Print)\s*\(/.test(trimmed)) {
           diagnostics.push({
             severity: 'error',
             line: idx + 1,
             title: `NameError (Line ${idx + 1}): Misspelled 'print' function`,
-            explainAr: `بالمصري: كتبت اسم دالة الطباعة غلط في السطر ${idx + 1}. الاسم الصح هو print().`,
-            explainEn: `Did you mean 'print()'? Check the spelling of the function name.`,
-            fixedCode: htmlCode.replace(/\b(pritn|pirnt|prnt)\s*\(/gi, 'print(')
+            explainAr: `بالمصري: كتبت اسم دالة الطباعة غلط في السطر ${idx + 1}. الاسم الصح في بايثون هو print() بحروف صغيرة.`,
+            explainEn: `Did you mean 'print()'? Check the spelling and case of the function name.`,
+            fixedCode: htmlCode.replace(/\b(pritn|pirnt|prnt|Pint|Print)\s*\(/g, 'print(')
           });
         }
       });
@@ -2317,6 +2337,12 @@ if (btn) {
 
     // --- A. HTML DIAGNOSTICS ---
     if (htmlCode && htmlCode.trim()) {
+      // عزل محتوى <script> و <style> والتعليقات حتى لا تتداخل مع فحص وسوم HTML
+      const htmlWithoutScriptsOrComments = htmlCode
+        .replace(/<!--[\s\S]*?-->/g, (m) => ' '.repeat(m.length))
+        .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, (m) => '<script></script>' + '\n'.repeat((m.match(/\n/g) || []).length))
+        .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, (m) => '<style></style>' + '\n'.repeat((m.match(/\n/g) || []).length));
+
       // 1. Common tag name typos
       const tagTypos = {
         'heder': 'header',
@@ -2338,7 +2364,7 @@ if (btn) {
       Object.keys(tagTypos).forEach((wrong) => {
         const right = tagTypos[wrong];
         const regex = new RegExp(`<\\/?${wrong}\\b`, 'i');
-        if (regex.test(htmlCode)) {
+        if (regex.test(htmlWithoutScriptsOrComments)) {
           diagnostics.push({
             severity: 'error',
             file: 'HTML',
@@ -2355,8 +2381,8 @@ if (btn) {
       containerTags.forEach((tag) => {
         const openRegex = new RegExp(`<${tag}(\\s+[^>]*)?>`, 'gi');
         const closeRegex = new RegExp(`</${tag}\\s*>`, 'gi');
-        const opens = (htmlCode.match(openRegex) || []).length;
-        const closes = (htmlCode.match(closeRegex) || []).length;
+        const opens = (htmlWithoutScriptsOrComments.match(openRegex) || []).length;
+        const closes = (htmlWithoutScriptsOrComments.match(closeRegex) || []).length;
         if (opens > closes) {
           diagnostics.push({
             severity: 'error',
@@ -2378,12 +2404,11 @@ if (btn) {
         }
       });
 
-      // 3. Broken bracket (e.g. <h1 Hello</h1>)
-      const lines = htmlCode.split('\n');
-      lines.forEach((line, i) => {
-        const openBrackets = (line.match(/</g) || []).length;
-        const closeBrackets = (line.match(/>/g) || []).length;
-        if (openBrackets > closeBrackets) {
+      // 3. Broken bracket (e.g. <h1 Hello</h1>) inside HTML only
+      const htmlLines = htmlWithoutScriptsOrComments.split('\n');
+      const rawHtmlLines = htmlCode.split('\n');
+      htmlLines.forEach((line, i) => {
+        if (/<[^<>]*</.test(line) || (line.includes('<') && !line.includes('>') && !/^\s*<[a-zA-Z0-9-]+\s*$/.test(line))) {
           diagnostics.push({
             severity: 'error',
             file: 'HTML',
@@ -2391,13 +2416,13 @@ if (btn) {
             title: `Syntax Error (Line ${i + 1}): Missing closing angle bracket '>'`,
             explainAr: `بالمصري: في السطر رقم ${i + 1} فتحت قوس تاج '<' بس نسيت تقفله بعلامة أكبر من '>'.`,
             explainEn: `Line ${i + 1} has an unclosed angle bracket '<'. Add '>' to complete the tag.`,
-            fixedCode: lines.map((l, idx) => (idx === i ? l + '>' : l)).join('\n')
+            fixedCode: rawHtmlLines.map((l, idx) => (idx === i ? l + '>' : l)).join('\n')
           });
         }
       });
 
       // 4. Accessibility & Attribute warnings (e.g., <img> without alt)
-      if (/<img\b(?![^>]*\balt=)[^>]*>/i.test(htmlCode)) {
+      if (/<img\b(?![^>]*\balt=)[^>]*>/i.test(htmlWithoutScriptsOrComments)) {
         diagnostics.push({
           severity: 'warn',
           file: 'HTML',
@@ -2427,7 +2452,6 @@ if (btn) {
         });
       }
 
-      // Common CSS property typos
       const cssTypos = {
         'colr': 'color',
         'backgroud': 'background',
@@ -2446,7 +2470,7 @@ if (btn) {
             title: `CSS Property Typo: '${typo}' is invalid`,
             explainAr: `بالمصري: خاصية الـ CSS اللي كتبتها (${typo}) فيها غلطة إملائية، والصح بتاعها هو (${right}:).`,
             explainEn: `Unknown CSS property '${typo}'. Did you mean '${right}'?`,
-            fixedCode: (htmlCode || '').replace(new RegExp(`\\b${typo}(\\s*:)`, 'gi'), `${right}$1`)
+            fixedCode: (htmlCode || cssCode || '').replace(new RegExp(`\\b${typo}(\\s*:)`, 'gi'), `${right}$1`)
           });
         }
       });
@@ -2459,12 +2483,14 @@ if (btn) {
       try {
         new Function(activeJs);
       } catch (syntaxErr) {
+        const autoFixedJs = buildSmartAutoFixedCode(activeJs, 'javascript');
         diagnostics.push({
           severity: 'error',
-          file: 'JS',
+          file: jsCode ? 'JS' : 'HTML',
           title: `JavaScript SyntaxError: ${syntaxErr.message}`,
           explainAr: `بالمصري: فيه خطأ في قواعد كتابة الجافاسكريبت (${syntaxErr.message}). اتأكد من قفل الأقواس () أو {} وعلامات التنصيص "".`,
-          explainEn: `JavaScript could not be parsed: ${syntaxErr.message}. Check your parentheses, brackets, and quotes.`
+          explainEn: `JavaScript could not be parsed: ${syntaxErr.message}. Check your parentheses, brackets, and quotes.`,
+          fixedCode: jsCode ? autoFixedJs : htmlCode.replace(/<script([^>]*)>[\s\S]*?<\/script>/i, `<script$1>\n${autoFixedJs}\n</script>`)
         });
       }
     }
@@ -3529,10 +3555,29 @@ usingMonaco = true;
     if (f2 && !document.getElementById('vscode-studio-modal')?.hidden) f2.srcdoc = docStr;
   }
 
-// دالة إصلاح شامل ذكي لأي كود به أقواس ناقصة أو زائدة أو علامات تنصيص أو فصلات منقوطة
+// دالة إصلاح شامل ذكي لأي كود به أقواس ناقصة أو زائدة أو علامات تنصيص أو فصلات منقوطة أو أخطاء إملائية
   function buildSmartAutoFixedCode(code, lang) {
-    let fixed = String(code || '');
-    // 1. إزالة أي ); أو ) شاردة بعد قوس إغلاق الكلاس الأخير } في Java / C++ / C#
+    let fixed = String(code || '').replace(/\u00A0/g, ' ');
+
+    // 1. تصحيح الأخطاء الإملائية الشائعة حسب اللغة
+    if (lang === 'java') {
+      fixed = fixed.replace(/\bsystem\.out\./gi, 'System.out.');
+      fixed = fixed.replace(/System\.out\.(?:pritnln|pirntln|prntln|printl|Println)\s*\(/g, 'System.out.println(');
+      fixed = fixed.replace(/System\.out\.(?:pritn|pirnt|prnt|Print)\s*\(/g, 'System.out.print(');
+      fixed = fixed.replace(/\bstring(\s+[a-zA-Z_]\w*)/g, 'String$1');
+      fixed = fixed.replace(/\bbool(\s+[a-zA-Z_]\w*)/g, 'boolean$1');
+    } else if (lang === 'csharp') {
+      fixed = fixed.replace(/\bconsole\.writeline\s*\(/gi, 'Console.WriteLine(');
+      fixed = fixed.replace(/\bconsole\.write\s*\(/gi, 'Console.Write(');
+    } else if (lang === 'cpp' || lang === 'c') {
+      fixed = fixed.replace(/\bcout\s*>>/g, 'cout <<');
+      fixed = fixed.replace(/\bcin\s*<</g, 'cin >>');
+      fixed = fixed.replace(/\b(?:pritnf|pirntf|Printf)\s*\(/g, 'printf(');
+    } else if (lang === 'python') {
+      fixed = fixed.replace(/\b(pritn|pirnt|prnt|Pint|Print)\s*\(/g, 'print(');
+    }
+
+    // 2. إزالة أي ); أو ) شاردة بعد قوس إغلاق الكلاس الأخير }
     if (lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') {
       fixed = fixed.replace(/\}\s*\)\s*;?\s*$/, '}');
     }
@@ -3545,17 +3590,25 @@ usingMonaco = true;
       const trimmed = codePart.trim();
       if (!trimmed) return rawLine;
 
-      // إصلاح علامة تنصيص مزدوجة مفتوحة في نفس السطر
+      // إصلاح علامة تنصيص مزدوجة أو مفردة مفتوحة في نفس السطر
       const doubleQuotes = (codePart.match(/(?<!\\)"/g) || []).length;
       if (doubleQuotes % 2 !== 0) {
         if (codePart.trimEnd().endsWith(';')) {
           codePart = codePart.replace(/;\s*$/, '";');
         } else {
-          codePart += '"';
+          codePart = codePart.trimEnd() + '"';
         }
       }
 
-      // إصلاح الأقواس الدائرية ( ) غير المتوازنة في نفس السطر (مثل System.out.println("..." ;)
+      // إصلاح النقطتين (:) في بايثون
+      if (lang === 'python') {
+        const tPy = codePart.trim();
+        if (/^(if|else|elif|def|for|while|class|try|except|finally)\b/.test(tPy) && !tPy.endsWith(':')) {
+          codePart = codePart.replace(/\s*$/, ':');
+        }
+      }
+
+      // إصلاح الأقواس الدائرية ( ) غير المتوازنة في نفس السطر
       const withoutStrings = codePart.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
       const openP = (withoutStrings.match(/\(/g) || []).length;
       const closeP = (withoutStrings.match(/\)/g) || []).length;
@@ -3568,8 +3621,12 @@ usingMonaco = true;
         } else {
           codePart = codePart.trimEnd() + missingClose;
         }
-      } else if (closeP > openP && /^\s*\}\s*\)\s*;?\s*$/.test(codePart)) {
-        codePart = codePart.replace(/\)\s*;?/, '');
+      } else if (closeP > openP) {
+        let extra = closeP - openP;
+        while (extra > 0 && /\)\s*;?\s*$/.test(codePart)) {
+          codePart = codePart.replace(/\)\s*(;?\s*)$/, '$1');
+          extra--;
+        }
       }
 
       // إصلاح الفصلة المنقوطة الناقصة في Java / C++ / C / C#
@@ -3587,9 +3644,12 @@ usingMonaco = true;
           t.endsWith('}') ||
           t.endsWith(':') ||
           t.endsWith(',') ||
-          /^(public|private|protected|class|interface|enum|struct|namespace|if|else|for|while|do|switch|try|catch|finally|void|int|double|float|String|char|bool|boolean|static)\b.*\(.*\)\s*$/.test(t) ||
-          /^(public\s+|private\s+|abstract\s+|final\s+)?(class|interface|enum|struct|namespace)\b/.test(t) ||
-          /^else\b/.test(t);
+          t.endsWith('+') ||
+          t.endsWith('(') ||
+          /^(?:public|private|protected|static|final|abstract|synchronized|virtual|inline|\s)*[a-zA-Z_]\w*(?:<[^>]+>)?(?:\[\])?\s+[a-zA-Z_]\w*\s*\([^;]*\)\s*$/.test(t) ||
+          /^(?:public|private|protected)?\s*[A-Z]\w*\s*\([^;]*\)\s*$/.test(t) ||
+          /^(?:public\s+|private\s+|abstract\s+|final\s+)*(?:class|interface|enum|struct|namespace)\b/.test(t) ||
+          /^(?:if|else|for|while|do|switch|try|catch|finally)\b/.test(t);
 
         if (!isHeaderOrBrace) {
           codePart = codePart.replace(/\s*$/, ';');
@@ -3603,44 +3663,56 @@ usingMonaco = true;
 
     // موازنة أقواس المجموعة { } في نهاية الملف
     if (lang !== 'python' && lang !== 'sql') {
-      const cleanAll = result.replace(/\/\/.*$/gm, '').replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
+      const cleanAll = result
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/\/\/.*$/gm, '')
+        .replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
       const openC = (cleanAll.match(/\{/g) || []).length;
       const closeC = (cleanAll.match(/\}/g) || []).length;
       if (openC > closeC) {
         result += '\n' + '}\n'.repeat(openC - closeC);
+      } else if (closeC > openC) {
+        let extraC = closeC - openC;
+        while (extraC > 0 && /\}\s*$/.test(result)) {
+          result = result.replace(/\}\s*$/, '');
+          extraC--;
+        }
       }
     }
 
     return result;
   }
 
-  // 2. فاحص الأخطاء ومُشغّل اللغات الحقيقي (Java OOP, C++, C, Python, C#, PHP, TypeScript, SQL)
+  // 2. فاحص الأخطاء البرمجية الدقيقة لكل اللغات (Java, C++, C, Python, C#, PHP, TypeScript, SQL)
   function checkTerminalSyntaxAndSuggestFix(code, info) {
     const lang = info.lang;
-    const rawLines = String(code || '').split('\n');
+    // تفريغ التعليقات متعددة الأسطر مع الحفاظ على أرقام الأسطر
+    const codeNoBlockComments = String(code || '').replace(/\/\*[\s\S]*?\*\//g, (m) =>
+      '\n'.repeat((m.match(/\n/g) || []).length)
+    );
+    const rawLines = codeNoBlockComments.split('\n');
     const diagnostics = [];
     const smartFixedAll = buildSmartAutoFixedCode(code, lang);
 
-    // أ) فحص وجود `});` شاردة في نهاية الكلاس (مثل خطأ الصورة بالضبط!)
-    if ((lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') && /\}\s*\)\s*;?\s*$/.test(code)) {
+    // أ) فحص وجود `});` شاردة في نهاية الكلاس
+    if ((lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') && /\}\s*\)\s*;?\s*$/.test(codeNoBlockComments)) {
       diagnostics.push({
         file: state.activePlaygroundFile,
         severity: 'error',
         line: rawLines.length,
         title: `SyntaxError (Line ${rawLines.length}): Stray ');' after closing class brace '}'`,
-        explainAr: `بالمصري: في السطر الأخير قفلت الكلاس بـ '});' بدل '}' لوحدها، وفيه قوس ناقص في جملة الطباعة فوق!`,
+        explainAr: `بالمصري: في السطر الأخير قفلت الكلاس بـ '});' بدل '}' لوحدها، أو فيه قوس ناقص في جملة الطباعة فوق!`,
         explainEn: `Unexpected ');' after class closing brace '}'.`,
-        suggestionAr: `حذف ');' الزائدة من نهاية الكلاس وإغلاق قوس الطباعة ')' في مكانه الصحيح قبل الفصلة المنقوطة.`,
+        suggestionAr: `اضغط على زر الإصلاح بالأسفل لحذف ');' الزائدة وموازنة الأقواس تلقائياً.`,
         fixedCode: smartFixedAll
       });
     }
 
-    // ب) فحص الأقواس الدائرية ( ) وعلامات التنصيص سطراً بسطر!
+    // ب) فحص الأقواس الدائرية ( ) وعلامات التنصيص سطراً بسطر
     rawLines.forEach((rawLine, idx) => {
       const withoutComment = rawLine.replace(/\/\/.*$/, '').replace(/#.*$/, '');
       if (!withoutComment.trim()) return;
 
-      // فحص علامات التنصيص غير المغلقة في السطر
       const quotesCount = (withoutComment.match(/(?<!\\)"/g) || []).length;
       if (quotesCount % 2 !== 0) {
         diagnostics.push({
@@ -3655,7 +3727,6 @@ usingMonaco = true;
         });
       }
 
-      // فحص قوس '(' مفتوح في السطر بدون ')' قبل الفصلة المنقوطة (مثل System.out.println("Total salary: " ;)
       const cleanLine = withoutComment.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
       const lineOpenP = (cleanLine.match(/\(/g) || []).length;
       const lineCloseP = (cleanLine.match(/\)/g) || []).length;
@@ -3664,10 +3735,10 @@ usingMonaco = true;
           file: state.activePlaygroundFile,
           severity: 'error',
           line: idx + 1,
-          title: `SyntaxError (Line ${idx + 1}): missing ')' before ';' in argument list`,
-          explainAr: `بالمصري: في السطر رقم ${idx + 1} فتحت قوس '(' في جملة (${ withoutComment.trim() }) بس نسيت تقفله بـ ')' قبل الفصلة المنقوطة!`,
+          title: `SyntaxError (Line ${idx + 1}): missing ')' before ';'`,
+          explainAr: `بالمصري: في السطر رقم ${idx + 1} فتحت قوس '(' في جملة (${withoutComment.trim()}) بس نسيت تقفله بـ ')'!`,
           explainEn: `Missing closing parenthesis ')' on line ${idx + 1}.`,
-          suggestionAr: `إضافة القوس ')' قبل الفصلة المنقوطة ';' في السطر رقم ${idx + 1}.`,
+          suggestionAr: `إضافة القوس ')' الناقص في السطر رقم ${idx + 1}.`,
           fixedCode: smartFixedAll
         });
       } else if (lineCloseP > lineOpenP) {
@@ -3678,40 +3749,42 @@ usingMonaco = true;
           title: `SyntaxError (Line ${idx + 1}): extra closing parenthesis ')'`,
           explainAr: `بالمصري: في السطر رقم ${idx + 1} فيه قوس إغلاق ')' زيادة ملوش قوس فتح مقابله في نفس السطر.`,
           explainEn: `Unmatched closing parenthesis ')' on line ${idx + 1}.`,
-          suggestionAr: `موازنة الأقواس في السطر رقم ${idx + 1}.`,
+          suggestionAr: `حذف القوس ')' الزائد في السطر رقم ${idx + 1}.`,
           fixedCode: smartFixedAll
         });
       }
     });
 
     // ج) فحص توازن أقواس المجموعة { } في الملف كله
-    let openCurly = 0, closeCurly = 0;
-    rawLines.forEach((l) => {
-      const clean = l.replace(/\/\/.*$/, '').replace(/#.*$/, '').replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
-      openCurly += (clean.match(/\{/g) || []).length;
-      closeCurly += (clean.match(/\}/g) || []).length;
-    });
+    if (lang !== 'python' && lang !== 'sql') {
+      let openCurly = 0, closeCurly = 0;
+      rawLines.forEach((l) => {
+        const clean = l.replace(/\/\/.*$/, '').replace(/#.*$/, '').replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '');
+        openCurly += (clean.match(/\{/g) || []).length;
+        closeCurly += (clean.match(/\}/g) || []).length;
+      });
 
-    if (openCurly > closeCurly) {
-      diagnostics.push({
-        file: state.activePlaygroundFile,
-        severity: 'error',
-        title: `SyntaxError: Missing ${openCurly - closeCurly} closing curly brace(s) '}'`,
-        explainAr: `بالمصري: فتحت قوس مجموعة '{' في الكود ونسيت تقفله بـ '}' (ناقص ${openCurly - closeCurly} قوس إغلاق).`,
-        explainEn: `Unbalanced curly braces: ${openCurly} '{' opened vs ${closeCurly} '}' closed.`,
-        suggestionAr: `إضافة '${'}'.repeat(openCurly - closeCurly)}' في نهاية الكود لقفل البلوكات المفتوحة.`,
-        fixedCode: smartFixedAll
-      });
-    } else if (closeCurly > openCurly) {
-      diagnostics.push({
-        file: state.activePlaygroundFile,
-        severity: 'error',
-        title: `SyntaxError: Extra closing curly brace '}' found`,
-        explainAr: `بالمصري: فيه قوس إغلاق '}' زيادة في الكود ملوش قوس فتح '{' مقابله.`,
-        explainEn: `Found ${closeCurly} '}' but only ${openCurly} '{'.`,
-        suggestionAr: `حذف قوس الإغلاق '}' الزائد من الكود.`,
-        fixedCode: code.replace(/\}\s*$/, '')
-      });
+      if (openCurly > closeCurly) {
+        diagnostics.push({
+          file: state.activePlaygroundFile,
+          severity: 'error',
+          title: `SyntaxError: Missing ${openCurly - closeCurly} closing curly brace(s) '}'`,
+          explainAr: `بالمصري: فتحت قوس مجموعة '{' في الكود ونسيت تقفله بـ '}' (ناقص ${openCurly - closeCurly} قوس إغلاق).`,
+          explainEn: `Unbalanced curly braces: ${openCurly} '{' opened vs ${closeCurly} '}' closed.`,
+          suggestionAr: `إضافة '${'}'.repeat(openCurly - closeCurly)}' في نهاية الكود لقفل البلوكات المفتوحة.`,
+          fixedCode: smartFixedAll
+        });
+      } else if (closeCurly > openCurly) {
+        diagnostics.push({
+          file: state.activePlaygroundFile,
+          severity: 'error',
+          title: `SyntaxError: Extra closing curly brace '}' found`,
+          explainAr: `بالمصري: فيه قوس إغلاق '}' زيادة في الكود ملوش قوس فتح '{' مقابله.`,
+          explainEn: `Found ${closeCurly} '}' but only ${openCurly} '{'.`,
+          suggestionAr: `حذف قوس الإغلاق '}' الزائد من الكود.`,
+          fixedCode: smartFixedAll
+        });
+      }
     }
 
     // د) فحص أخطاء Python
@@ -3719,7 +3792,7 @@ usingMonaco = true;
       rawLines.forEach((rawLine, idx) => {
         const trimmed = rawLine.replace(/#.*$/, '').trim();
         if (!trimmed) return;
-        if (/^(if|else|elif|def|for|while|class)\b/.test(trimmed) && !trimmed.endsWith(':')) {
+        if (/^(if|else|elif|def|for|while|class|try|except|finally)\b/.test(trimmed) && !trimmed.endsWith(':')) {
           diagnostics.push({
             file: state.activePlaygroundFile,
             severity: 'error',
@@ -3728,7 +3801,7 @@ usingMonaco = true;
             explainAr: `بالمصري: في السطر رقم ${idx + 1} نسيت تحط النقطتين فوق بعض (:) في آخر جملة ${trimmed.split(/\s+/)[0]}.`,
             explainEn: `Python requires ':' at the end of block headers (if, for, def, class).`,
             suggestionAr: `إضافة ':' في نهاية السطر رقم ${idx + 1}.`,
-            fixedCode: rawLines.map((l, i) => (i === idx ? l.replace(/\s*$/, ':') : l)).join('\n')
+            fixedCode: smartFixedAll
           });
         }
         if (/\b(pritn|pirnt|prnt|Pint|Print)\s*\(/.test(trimmed)) {
@@ -3740,7 +3813,7 @@ usingMonaco = true;
             explainAr: `بالمصري: في السطر رقم ${idx + 1} كتبت دالة الطباعة غلط، والصحيح في بايثون هو print() بحروف صغيرة.`,
             explainEn: `Function 'print' is misspelled or capitalized on line ${idx + 1}.`,
             suggestionAr: `تصحيح اسم الدالة إلى print(...) في السطر ${idx + 1}.`,
-            fixedCode: code.replace(/\b(pritn|pirnt|prnt|Pint|Print)\s*\(/g, 'print(')
+            fixedCode: smartFixedAll
           });
         }
       });
@@ -3753,16 +3826,16 @@ usingMonaco = true;
         if (!clean || clean.startsWith('#') || clean.startsWith('@') || clean.startsWith('/*') || clean.startsWith('*')) return;
 
         if (lang === 'java') {
-          if (/\bsystem\.out\./.test(clean)) {
+          if (/\bsystem\.out\./.test(clean) || /System\.out\.(?:pritnln|pirntln|prntln|printl|Println|pritn|pirnt)\s*\(/.test(clean)) {
             diagnostics.push({
               file: state.activePlaygroundFile,
               severity: 'error',
               line: idx + 1,
-              title: `Compiler Error (Line ${idx + 1}): package system does not exist`,
-              explainAr: `بالمصري: في السطر ${idx + 1} كتبت كلمة system بحرف s صغير، وفي لغة الجافا لازم تبدأ بحرف كبير System.out.println.`,
-              explainEn: `Java is case-sensitive. Use 'System.out.println' with an uppercase 'S'.`,
-              suggestionAr: `تحويل system.out إلى System.out.`,
-              fixedCode: code.replace(/\bsystem\.out\./g, 'System.out.')
+              title: `Compiler Error (Line ${idx + 1}): Invalid System.out print statement`,
+              explainAr: `بالمصري: في السطر ${idx + 1} فيه غلطة في كتابة جملة الطباعة، والصحيح في الجافا هو System.out.println(...) بحرف S كابيتال.`,
+              explainEn: `Use 'System.out.println(...)' or 'System.out.print(...)'.`,
+              suggestionAr: `تصحيح جملة الطباعة إلى System.out.println.`,
+              fixedCode: smartFixedAll
             });
           }
           if (/\bstring\s+[a-zA-Z_]\w*/.test(clean)) {
@@ -3774,9 +3847,22 @@ usingMonaco = true;
               explainAr: `بالمصري: في السطر ${idx + 1} كتبت نوع النص string بحرف s صغير، وفي الجافا لازم يتكتب String بحرف S كابيتال.`,
               explainEn: `In Java, 'String' is a class and must start with an uppercase 'S'.`,
               suggestionAr: `تحويل كلمة string إلى String.`,
-              fixedCode: code.replace(/\bstring(\s+[a-zA-Z_]\w*)/g, 'String$1')
+              fixedCode: smartFixedAll
             });
           }
+        }
+
+        if (lang === 'csharp' && /\bconsole\.(?:writeline|write)\s*\(/i.test(clean) && !/\bConsole\.(?:WriteLine|Write)\s*\(/.test(clean)) {
+          diagnostics.push({
+            file: state.activePlaygroundFile,
+            severity: 'error',
+            line: idx + 1,
+            title: `Compiler Error (Line ${idx + 1}): C# is case-sensitive ('Console.WriteLine')`,
+            explainAr: `بالمصري: في السطر ${idx + 1} كتبت جملة الطباعة بحروف صغيرة، وفي C# لازم تتكتب Console.WriteLine.`,
+            explainEn: `Use 'Console.WriteLine(...)' with proper capitalization in C#.`,
+            suggestionAr: `تصحيحها إلى Console.WriteLine.`,
+            fixedCode: smartFixedAll
+          });
         }
 
         if (lang === 'cpp' && /\bcout\s*>>/.test(clean)) {
@@ -3784,11 +3870,11 @@ usingMonaco = true;
             file: state.activePlaygroundFile,
             severity: 'error',
             line: idx + 1,
-            title: `Compiler Error (Line ${idx + 1}): invalid operands to binary expression ('ostream' and '>>')`,
+            title: `Compiler Error (Line ${idx + 1}): invalid operator '>>' with 'cout'`,
             explainAr: `بالمصري: في السطر ${idx + 1} استخدمت علامة '>>' مع cout، والصح إن cout بتاخد علامة الأصغر من مرتين '<<'.`,
             explainEn: `Use the insertion operator '<<' with cout instead of '>>'.`,
             suggestionAr: `تغيير 'cout >>' إلى 'cout <<'.`,
-            fixedCode: code.replace(/\bcout\s*>>/g, 'cout <<')
+            fixedCode: smartFixedAll
           });
         }
 
@@ -3800,9 +3886,10 @@ usingMonaco = true;
           clean.endsWith(',') ||
           clean.endsWith('+') ||
           clean.endsWith('(') ||
-          /^(public|private|protected|class|interface|enum|struct|namespace|if|else|for|while|do|switch|try|catch|finally|void|int|double|float|String|char|bool|boolean|static)\b.*\(.*\)\s*$/.test(clean) ||
-          /^(public\s+|private\s+|abstract\s+|final\s+)?(class|interface|enum|struct|namespace)\b/.test(clean) ||
-          /^else\b/.test(clean);
+          /^(?:public|private|protected|static|final|abstract|synchronized|virtual|inline|\s)*[a-zA-Z_]\w*(?:<[^>]+>)?(?:\[\])?\s+[a-zA-Z_]\w*\s*\([^;]*\)\s*$/.test(clean) ||
+          /^(?:public|private|protected)?\s*[A-Z]\w*\s*\([^;]*\)\s*$/.test(clean) ||
+          /^(?:public\s+|private\s+|abstract\s+|final\s+)*(?:class|interface|enum|struct|namespace)\b/.test(clean) ||
+          /^(?:if|else|for|while|do|switch|try|catch|finally)\b/.test(clean);
 
         if (!isBlockOrHeader) {
           diagnostics.push({
@@ -3822,26 +3909,50 @@ usingMonaco = true;
     return diagnostics;
   }
 
-// مترجم ومشغل فعلي كامل لـ Java / C++ / C# / Python (يفصل رأس الدالة عن جسمها ويدعم الـ OOP والـ Inheritance والـ super)
+  // تحويل أقواس المصفوفات {1, 2, 3} إلى [1, 2, 3]
+  function convertBracedArrayLiteral(expr) {
+    let s = String(expr || '').trim();
+    while (/\{[^{}]*\}/.test(s)) {
+      s = s.replace(/\{([^{}]*)\}/g, '[$1]');
+    }
+    return s;
+  }
+
+  // تقسيم تعريفات المتغيرات المفصولة بفاصلة مثل: int w, h = 5, z
+  function splitTopLevelDeclarators(declStr) {
+    const parts = [];
+    let current = '';
+    let depth = 0;
+    for (let i = 0; i < declStr.length; i++) {
+      const ch = declStr[i];
+      if (ch === '(' || ch === '[' || ch === '{' || ch === '<') depth++;
+      else if (ch === ')' || ch === ']' || ch === '}' || ch === '>') depth = Math.max(0, depth - 1);
+      if (ch === ',' && depth === 0) {
+        if (current.trim()) parts.push(current.trim());
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+    if (current.trim()) parts.push(current.trim());
+    return parts;
+  }
+
+  // مترجم ومشغل فعلي كامل لـ Java / C# / C++ / C / Python / PHP / TypeScript
   function transpileAndRunOOPCode(code, lang) {
     const outputs = [];
-    // تنظيف المسافات غير القياسية (\u00A0) التي تأتي عند نسخ الكود
     const normalizedInput = String(code || '').replace(/\u00A0/g, ' ');
 
+    // =========================================================================
+    // A. محرك تشغيل Java و C# الكامل (يدعم OOP, Constructor Chaining this(), super(), Overloading, Arrays)
+    // =========================================================================
     if (lang === 'java' || lang === 'csharp') {
       let src = normalizedInput;
       src = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       src = src.replace(/^\s*(package|import|using)\s+[^;]+;/gm, '');
       src = src.replace(/@[a-zA-Z_]\w*(?:\s*\([^)]*\))?/g, '');
 
-      // تتبع الحقول والدوال من نوع double/float لطباعة .0 مطابقة لـ Java الحقيقي
       const doubleMembers = new Set();
-      const doubleDeclRegex = /\b(?:double|float)\s+([a-zA-Z_]\w*)\b/g;
-      let dm;
-      while ((dm = doubleDeclRegex.exec(src)) !== null) {
-        doubleMembers.add(dm[1]);
-      }
-
       const classRegex = /(?:public\s+|private\s+|protected\s+|abstract\s+|final\s+|static\s+)*class\s+([a-zA-Z_]\w*)(?:\s+(?:extends|:)\s+([a-zA-Z_]\w*))?(?:\s+implements\s+[^{]+)?\s*\{/g;
       const classes = [];
       let match;
@@ -3861,30 +3972,20 @@ usingMonaco = true;
         classes.push({ className, parentName, body });
       }
 
-      // جمع أسماء الحقول والدوال في الكلاسات لربطها بـ this داخل جسم الدوال فقط
-      const allClassMembers = new Set();
-      classes.forEach((cls) => {
-        const fRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|var)\s+([a-zA-Z_]\w*)\s*(?:=\s*[^;]+)?;/g;
-        let fm;
-        while ((fm = fRegex.exec(cls.body)) !== null) {
-          allClassMembers.add(fm[1]);
-        }
-        const mRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:void|String|int|double|float|boolean|bool|char|long|[a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)\s*\(/g;
-        let mm;
-        while ((mm = mRegex.exec(cls.body)) !== null) {
-          if (mm[1] !== cls.className && mm[1] !== 'main' && mm[1] !== 'Main') {
-            allClassMembers.add(mm[1]);
-          }
-        }
-      });
-
+      const classMembersMap = {};
+      const parsedClasses = [];
       let mainBodyJS = '';
-      const jsClasses = [];
+      let mainClassName = null;
 
       classes.forEach((cls) => {
         let b = cls.body;
+        const clsMembers = new Set();
+        classMembersMap[cls.className] = clsMembers;
 
-        // 1. استخراج دالة main إن وجدت داخل الكلاس
+        // إزالة خصائص C# التلقائية { get; set; } وتحويلها لحقول قياسية
+        b = b.replace(/\{\s*get\s*;\s*set\s*;\s*\}/g, ';');
+
+        // 1. استخراج دالة main إن وجدت
         const mainRegex = /(?:public\s+|private\s+|protected\s+|static\s+|final\s+)*void\s+(?:main|Main)\s*\([^)]*\)\s*\{/;
         const mainMatch = mainRegex.exec(b);
         if (mainMatch) {
@@ -3896,10 +3997,11 @@ usingMonaco = true;
             k++;
           }
           mainBodyJS = b.slice(mStart, k - 1);
+          mainClassName = cls.className;
           b = b.slice(0, mainMatch.index) + b.slice(k);
         }
 
-        // 2. استخراج الـ Constructors (التي تحمل نفس اسم الكلاس)
+        // 2. استخراج جميع الـ Constructors الخاصة بالكلاس
         const constructors = [];
         const ctorRegex = new RegExp(`(?:public|private|protected)?\\s*\\b${cls.className}\\s*\\(([^)]*)\\)\\s*\\{`, 'g');
         let cm;
@@ -3918,18 +4020,19 @@ usingMonaco = true;
           const cBody = b.slice(cStart, k - 1);
           constructors.push({ paramNames, cBody, start: cm.index, end: k });
         }
-
         for (let idx = constructors.length - 1; idx >= 0; idx--) {
           b = b.slice(0, constructors[idx].start) + b.slice(constructors[idx].end);
         }
 
-        // 3. استخراج الدوال (Methods) واحدة تلو الأخرى وفصل رأس الدالة عن جسمها تماماً!
+        // 3. استخراج جميع الدوال (Methods) داخل الكلاس
         const methods = [];
-        const methodRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:synchronized\s+)?(?:void|String|int|double|float|boolean|bool|char|long|[a-zA-Z_]\w*(?:\[\])?)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g;
+        const methodRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:synchronized\s+)?(?:override\s+)?(?:virtual\s+)?(void|String|string|int|double|float|boolean|bool|char|long|short|byte|[a-zA-Z_]\w*(?:<[^>]+>)?(?:\[\])*)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g;
         let mm;
         while ((mm = methodRegex.exec(b)) !== null) {
-          const mName = mm[1];
-          const paramsRaw = mm[2].trim();
+          const retType = mm[1];
+          const mName = mm[2];
+          if (mName === cls.className || mName === 'if' || mName === 'for' || mName === 'while' || mName === 'switch') continue;
+          const paramsRaw = mm[3].trim();
           const pNames = paramsRaw
             ? paramsRaw.split(',').map(p => p.trim().split(/\s+/).pop().replace(/\[\]/g, ''))
             : [];
@@ -3941,59 +4044,151 @@ usingMonaco = true;
             k++;
           }
           const mBody = b.slice(mStart, k - 1);
+          clsMembers.add(mName);
+          if (retType === 'double' || retType === 'float') {
+            doubleMembers.add(mName);
+          }
           methods.push({ mName, pNames, mBody, start: mm.index, end: k });
         }
-
         for (let idx = methods.length - 1; idx >= 0; idx--) {
           b = b.slice(0, methods[idx].start) + b.slice(methods[idx].end);
         }
 
-        // 4. استخراج الحقول المتبقية في الكلاس
+        // 4. استخراج جميع الحقول (بما فيها الحقول المتعددة في سطر واحد مثل int w, h;)
         const fieldInits = [];
-        b.replace(
-          /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|[A-Z]\w*)\s+([a-zA-Z_]\w*)\s*(?:=\s*([^;]+))?;/g,
-          function (_, fName, fVal) {
-            if (fVal !== undefined) {
-              fieldInits.push(`this.${fName} = ${fVal.trim()};`);
-            } else {
-              fieldInits.push(`if (this.${fName} === undefined) this.${fName} = ${doubleMembers.has(fName) ? '0' : 'null'};`);
-            }
-            return '';
-          }
-        );
+        const fieldStmtRegex = /(?:public|private|protected)?\s*(?:static\s+)?(?:final\s+)?(?:const\s+)?(String|string|int|double|float|boolean|bool|char|long|short|byte|[A-Z]\w*)(?:\s*\[\s*\])*\s+([^;{}]+);/g;
+        let fm;
+        while ((fm = fieldStmtRegex.exec(b)) !== null) {
+          const fieldType = fm[1];
+          const decls = splitTopLevelDeclarators(fm[2]);
+          const isNumeric = /^(int|double|float|long|short|byte)$/.test(fieldType);
+          const isBool = /^(boolean|bool)$/.test(fieldType);
+          const defaultVal = isNumeric ? '0' : (isBool ? 'false' : 'null');
 
-        // 5. بناء الـ Constructor بصيغة JS سليمة
-        let ctorJS = '';
-        if (constructors.length === 1) {
-          const c = constructors[0];
-          let bodyTransformed = transformMethodBody(c.cBody, c.paramNames, allClassMembers, doubleMembers);
-          if (cls.parentName && !/\bsuper\s*\(/.test(bodyTransformed)) {
-            bodyTransformed = `super();\n` + bodyTransformed;
-          }
-          ctorJS = `constructor(${c.paramNames.join(', ')}) {\n${bodyTransformed}\n}`;
-        } else if (constructors.length > 1) {
-          let branches = constructors.map((c) => {
-            let bTrans = transformMethodBody(c.cBody, c.paramNames, allClassMembers, doubleMembers);
-            const assignArgs = c.paramNames.map((p, i) => `let ${p} = __args[${i}];`).join(' ');
-            return `if (__args.length === ${c.paramNames.length}) { ${assignArgs}\n${bTrans}\n}`;
-          }).join(' else ');
-          ctorJS = `constructor(...__args) {\n${cls.parentName ? 'super(...__args);\n' : ''}${fieldInits.join('\n')}\n${branches}\n}`;
-        } else {
-          ctorJS = `constructor(...__args) {\n${cls.parentName ? 'super(...__args);\n' : ''}${fieldInits.join('\n')}\n}`;
+          decls.forEach((decl) => {
+            const dMatch = decl.match(/^([a-zA-Z_]\w*)(?:\s*\[\s*\])?(?:\s*=\s*([\s\S]+))?$/);
+            if (dMatch) {
+              const fName = dMatch[1];
+              let fVal = dMatch[2] ? dMatch[2].trim() : undefined;
+              clsMembers.add(fName);
+              if (fieldType === 'double' || fieldType === 'float') {
+                doubleMembers.add(fName);
+              }
+              if (fVal !== undefined) {
+                if (fVal.startsWith('{')) fVal = convertBracedArrayLiteral(fVal);
+                fieldInits.push(`this.${fName} = ${fVal};`);
+              } else {
+                fieldInits.push(`if (this.${fName} === undefined) this.${fName} = ${defaultVal};`);
+              }
+            }
+          });
         }
 
-        // 6. بناء الدوال بعد تحويل جسم كل دالة على حدة دون المساس برأس الدالة
-        const methodsJS = methods.map((m) => {
-          const transformedBody = transformMethodBody(m.mBody, m.pNames, allClassMembers, doubleMembers);
-          return `${m.mName}(${m.pNames.join(', ')}) {\n${transformedBody}\n}`;
-        }).join('\n');
-
-        jsClasses.push(`class ${cls.className}${cls.parentName ? ` extends ${cls.parentName}` : ''} {\n${ctorJS}\n${methodsJS}\n}`);
+        parsedClasses.push({
+          className: cls.className,
+          parentName: cls.parentName,
+          constructors,
+          methods,
+          fieldInits,
+          clsMembers
+        });
       });
 
-      const fullMainJS = transformMethodBody(mainBodyJS || src, [], new Set(), doubleMembers);
+      // توريث أسماء الحقول والدوال من الكلاس الأب إلى الكلاس الابن
+      parsedClasses.forEach((cls) => {
+        let p = cls.parentName;
+        while (p && classMembersMap[p]) {
+          classMembersMap[p].forEach(m => cls.clsMembers.add(m));
+          const pObj = parsedClasses.find(x => x.className === p);
+          p = pObj ? pObj.parentName : null;
+        }
+      });
+
+      const jsClasses = parsedClasses.map((cls) => {
+        // بناء دالة __init لدعم تعدد الـ Constructors واستدعاء this(...) و super(...)
+        let initMethodJS = '';
+        if (cls.constructors.length === 0) {
+          initMethodJS = `__init(...__args) {\n${cls.parentName ? 'if (super.__init) super.__init(...__args);\n' : ''}}`;
+        } else if (cls.constructors.length === 1) {
+          const c = cls.constructors[0];
+          let bTrans = transformMethodBody(c.cBody, c.paramNames, cls.clsMembers, doubleMembers);
+          if (cls.parentName && !/\bsuper\.__init\s*\(/.test(bTrans) && !/\bthis\.__init\s*\(/.test(bTrans)) {
+            bTrans = `if (super.__init) super.__init();\n` + bTrans;
+          }
+          initMethodJS = `__init(${c.paramNames.join(', ')}) {\n${bTrans}\n}`;
+        } else {
+          const branches = cls.constructors.map((c) => {
+            let bTrans = transformMethodBody(c.cBody, c.paramNames, cls.clsMembers, doubleMembers);
+            if (cls.parentName && !/\bsuper\.__init\s*\(/.test(bTrans) && !/\bthis\.__init\s*\(/.test(bTrans)) {
+              bTrans = `if (super.__init) super.__init();\n` + bTrans;
+            }
+            const assignArgs = c.paramNames.map((p, i) => `let ${p} = __args[${i}];`).join(' ');
+            return `if (__args.length === ${c.paramNames.length}) {\n${assignArgs}\n${bTrans}\n}`;
+          }).join(' else ');
+          initMethodJS = `__init(...__args) {\n${branches}\n}`;
+        }
+
+        // تجميع الدوال ودعم Method Overloading (أكثر من دالة بنفس الاسم وعدد معاملات مختلف)
+        const methodGroups = {};
+        cls.methods.forEach((m) => {
+          if (!methodGroups[m.mName]) methodGroups[m.mName] = [];
+          methodGroups[m.mName].push(m);
+        });
+
+        const methodsJS = Object.keys(methodGroups).map((mName) => {
+          const group = methodGroups[mName];
+          if (group.length === 1) {
+            const m = group[0];
+            const transformedBody = transformMethodBody(m.mBody, m.pNames, cls.clsMembers, doubleMembers);
+            return `${m.mName}(${m.pNames.join(', ')}) {\n${transformedBody}\n}`;
+          } else {
+            const branches = group.map((m) => {
+              const transformedBody = transformMethodBody(m.mBody, m.pNames, cls.clsMembers, doubleMembers);
+              const assignArgs = m.pNames.map((p, i) => `let ${p} = __args[${i}];`).join(' ');
+              return `if (__args.length === ${m.pNames.length}) {\n${assignArgs}\n${transformedBody}\n}`;
+            }).join(' else ');
+            return `${mName}(...__args) {\n${branches}\n}`;
+          }
+        }).join('\n');
+
+        const staticBindings = Object.keys(methodGroups).map((mName) =>
+          `${cls.className}.${mName} = function(...a) { return ${cls.className}.prototype.${mName}.apply(${cls.className}.prototype, a); };`
+        ).join('\n');
+
+        return `class ${cls.className}${cls.parentName ? ` extends ${cls.parentName}` : ''} {
+  constructor(...__args) {
+    ${cls.parentName ? "super('__CODEMASR_SKIP_INIT__');" : ''}
+    this.__initFields();
+    if (__args[0] !== '__CODEMASR_SKIP_INIT__') {
+      this.__init(...__args);
+    }
+  }
+  __initFields() {
+    ${cls.parentName ? 'if (super.__initFields) super.__initFields();' : ''}
+    ${cls.fieldInits.join('\n    ')}
+  }
+  ${initMethodJS}
+  ${methodsJS}
+}
+${staticBindings}`;
+      });
+
+      const mainClsMembers = (mainClassName && classMembersMap[mainClassName]) ? classMembersMap[mainClassName] : new Set();
+      let fullMainJS = transformMethodBody(mainBodyJS || (classes.length === 0 ? src : ''), [], mainClsMembers, doubleMembers);
+      if (mainClassName) {
+        fullMainJS = fullMainJS.replace(/\bthis\./g, `${mainClassName}.`);
+      }
 
       const runnerScript = `
+        if (!String.prototype.equals) {
+          String.prototype.equals = function(other) { return String(this) === String(other); };
+        }
+        if (!String.prototype.equalsIgnoreCase) {
+          String.prototype.equalsIgnoreCase = function(other) { return String(this).toLowerCase() === String(other || '').toLowerCase(); };
+        }
+        if (!String.prototype.isEmpty) {
+          String.prototype.isEmpty = function() { return this.length === 0; };
+        }
         function __fmt(v, isDoubleHint) {
           if (typeof v === 'number' && isDoubleHint && Number.isInteger(v)) {
             return v.toFixed(1);
@@ -4001,23 +4196,41 @@ usingMonaco = true;
           return v;
         }
         const __out = [];
+        let __lineBuf = '';
+        function __flushLine(str) {
+          __out.push(__lineBuf + str);
+          __lineBuf = '';
+        }
         const System = {
           out: {
-            println: function(...args) { __out.push(args.join('')); },
-            print: function(...args) { __out.push(args.join('')); },
+            println: function(...args) { __flushLine(args.join('')); },
+            print: function(...args) { __lineBuf += args.join(''); },
             printf: function(fmt, ...args) {
               let i = 0;
-              let s = String(fmt || '').replace(/\\n/g, '').replace(/%(?:\\.\\d+)?[dfs]/g, () => args[i++] ?? '');
-              __out.push(s);
+              let s = String(fmt || '').replace(/%(?:\\.(\\d+))?([dfs])/g, (_, dec, type) => {
+                let val = args[i++];
+                if (type === 'f' && dec !== undefined && !isNaN(val)) return Number(val).toFixed(Number(dec));
+                return val ?? '';
+              });
+              if (s.endsWith('\\n')) {
+                __flushLine(s.replace(/\\n$/, ''));
+              } else {
+                __lineBuf += s;
+              }
             }
           }
         };
         const Console = {
-          WriteLine: function(...args) { __out.push(args.join('')); },
-          Write: function(...args) { __out.push(args.join('')); }
+          WriteLine: function(...args) { __flushLine(args.join('')); },
+          Write: function(...args) { __lineBuf += args.join(''); }
+        };
+        const Arrays = {
+          toString: function(arr) { return '[' + (Array.isArray(arr) ? arr.join(', ') : '') + ']'; },
+          sort: function(arr) { if (Array.isArray(arr)) arr.sort((a, b) => (a > b ? 1 : (a < b ? -1 : 0))); }
         };
         ${jsClasses.join('\n\n')}
         ${fullMainJS}
+        if (__lineBuf !== '') __out.push(__lineBuf);
         return __out;
       `;
 
@@ -4026,31 +4239,62 @@ usingMonaco = true;
       return outputs;
     }
 
+    // =========================================================================
+    // B. محرك تشغيل C++ و C الكامل (يدعم الكلاسات والـ Structs والمصفوفات والدوال الرياضية)
+    // =========================================================================
     if (lang === 'cpp' || lang === 'c') {
       let src = normalizedInput;
       src = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       src = src.replace(/^\s*#include.*$/gm, '').replace(/^\s*using\s+namespace\s+\w+\s*;/gm, '');
 
+      // دعم cout و cin و printf
       src = src.replace(/(?:std::)?cout\s*<<([^;]+);/g, function (_, expr) {
         const parts = expr.split('<<').map((p) => {
           const clean = p.trim();
-          if (clean === 'endl' || clean === 'std::endl') return '"\\n"';
+          if (clean === 'endl' || clean === 'std::endl' || clean === "'\\n'" || clean === '"\\n"') return '"\\n"';
           return clean;
         });
         return `__cout(${parts.join(', ')});`;
       });
-
+      src = src.replace(/(?:std::)?cin\s*>>([^;]+);/g, '/* cin */');
       src = src.replace(/\bprintf\s*\(/g, '__printf(');
+      src = src.replace(/\bscanf\s*\([^;]+;/g, '/* scanf */');
 
-      src = src.replace(/\b(?:int|void|double|float|string|std::string|char|bool|long|auto)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g, function (_, fnName, params) {
-        const pNames = params.trim()
-          ? params.split(',').map(p => p.trim().replace(/&|\*/g, '').split(/\s+/).pop().replace(/\[\]/g, '')).join(', ')
+      // إزالة public: / private: / protected: داخل كلاسات C++
+      src = src.replace(/\b(?:public|private|protected)\s*:/g, '');
+
+      // تحويل struct إلى class وإزالة الفاصلة المنقوطة بعد قوس إغلاق الكلاس };
+      src = src.replace(/\bstruct\s+([a-zA-Z_]\w*)\s*\{/g, 'class $1 {');
+      src = src.replace(/\}\s*;/g, '}');
+
+      // تحويل الكلاسات في C++ إن وجدت
+      const cppClassRegex = /\bclass\s+([a-zA-Z_]\w*)(?:\s*:\s*(?:public|private|protected)?\s*([a-zA-Z_]\w*))?\s*\{/g;
+      let cm;
+      while ((cm = cppClassRegex.exec(src)) !== null) {
+        const cName = cm[1];
+        const cStart = cm.index + cm[0].length;
+        let d = 1, k = cStart;
+        while (k < src.length && d > 0) {
+          if (src[k] === '{') d++;
+          else if (src[k] === '}') d--;
+          k++;
+        }
+        let cBody = src.slice(cStart, k - 1);
+        const ctorReg = new RegExp(`\\b${cName}\\s*\\(([^)]*)\\)\\s*\\{`, 'g');
+        cBody = cBody.replace(ctorReg, 'constructor($1) {');
+        cBody = transformMethodBody(cBody, [], new Set(), new Set());
+        src = src.slice(0, cm.index) + `class ${cName}${cm[2] ? ' extends ' + cm[2] : ''} {` + cBody + '}' + src.slice(k);
+      }
+
+      // تحويل الدوال الحرة في C / C++
+      src = src.replace(/\b(?:unsigned\s+|signed\s+|long\s+|short\s+|const\s+|static\s+|inline\s+)*(?:int|void|double|float|string|std::string|char|bool|long|short|size_t|auto)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g, function (_, fnName, params) {
+        const pNames = params.trim() && params.trim() !== 'void'
+          ? params.split(',').map(p => p.trim().replace(/&|\*/g, '').split(/\s+/).pop().replace(/\[.*\]/g, '')).join(', ')
           : '';
         return `function ${fnName}(${pNames}) {`;
       });
 
-      src = src.replace(/\b(?:const\s+)?(?:int|double|float|string|std::string|char|bool|long|auto)\s+([a-zA-Z_]\w*(?:\s*=\s*[^;,]+)?(?:\s*,\s*[a-zA-Z_]\w*(?:\s*=\s*[^;,]+)?)*)\s*;/g, 'let $1;');
-      src = src.replace(/\bfor\s*\(\s*(?:int|size_t|long|auto)\s+/g, 'for (let ');
+      src = transformMethodBody(src, [], new Set(), new Set());
 
       const runnerScript = `
         let __buf = '';
@@ -4059,62 +4303,153 @@ usingMonaco = true;
         }
         function __printf(fmt, ...args) {
           let i = 0;
-          let s = String(fmt || '').replace(/%(?:\\.\\d+)?[difs]/g, () => args[i++] ?? '');
+          let s = String(fmt || '').replace(/%(?:\\.(\\d+))?(?:l)?([difsc])/g, (_, dec, type) => {
+            let val = args[i++];
+            if (type === 'f' && dec !== undefined && !isNaN(val)) return Number(val).toFixed(Number(dec));
+            return val ?? '';
+          });
           __buf += s;
         }
+        const max = Math.max, min = Math.min, abs = Math.abs, pow = Math.pow, sqrt = Math.sqrt, floor = Math.floor, ceil = Math.ceil, round = Math.round;
         ${src}
         if (typeof main === 'function') main();
-        return __buf.replace(/\\n$/, '').split('\\n');
+        return __buf === '' ? [] : __buf.replace(/\\n$/, '').split('\\n');
       `;
       const res = Function(runnerScript)();
       res.forEach(l => outputs.push(l));
       return outputs;
     }
 
+    // =========================================================================
+    // C. محرك تشغيل Python الكامل (يدعم المسافات البادئة بأي عدد، الكلاسات، القوائم، f-strings، الدوال المدمجة)
+    // =========================================================================
     if (lang === 'python') {
       let pyLines = normalizedInput.replace(/\r\n/g, '\n').split('\n');
-      let jsLines = ['const __out = [];', 'function print(...args) { __out.push(args.join(" ")); }', 'function range(a, b, step = 1) { let arr = []; let start = b === undefined ? 0 : a; let end = b === undefined ? a : b; for (let i = start; i < end; i += step) arr.push(i); return arr; }'];
+      const definedClasses = new Set();
+      pyLines.forEach((l) => {
+        const m = l.trim().match(/^class\s+([a-zA-Z_]\w*)/);
+        if (m) definedClasses.add(m[1]);
+      });
+
+      let jsLines = [
+        'const __out = [];',
+        'if (!Array.prototype.append) { Array.prototype.append = function(v) { this.push(v); }; }',
+        'function print(...args) { __out.push(args.map(a => Array.isArray(a) ? "[" + a.join(", ") + "]" : String(a)).join(" ")); }',
+        'function len(x) { return x && x.length !== undefined ? x.length : Object.keys(x || {}).length; }',
+        'function str(x) { return String(x); }',
+        'function int(x) { return parseInt(x, 10) || 0; }',
+        'function float(x) { return parseFloat(x) || 0.0; }',
+        'function abs(x) { return Math.abs(x); }',
+        'function max(...a) { return Array.isArray(a[0]) ? Math.max(...a[0]) : Math.max(...a); }',
+        'function min(...a) { return Array.isArray(a[0]) ? Math.min(...a[0]) : Math.min(...a); }',
+        'function sum(arr) { return (arr || []).reduce((a, b) => a + b, 0); }',
+        'function round(n, d = 0) { const f = Math.pow(10, d); return Math.round(n * f) / f; }',
+        'function range(a, b, step = 1) { let arr = []; let start = b === undefined ? 0 : a; let end = b === undefined ? a : b; if (step > 0) { for (let i = start; i < end; i += step) arr.push(i); } else if (step < 0) { for (let i = start; i > end; i += step) arr.push(i); } return arr; }'
+      ];
+
       let indentStack = [0];
+      let expectIndent = false;
+      let inClassStack = [false];
+
+      function transformPyExpr(expr) {
+        let e = expr;
+        // تحويل f-strings مثل f"Hello {name}" إلى `Hello ${name}`
+        e = e.replace(/\bf(["'])(.*?)\1/g, (_, q, inner) => '`' + inner.replace(/\{([^}]+)\}/g, '${$1}') + '`');
+        e = e.replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false').replace(/\bNone\b/g, 'null');
+        e = e.replace(/\band\b/g, '&&').replace(/\bor\b/g, '||').replace(/\bnot\s+/g, '!');
+        // القسمة الصحيحة // في بايثون
+        e = e.replace(/(\b\w+|\([^)]+\))\s*\/\/\s*(\b\w+|\([^)]+\))/g, 'Math.floor($1 / $2)');
+        // الأسس ** تعمل تلقائياً في JS الحديث، وتحويل إنشاء الكائنات بدون new
+        definedClasses.forEach((cName) => {
+          const reg = new RegExp(`(?<!new\\s+|class\\s+|function\\s+)\\b${cName}\\s*\\(`, 'g');
+          e = e.replace(reg, `new ${cName}(`);
+        });
+        return e;
+      }
 
       pyLines.forEach((raw) => {
         const withoutComment = raw.replace(/#.*$/, '');
         if (!withoutComment.trim()) return;
-        const indent = raw.match(/^\s*/)[0].length;
+        const indent = raw.replace(/\t/g, '    ').match(/^\s*/)[0].length;
         let trimmed = withoutComment.trim();
 
-        while (indent < indentStack[indentStack.length - 1]) {
-          indentStack.pop();
-          jsLines.push('}');
+        if (expectIndent) {
+          if (indent > indentStack[indentStack.length - 1]) {
+            indentStack.push(indent);
+          }
+          expectIndent = false;
+        } else {
+          while (indentStack.length > 1 && indent < indentStack[indentStack.length - 1]) {
+            indentStack.pop();
+            inClassStack.pop();
+            jsLines.push('}');
+          }
         }
 
-        if (/^elif\s+(.+):$/.test(trimmed)) {
-          const cond = trimmed.replace(/^elif\s+/, '').slice(0, -1).replace(/\band\b/g, '&&').replace(/\bor\b/g, '||').replace(/\bnot\b/g, '!');
+        const insideClass = inClassStack[inClassStack.length - 1];
+
+        if (/^class\s+([a-zA-Z_]\w*)(?:\(([^)]*)\))?\s*:$/.test(trimmed)) {
+          const m = trimmed.match(/^class\s+([a-zA-Z_]\w*)(?:\(([^)]*)\))?\s*:$/);
+          jsLines.push(`class ${m[1]}${m[2] ? ' extends ' + m[2].trim() : ''} {`);
+          expectIndent = true;
+          inClassStack.push(true);
+        } else if (/^elif\s+(.+):$/.test(trimmed)) {
+          const cond = transformPyExpr(trimmed.replace(/^elif\s+/, '').slice(0, -1));
           if (jsLines[jsLines.length - 1] === '}') jsLines.pop();
           jsLines.push(`} else if (${cond}) {`);
-          indentStack.push(indent + 2);
+          expectIndent = true;
+          inClassStack.push(insideClass);
         } else if (/^else\s*:$/.test(trimmed)) {
           if (jsLines[jsLines.length - 1] === '}') jsLines.pop();
           jsLines.push('} else {');
-          indentStack.push(indent + 2);
+          expectIndent = true;
+          inClassStack.push(insideClass);
+        } else if (/^except(?:\s+[^:]*)?:$/.test(trimmed)) {
+          if (jsLines[jsLines.length - 1] === '}') jsLines.pop();
+          jsLines.push('} catch (__err) {');
+          expectIndent = true;
+          inClassStack.push(insideClass);
+        } else if (/^finally\s*:$/.test(trimmed)) {
+          if (jsLines[jsLines.length - 1] === '}') jsLines.pop();
+          jsLines.push('} finally {');
+          expectIndent = true;
+          inClassStack.push(insideClass);
+        } else if (/^try\s*:$/.test(trimmed)) {
+          jsLines.push('try {');
+          expectIndent = true;
+          inClassStack.push(insideClass);
         } else if (/^if\s+(.+):$/.test(trimmed)) {
-          const cond = trimmed.replace(/^if\s+/, '').slice(0, -1).replace(/\band\b/g, '&&').replace(/\bor\b/g, '||').replace(/\bnot\b/g, '!');
+          const cond = transformPyExpr(trimmed.replace(/^if\s+/, '').slice(0, -1));
           jsLines.push(`if (${cond}) {`);
-          indentStack.push(indent + 2);
+          expectIndent = true;
+          inClassStack.push(insideClass);
         } else if (/^for\s+([a-zA-Z_]\w*)\s+in\s+(.+):$/.test(trimmed)) {
           const m = trimmed.match(/^for\s+([a-zA-Z_]\w*)\s+in\s+(.+):$/);
-          jsLines.push(`for (let ${m[1]} of ${m[2]}) {`);
-          indentStack.push(indent + 2);
+          jsLines.push(`for (let ${m[1]} of ${transformPyExpr(m[2])}) {`);
+          expectIndent = true;
+          inClassStack.push(insideClass);
         } else if (/^while\s+(.+):$/.test(trimmed)) {
-          const cond = trimmed.replace(/^while\s+/, '').slice(0, -1);
+          const cond = transformPyExpr(trimmed.replace(/^while\s+/, '').slice(0, -1));
           jsLines.push(`while (${cond}) {`);
-          indentStack.push(indent + 2);
+          expectIndent = true;
+          inClassStack.push(insideClass);
         } else if (/^def\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*:$/.test(trimmed)) {
           const m = trimmed.match(/^def\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*:$/);
-          jsLines.push(`function ${m[1]}(${m[2]}) {`);
-          indentStack.push(indent + 2);
+          const fnName = m[1];
+          const rawParams = m[2].split(',').map(p => p.trim()).filter(Boolean);
+          if (insideClass) {
+            const paramsNoSelf = rawParams.filter(p => p !== 'self').join(', ');
+            const methodHeader = fnName === '__init__' ? `constructor(${paramsNoSelf})` : `${fnName}(${paramsNoSelf})`;
+            jsLines.push(`${methodHeader} { const self = this;`);
+          } else {
+            jsLines.push(`function ${fnName}(${rawParams.join(', ')}) {`);
+          }
+          expectIndent = true;
+          inClassStack.push(false);
+        } else if (trimmed === 'pass') {
+          jsLines.push('/* pass */');
         } else {
-          trimmed = trimmed.replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false').replace(/\bNone\b/g, 'null');
-          jsLines.push(trimmed + ';');
+          jsLines.push(transformPyExpr(trimmed) + ';');
         }
       });
 
@@ -4126,11 +4461,18 @@ usingMonaco = true;
       return Function(jsLines.join('\n'))();
     }
 
+    // =========================================================================
+    // D. محرك تشغيل TypeScript و PHP
+    // =========================================================================
     if (lang === 'typescript' || lang === 'php') {
       let src = normalizedInput.replace(/<\?php|\?>/g, '');
       src = src.replace(/:\s*(?:string|number|boolean|any|void)(?:\[\])?/g, '');
       src = src.replace(/\becho\s+([^;]+);/g, 'console.log($1);');
       src = src.replace(/\$([a-zA-Z_]\w*)/g, '$1');
+      if (lang === 'php') {
+        // تحويل نقطة الدمج (.) في PHP بين النصوص والمتغيرات إلى (+)
+        src = src.replace(/(\S)\s+\.\s+(\S)/g, '$1 + $2');
+      }
       const runner = `
         const __out = [];
         const console = { log: (...a) => __out.push(a.join(' ')) };
@@ -4147,35 +4489,87 @@ usingMonaco = true;
     let s = String(bodyStr || '');
     const localVars = new Set(paramNames || []);
 
-    // تحويل تعريفات المصفوفات والمتغيرات المحلية إلى let
+    // 1. حماية النصوص (Strings) حتى لا تتأثر بتحويل الكلمات أو أسماء المتغيرات
+    const stringLiterals = [];
+    s = s.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, function (match) {
+      const idx = stringLiterals.length;
+      stringLiterals.push(match);
+      return `__CM_STR_${idx}__`;
+    });
+
+    // 2. تحويل استدعاءات this(...) و super(...) داخل الـ Constructor إلى this.__init(...) و super.__init(...)
+    s = s.replace(/\bthis\s*\(/g, 'this.__init(');
+    s = s.replace(/\bsuper\s*\(/g, 'super.__init(');
+
+    // 3. تحويل .length() في نصوص الجافا إلى .length
+    s = s.replace(/\.length\s*\(\s*\)/g, '.length');
+
+    // 4. تحويل إنشاء المصفوفات new int[]{1, 2} أو new int[5]
+    s = s.replace(/\bnew\s+(?:String|string|int|double|float|boolean|bool|char|long|short|byte|[A-Z]\w*)\s*(?:\[\s*\])+\s*\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g, function (_, inner) {
+      return convertBracedArrayLiteral('{' + inner + '}');
+    });
+    s = s.replace(/\bnew\s+(?:int|double|float|long|short|byte)\s*\[\s*([^\]]+)\s*\]/g, 'new Array($1).fill(0)');
+    s = s.replace(/\bnew\s+(?:boolean|bool)\s*\[\s*([^\]]+)\s*\]/g, 'new Array($1).fill(false)');
+    s = s.replace(/\bnew\s+(?:String|string|char|[A-Z]\w*)\s*\[\s*([^\]]+)\s*\]/g, 'new Array($1).fill(null)');
+
+    // 5. تحويل حلقات for-each وحلقات for القياسية
     s = s.replace(
-      /\b(?:final\s+)?(?:String|int|double|float|boolean|bool|char|long|[A-Z][a-zA-Z0-9_]*)(?:\[\])?\s+([a-zA-Z_]\w*)\s*=/g,
-      function (_, vName) {
-        localVars.add(vName);
-        return `let ${vName} =`;
-      }
-    );
-    s = s.replace(
-      /\bfor\s*\(\s*(?:int|double|float|String|long|var|[A-Z][a-zA-Z0-9_]*)\s+([a-zA-Z_]\w*)\s*:\s*([^)]+)\)/g,
+      /\bfor\s*\(\s*(?:final\s+|const\s+)?(?:String|string|int|double|float|boolean|bool|char|long|short|byte|var|auto|[A-Z][a-zA-Z0-9_]*)(?:\s*\[\s*\])?\s+([a-zA-Z_]\w*)\s*:\s*([^)]+)\)/g,
       function (_, vName, listExpr) {
         localVars.add(vName);
         return `for (let ${vName} of ${listExpr})`;
       }
     );
-    s = s.replace(/\bfor\s*\(\s*(?:int|double|long|var)\s+([a-zA-Z_]\w*)/g, function (_, vName) {
-      localVars.add(vName);
-      return `for (let ${vName}`;
-    });
-
-    // إضافة this. للحقول والدوال الخاصة بالكلاس داخل جسم الدالة فقط
-    classMembers.forEach((member) => {
-      if (!localVars.has(member)) {
-        const reg = new RegExp(`(?<!\\.|this\\.|super\\.|new\\s+|function\\s+|let\\s+)\\b${member}\\b(?!\\s*:)`, 'g');
-        s = s.replace(reg, `this.${member}`);
+    s = s.replace(
+      /\bfor\s*\(\s*(?:int|double|float|long|short|byte|size_t|var|auto)\s+([a-zA-Z_]\w*)/g,
+      function (_, vName) {
+        localVars.add(vName);
+        return `for (let ${vName}`;
       }
+    );
+
+    // 6. تحويل تعريفات المتغيرات والمصفوفات المحلية (المفردة والمتعددة مثل int a = 1, b = 2; أو int x;)
+    const localDeclRegex = /(?<!\.)\b(?:final\s+|const\s+|unsigned\s+|signed\s+)*(String|string|int|double|float|boolean|bool|char|long|short|byte|size_t|var|auto|[A-Z][a-zA-Z0-9_]*)(?:\s*\[\s*\])*\s+([a-zA-Z_]\w*(?:\s*\[\s*\d*\s*\])*(?:\s*=\s*[^;,]+)?(?:\s*,\s*[a-zA-Z_]\w*(?:\s*\[\s*\d*\s*\])*(?:\s*=\s*[^;,]+)?)*)\s*;/g;
+    s = s.replace(localDeclRegex, function (fullMatch, typeName, declsPart) {
+      if (typeName === 'return' || typeName === 'new' || typeName === 'delete' || typeName === 'case') return fullMatch;
+      const isNumeric = /^(int|double|float|long|short|byte|size_t)$/.test(typeName);
+      const isBool = /^(boolean|bool)$/.test(typeName);
+      const defaultVal = isNumeric ? '0' : (isBool ? 'false' : 'null');
+
+      const decls = splitTopLevelDeclarators(declsPart);
+      const jsDecls = decls.map((d) => {
+        const m = d.match(/^([a-zA-Z_]\w*)(?:\s*\[\s*(\d*)\s*\])*(?:\s*=\s*([\s\S]+))?$/);
+        if (!m) return d;
+        const vName = m[1];
+        const arrSize = m[2];
+        let rhs = m[3] ? m[3].trim() : undefined;
+        localVars.add(vName);
+        if (typeName === 'double' || typeName === 'float') {
+          doubleMembers.add(vName);
+        }
+        if (rhs !== undefined) {
+          if (rhs.startsWith('{')) rhs = convertBracedArrayLiteral(rhs);
+          return `${vName} = ${rhs}`;
+        } else if (arrSize) {
+          return `${vName} = new Array(${arrSize}).fill(${defaultVal})`;
+        } else {
+          return `${vName} = ${defaultVal}`;
+        }
+      });
+      return `let ${jsDecls.join(', ')};`;
     });
 
-    // تنسيق قيم double بـ (.0) فقط عند طباعتها داخل System.out.print / Console.Write دون المساس بالعمليات الحسابية مثل return salary + bonus
+    // 7. ربط حقول ودوال الكلاس بـ this. عندما لا تكون متغيرات محلية
+    if (classMembers && classMembers.size > 0) {
+      classMembers.forEach((member) => {
+        if (!localVars.has(member)) {
+          const reg = new RegExp(`(?<!\\.|\\bthis\\.|\\bsuper\\.|\\bnew\\s+|\\bfunction\\s+|\\blet\\s+|\\bconst\\s+|\\bvar\\s+)\\b${member}\\b(?!\\s*:)`, 'g');
+          s = s.replace(reg, `this.${member}`);
+        }
+      });
+    }
+
+    // 8. تنسيق قيم double بـ (.0) عند الطباعة في الجافا و C#
     s = s.replace(/(System\.out\.print(?:ln)?|Console\.Write(?:Line)?)\s*\(([\s\S]*?)\)\s*;/g, function (full, fnCall, insideArgs) {
       let updatedArgs = insideArgs;
       doubleMembers.forEach((dName) => {
@@ -4184,6 +4578,9 @@ usingMonaco = true;
       });
       return `${fnCall}(${updatedArgs});`;
     });
+
+    // 9. استرجاع النصوص المحمية كما كانت
+    s = s.replace(/__CM_STR_(\d+)__/g, (_, idx) => stringLiterals[Number(idx)]);
 
     return s;
   }
@@ -4201,7 +4598,7 @@ usingMonaco = true;
       typescript: `ts-node ${info.displayName}`
     };
 
-    // 1. فحص الأخطاء البرمجية أولاً: إذا وُجد خطأ، نوقف التشغيل تماماً ونعرض سبب الخطأ والحل المقترح مع زر الإصلاح!
+    // 1. فحص الأخطاء البرمجية أولاً وعرض سبب الخطأ والحل المقترح مع زر الإصلاح الفوري
     const syntaxDiagnostics = checkTerminalSyntaxAndSuggestFix(code, info);
     if (syntaxDiagnostics.length > 0) {
       syntaxDiagnostics.forEach(d => appendDiagnosticToConsole(d));
@@ -4253,25 +4650,54 @@ usingMonaco = true;
     let outputs = [];
     try {
       if (lang === 'sql') {
-        const rows = [];
-        String(code || '').split('\n').forEach((rawLine) => {
-          const ins = rawLine.trim().match(/INSERT\s+INTO\s+\w+\s+VALUES\s*\(([^)]+)\)/i);
-          if (ins) rows.push(ins[1].split(',').map(c => c.trim().replace(/^['"]|['"]$/g, '')));
-        });
-        if (/SELECT\s+/i.test(code)) {
-          if (rows.length > 0) {
-            outputs.push('┌────┬──────────────────┬───────┐');
-            outputs.push('│ ID │ Name             │ Grade │');
-            outputs.push('├────┼──────────────────┼───────┤');
-            rows.forEach((r) => {
-              outputs.push(`│ ${String(r[0] || '').padEnd(2)} │ ${String(r[1] || '').padEnd(16)} │ ${String(r[2] || '').padEnd(5)} │`);
-            });
-            outputs.push('└────┴──────────────────┴───────┘');
-            outputs.push(`\n(${rows.length} rows returned in 0.003s)`);
-          } else {
-            outputs.push('Query executed successfully.');
+        const tables = {};
+        let lastTable = 'Table';
+        String(code || '').split(';').forEach((stmtRaw) => {
+          const stmt = stmtRaw.replace(/--.*$/gm, '').trim();
+          if (!stmt) return;
+          const createMatch = stmt.match(/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(\w+)\s*\(([\s\S]+)\)/i);
+          if (createMatch) {
+            const tName = createMatch[1];
+            const cols = createMatch[2].split(',').map(c => c.trim().split(/\s+/)[0]).filter(Boolean);
+            tables[tName] = { cols, rows: [] };
+            lastTable = tName;
+            return;
           }
-        }
+          const insertMatch = stmt.match(/INSERT\s+INTO\s+(\w+)(?:\s*\(([^)]+)\))?\s*VALUES\s*([\s\S]+)/i);
+          if (insertMatch) {
+            const tName = insertMatch[1];
+            if (!tables[tName]) tables[tName] = { cols: ['Col1', 'Col2', 'Col3'], rows: [] };
+            lastTable = tName;
+            const tupleRegex = /\(([^)]+)\)/g;
+            let tm;
+            while ((tm = tupleRegex.exec(insertMatch[3])) !== null) {
+              const vals = tm[1].split(',').map(v => v.trim().replace(/^['"]|['"]$/g, ''));
+              tables[tName].rows.push(vals);
+            }
+            return;
+          }
+          const selectMatch = stmt.match(/SELECT\s+([\s\S]+?)\s+FROM\s+(\w+)/i);
+          if (selectMatch) {
+            const tName = selectMatch[2];
+            const tbl = tables[tName] || tables[lastTable];
+            if (tbl && tbl.rows.length > 0) {
+              const widths = tbl.cols.map((col, idx) =>
+                Math.max(col.length, ...tbl.rows.map(r => String(r[idx] ?? '').length), 4)
+              );
+              const topBorder = '┌─' + widths.map(w => '─'.repeat(w)).join('─┬─') + '─┐';
+              const headerRow = '│ ' + tbl.cols.map((c, i) => c.padEnd(widths[i])).join(' │ ') + ' │';
+              const midBorder = '├─' + widths.map(w => '─'.repeat(w)).join('─┼─') + '─┤';
+              const bottomBorder = '└─' + widths.map(w => '─'.repeat(w)).join('─┴─') + '─┘';
+              outputs.push(topBorder, headerRow, midBorder);
+              tbl.rows.forEach((r) => {
+                outputs.push('│ ' + widths.map((w, i) => String(r[i] ?? '').padEnd(w)).join(' │ ') + ' │');
+              });
+              outputs.push(bottomBorder, `\n(${tbl.rows.length} rows returned in 0.002s)`);
+            } else {
+              outputs.push('Query executed successfully (0 rows).');
+            }
+          }
+        });
       } else {
         outputs = transpileAndRunOOPCode(code, lang);
       }
@@ -4313,7 +4739,7 @@ usingMonaco = true;
     .term-header { background: #1e293b; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #94a3b8; }
     .term-badge { background: #10b98125; color: #34d399; border: 1px solid #10b981; padding: 2px 8px; border-radius: 6px; font-weight: 700; }
     .term-body { padding: 16px; }
-    .cmd-line { color: #38bdf8; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #334155; }
+    .cmd-line { color: #38bdf8; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #334135; }
     .stdout { color: #4ade80; white-space: pre-wrap; margin: 0; font-size: 14px; }
     .exit-status { margin-top: 16px; font-size: 11px; color: #64748b; }
   </style>
