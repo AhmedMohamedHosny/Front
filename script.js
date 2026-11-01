@@ -2968,23 +2968,57 @@ function explainRuntimeError(errMsg) {
       tagEl.textContent = course.tag;
     }
 
+const lessonContentEl = document.querySelector('#lesson-view .lesson-content');
+    const isArabicLesson = /[\u0600-\u06FF]/.test((lesson.title || '') + ' ' + (lesson.lead || ''));
+
+    // ضبط اتجاه الحاوية تلقائياً لليمين للعربي واليسار للإنجليزي
+    if (lessonContentEl) {
+      if (isArabicLesson) {
+        lessonContentEl.setAttribute('dir', 'rtl');
+        lessonContentEl.classList.add('lesson-ar-content');
+      } else {
+        lessonContentEl.setAttribute('dir', 'ltr');
+        lessonContentEl.classList.remove('lesson-ar-content');
+      }
+    }
+
+    // دالة لعزل الكلمات الإنجليزية والأقواس حتى لا تنقلب الجملة العربية
+    function formatBiDiText(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&lt;([^&]+)&gt;/g, '<bdi class="code-badge">&lt;$1&gt;</bdi>')
+        .replace(/\(([A-Za-z0-9_,\s.-]+)\)/g, '(<bdi class="code-badge">$1</bdi>)');
+    }
+
+    // دالة لتنظيم الشرح وفصل النقاط وعزل وسوم الأكواد بدلاً من تكدسها
+    function formatExplanationContent(raw) {
+      if (!raw) return '';
+      const lines = String(raw).split(/<br\s*\/?>/i);
+      return lines.map(line => {
+        let trimmed = line.trim();
+        if (!trimmed) return '';
+        trimmed = trimmed.replace(/&lt;([^&]+)&gt;/g, '<bdi class="code-badge">&lt;$1&gt;</bdi>');
+        return `<div class="expl-line">${trimmed}</div>`;
+      }).filter(Boolean).join('');
+    }
+
     const eyebrowEl = document.querySelector('#lesson-view .lesson-content > .eyebrow');
     if (eyebrowEl) eyebrowEl.textContent = lesson.eyebrow;
 
     const titleEl = document.getElementById('lesson-title');
-    if (titleEl) titleEl.textContent = lesson.title;
+    if (titleEl) titleEl.innerHTML = formatBiDiText(lesson.title);
 
     const leadEl = document.getElementById('lesson-lead');
-    if (leadEl) leadEl.textContent = lesson.lead;
+    if (leadEl) leadEl.innerHTML = formatBiDiText(lesson.lead);
 
     const goalEl = document.getElementById('lesson-goal');
-    if (goalEl) goalEl.textContent = lesson.goal;
+    if (goalEl) goalEl.innerHTML = formatBiDiText(lesson.goal);
 
     const secTitleEl = document.getElementById('lesson-section-title');
-    if (secTitleEl) secTitleEl.textContent = lesson.sectionTitle;
+    if (secTitleEl) secTitleEl.innerHTML = formatBiDiText(lesson.sectionTitle);
 
     const expEl = document.getElementById('lesson-explanation');
-    if (expEl) expEl.textContent = lesson.explanation;
+    if (expEl) expEl.innerHTML = formatExplanationContent(lesson.explanation);
 
     const codeEl = document.querySelector('#lesson-code code') || document.getElementById('lesson-code');
     if (codeEl) codeEl.textContent = lesson.exampleCode;
