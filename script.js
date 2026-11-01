@@ -1600,7 +1600,7 @@ lessons: [
           lead: 'Bring color, custom fonts, and clean alignment to your HTML elements using <style> rules.',
           goal: 'Write a CSS rule inside <style> that sets color and font-size on an h1 or p element.',
           sectionTitle: 'Selectors, Properties & Values',
-          explanation: 'CSS rules consist of a selector (like h1) followed by curly braces { property: value; }. بالمصري: بنختار العنصر اللي عايزين نلونه، ونفتح قوسين مجموعة { } ونكتب الخاصية وبعدها نقطتين فوق بعض : وفي الآخر فصلة منقوطة ;.',
+          explanation: 'CSS rules consist of a selector (like h1) followed by curly braces { property: value; }.  بنختار العنصر اللي عايزين نلونه، ونفتح قوسين مجموعة { } ونكتب الخاصية وبعدها نقطتين فوق بعض : وفي الآخر فصلة منقوطة ;.',
           exampleCode: '<style>\n  h1 {\n    color: #6c5ce7;\n    font-size: 28px;\n  }\n  p {\n    color: #555;\n  }\n</style>\n<h1>تصميم عصري بالـ CSS</h1>\n<p>الألوان بتدي روح للصفحة!</p>',
           starterCode: '<style>\n  h1 {\n    color: #6c5ce7;\n    font-size: 28px;\n  }\n</style>\n<h1>أول تصميم بالـ CSS</h1>\n<p>جرب تغير اللون وحجم الخط واضغط Run!</p>',
           solutionCode: '<style>\n  h1 {\n    color: #6c5ce7;\n    font-size: 28px;\n  }\n</style>\n<h1>أول تصميم بالـ CSS</h1>\n<p>جرب تغير اللون وحجم الخط واضغط Run!</p>',
@@ -1621,7 +1621,7 @@ lessons: [
           lead: 'Every HTML element is a rectangular box controlled by padding, border, margin, and border-radius.',
           goal: 'Style a .card class with padding, border-radius, and background.',
           sectionTitle: 'Padding vs Margin',
-          explanation: 'Padding is the inner space between content and the border. Margin is the outer space pushing other elements away. بالمصري: الـ padding هو الوسع من جوه العلبة، لكن الـ margin هو المسافة اللي بين العلبة واللي جنبها.',
+          explanation: 'Padding is the inner space between content and the border. Margin is the outer space pushing other elements away.  الـ padding هو الوسع من جوه العلبة، لكن الـ margin هو المسافة اللي بين العلبة واللي جنبها.',
           exampleCode: '<style>\n  .card {\n    background: #f0edff;\n    padding: 20px;\n    border-radius: 12px;\n    border: 2px solid #6c5ce7;\n  }\n</style>\n<div class="card">\n  <h3>بطاقة أنيقة</h3>\n  <p>مصممة بنموذج الصندوق Box Model.</p>\n</div>',
           starterCode: '<style>\n  .card {\n    background: #f0edff;\n    padding: 20px;\n    border-radius: 12px;\n  }\n</style>\n<div class="card">\n  <h3>بطاقة منتج</h3>\n  <p>مسافات داخلية مريحة للعين.</p>\n</div>',
           solutionCode: '<style>\n  .card {\n    background: #f0edff;\n    padding: 20px;\n    border-radius: 12px;\n  }\n</style>\n<div class="card">\n  <h3>بطاقة منتج</h3>\n  <p>مسافات داخلية مريحة للعين.</p>\n</div>',
@@ -1729,7 +1729,7 @@ lessons: [
           lead: 'Store numbers, strings, and booleans in memory using const and let, and display them in the page.',
           goal: 'Declare a variable with const or let and output it into the page.',
           sectionTitle: 'Variables in JavaScript',
-          explanation: 'Use const for values that will not be reassigned, and let for values that change (like a counter score). بالمصري: المتغير هو درج بنشيل جواه قيمة ونسميه باسم واضح علشان ننده عليه في أي وقت.',
+          explanation: 'Use const for values that will not be reassigned, and let for values that change (like a counter score). المتغير هو درج بنشيل جواه قيمة ونسميه باسم واضح علشان ننده عليه في أي وقت.',
           exampleCode: '<h2 id="greeting"></h2>\n<script>\n  const userName = "يا بشمهندس أحمد";\n  document.getElementById("greeting").textContent = "أهلاً بيك " + userName;\n</script>',
           starterCode: '<h2 id="greeting">...</h2>\n<script>\n  const studentName = "مطور المستقبل";\n  document.getElementById("greeting").textContent = "مرحباً " + studentName;\n</script>',
           solutionCode: '<h2 id="greeting">...</h2>\n<script>\n  const studentName = "مطور المستقبل";\n  document.getElementById("greeting").textContent = "مرحباً " + studentName;\n</script>',
@@ -2302,7 +2302,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
             severity: 'error',
             line: idx + 1,
             title: `SyntaxError (Line ${idx + 1}): Unclosed string literal ${qChar}`,
-            explainAr: `بالمصري: في السطر ${idx + 1} فتحت علامة تنصيص (${qChar}) للنص بس نسيت تقفلها في آخر السطر.`,
+            explainAr: ` في السطر ${idx + 1} فتحت علامة تنصيص (${qChar}) للنص بس نسيت تقفلها في آخر السطر.`,
             explainEn: `Unclosed string quote ${qChar} on line ${idx + 1}.`,
             fixedCode: lines.map((l, i) => (i === idx ? l + qChar : l)).join('\n')
           });
@@ -2314,7 +2314,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
             severity: 'error',
             line: idx + 1,
             title: `SyntaxError (Line ${idx + 1}): Missing colon ':'`,
-            explainAr: `بالمصري: في السطر ${idx + 1} نسيت تحط النقطتين فوق بعض (:) في آخر جملة الـ ${trimmed.split(/\s+/)[0]}. في لغة بايثون أي جملة شرط أو دالة أو حلقة لازم تنتهي بـ (:).`,
+            explainAr: ` في السطر ${idx + 1} نسيت تحط النقطتين فوق بعض (:) في آخر جملة الـ ${trimmed.split(/\s+/)[0]}. في لغة بايثون أي جملة شرط أو دالة أو حلقة لازم تنتهي بـ (:).`,
             explainEn: `Python requires a colon ':' at the end of '${trimmed.split(/\s+/)[0]}' statements.`,
             fixedCode: lines.map((l, i) => (i === idx ? l.replace(/\s*$/, ':') : l)).join('\n')
           });
@@ -2326,7 +2326,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
             severity: 'error',
             line: idx + 1,
             title: `NameError (Line ${idx + 1}): Misspelled 'print' function`,
-            explainAr: `بالمصري: كتبت اسم دالة الطباعة غلط في السطر ${idx + 1}. الاسم الصح في بايثون هو print() بحروف صغيرة.`,
+            explainAr: ` كتبت اسم دالة الطباعة غلط في السطر ${idx + 1}. الاسم الصح في بايثون هو print() بحروف صغيرة.`,
             explainEn: `Did you mean 'print()'? Check the spelling and case of the function name.`,
             fixedCode: htmlCode.replace(/\b(pritn|pirnt|prnt|Pint|Print)\s*\(/g, 'print(')
           });
@@ -2369,7 +2369,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
             severity: 'error',
             file: 'HTML',
             title: `HTML Tag Typo: <${wrong}> is not a valid HTML tag`,
-            explainAr: `بالمصري: يا هندسة أنت كتبت وسم <${wrong}> بالغلط، والصح بتاعه في الـ HTML هو <${right}>.`,
+            explainAr: ` يا هندسة أنت كتبت وسم <${wrong}> بالغلط، والصح بتاعه في الـ HTML هو <${right}>.`,
             explainEn: `Unknown tag <${wrong}> detected. Replace it with the standard <${right}> element.`,
             fixedCode: htmlCode.replace(new RegExp(`(<\\/?)${wrong}\\b`, 'gi'), `$1${right}`)
           });
@@ -2388,7 +2388,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
             severity: 'error',
             file: 'HTML',
             title: `Unclosed HTML Tag: <${tag}> is missing </${tag}>`,
-            explainAr: `بالمصري: أنت فتحت وسم <${tag}> بس نسيت تقفله بـ </${tag}>! ده هيخلي المتصفح يدخل العناصر اللي بعده جواه بالغلط.`,
+            explainAr: ` أنت فتحت وسم <${tag}> بس نسيت تقفله بـ </${tag}>! ده هيخلي المتصفح يدخل العناصر اللي بعده جواه بالغلط.`,
             explainEn: `Found ${opens} opening <${tag}> tag(s) but only ${closes} closing </${tag}> tag(s).`,
             fixedCode: htmlCode + `\n</${tag}>`
           });
@@ -2397,7 +2397,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
             severity: 'error',
             file: 'HTML',
             title: `Stray Closing Tag: </${tag}> found without opening <${tag}>`,
-            explainAr: `بالمصري: فيه قفلة وسم </${tag}> زيادة في الكود من غير ما تفتح <${tag}> قبلها.`,
+            explainAr: ` فيه قفلة وسم </${tag}> زيادة في الكود من غير ما تفتح <${tag}> قبلها.`,
             explainEn: `Found closing </${tag}> tag without a matching opening <${tag}> tag.`,
             fixedCode: htmlCode.replace(new RegExp(`</${tag}\\s*>`, 'i'), '')
           });
@@ -2414,7 +2414,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
             file: 'HTML',
             line: i + 1,
             title: `Syntax Error (Line ${i + 1}): Missing closing angle bracket '>'`,
-            explainAr: `بالمصري: في السطر رقم ${i + 1} فتحت قوس تاج '<' بس نسيت تقفله بعلامة أكبر من '>'.`,
+            explainAr: ` في السطر رقم ${i + 1} فتحت قوس تاج '<' بس نسيت تقفله بعلامة أكبر من '>'.`,
             explainEn: `Line ${i + 1} has an unclosed angle bracket '<'. Add '>' to complete the tag.`,
             fixedCode: rawHtmlLines.map((l, idx) => (idx === i ? l + '>' : l)).join('\n')
           });
@@ -2444,7 +2444,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
           severity: 'error',
           file: 'CSS',
           title: `CSS Syntax Error: Missing closing curly brace '}'`,
-          explainAr: `بالمصري: فتحت قوس مجموعة '{' في الـ CSS بس نسيت تقفله بـ '}'، وده هيوقف باقي التنسيقات.`,
+          explainAr: ` فتحت قوس مجموعة '{' في الـ CSS بس نسيت تقفله بـ '}'، وده هيوقف باقي التنسيقات.`,
           explainEn: `Unbalanced curly braces in CSS: ${openBraces} '{' vs ${closeBraces} '}'.`,
           fixedCode: htmlCode && /<style/i.test(htmlCode)
             ? htmlCode.replace(/<\/style>/i, '\n}\n</style>')
@@ -2468,7 +2468,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
             severity: 'error',
             file: 'CSS',
             title: `CSS Property Typo: '${typo}' is invalid`,
-            explainAr: `بالمصري: خاصية الـ CSS اللي كتبتها (${typo}) فيها غلطة إملائية، والصح بتاعها هو (${right}:).`,
+            explainAr: ` خاصية الـ CSS اللي كتبتها (${typo}) فيها غلطة إملائية، والصح بتاعها هو (${right}:).`,
             explainEn: `Unknown CSS property '${typo}'. Did you mean '${right}'?`,
             fixedCode: (htmlCode || cssCode || '').replace(new RegExp(`\\b${typo}(\\s*:)`, 'gi'), `${right}$1`)
           });
@@ -2488,7 +2488,7 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
           severity: 'error',
           file: jsCode ? 'JS' : 'HTML',
           title: `JavaScript SyntaxError: ${syntaxErr.message}`,
-          explainAr: `بالمصري: فيه خطأ في قواعد كتابة الجافاسكريبت (${syntaxErr.message}). اتأكد من قفل الأقواس () أو {} وعلامات التنصيص "".`,
+          explainAr: ` فيه خطأ في قواعد كتابة الجافاسكريبت (${syntaxErr.message}). اتأكد من قفل الأقواس () أو {} وعلامات التنصيص "".`,
           explainEn: `JavaScript could not be parsed: ${syntaxErr.message}. Check your parentheses, brackets, and quotes.`,
           fixedCode: jsCode ? autoFixedJs : htmlCode.replace(/<script([^>]*)>[\s\S]*?<\/script>/i, `<script$1>\n${autoFixedJs}\n</script>`)
         });
@@ -2508,24 +2508,24 @@ function explainRuntimeError(errMsg) {
     if (refMatch) {
       const badVar = refMatch[1];
       return {
-        explainAr: `بالمصري: الكلمة (${badVar}) مكتوبة من غير علامات تنصيص "${badVar}" لو كنت تقصد تطبعها كنص، أو إنك استخدمت متغير بالاسم ده من غير ما تعرفه الأول!`,
+        explainAr: ` الكلمة (${badVar}) مكتوبة من غير علامات تنصيص "${badVar}" لو كنت تقصد تطبعها كنص، أو إنك استخدمت متغير بالاسم ده من غير ما تعرفه الأول!`,
         explainEn: `'${badVar}' is not defined. Wrap it in quotes "${badVar}" if it is a string, or declare the variable first.`
       };
     }
     if (/TypeError:.*null/i.test(msg)) {
       return {
-        explainAr: `بالمصري: بتحاول تعدل على عنصر HTML (زي getElementById أو querySelector) بس العنصر ده مش موجود في الصفحة أو الـ id بتاعه مكتوب غلط فراجع بقيمة null!`,
+        explainAr: ` بتحاول تعدل على عنصر HTML (زي getElementById أو querySelector) بس العنصر ده مش موجود في الصفحة أو الـ id بتاعه مكتوب غلط فراجع بقيمة null!`,
         explainEn: `Attempted to access a property on 'null'. Check that your HTML element ID or selector matches the actual HTML.`
       };
     }
     if (/TypeError:.*is not a function/i.test(msg)) {
       return {
-        explainAr: `بالمصري: بتحاول تشغل حاجة كأنها دالة () وهي مش دالة، أو كتبت اسم الدالة بحروف Capital/Small مختلفة.`,
+        explainAr: ` بتحاول تشغل حاجة كأنها دالة () وهي مش دالة، أو كتبت اسم الدالة بحروف Capital/Small مختلفة.`,
         explainEn: `Tried to call a value that is not a function. Verify method capitalization.`
       };
     }
     return {
-      explainAr: `بالمصري: حصل خطأ أثناء تشغيل الكود (${msg}). اضغط على زر الإصلاح التلقائي بالأسفل لمعالجته فوراً.`,
+      explainAr: ` حصل خطأ أثناء تشغيل الكود (${msg}). اضغط على زر الإصلاح التلقائي بالأسفل لمعالجته فوراً.`,
       explainEn: `Runtime Error occurred during execution: ${msg}`
     };
   }
@@ -3769,7 +3769,7 @@ usingMonaco = true;
         severity: 'error',
         line: rawLines.length,
         title: `SyntaxError (Line ${rawLines.length}): Stray ');' after closing class brace '}'`,
-        explainAr: `بالمصري: في السطر الأخير قفلت الكلاس بـ '});' بدل '}' لوحدها، أو فيه قوس ناقص في جملة الطباعة فوق!`,
+        explainAr: ` في السطر الأخير قفلت الكلاس بـ '});' بدل '}' لوحدها، أو فيه قوس ناقص في جملة الطباعة فوق!`,
         explainEn: `Unexpected ');' after class closing brace '}'.`,
         suggestionAr: `اضغط على زر الإصلاح بالأسفل لحذف ');' الزائدة وموازنة الأقواس تلقائياً.`,
         fixedCode: smartFixedAll
@@ -3788,7 +3788,7 @@ usingMonaco = true;
           severity: 'error',
           line: idx + 1,
           title: `SyntaxError (Line ${idx + 1}): Unclosed string literal '"'`,
-          explainAr: `بالمصري: في السطر رقم ${idx + 1} فتحت علامة تنصيص '"' للنص بس نسيت تقفلها قبل نهاية السطر!`,
+          explainAr: ` في السطر رقم ${idx + 1} فتحت علامة تنصيص '"' للنص بس نسيت تقفلها قبل نهاية السطر!`,
           explainEn: `Unclosed string quote '"' on line ${idx + 1}.`,
           suggestionAr: `إغلاق علامة التنصيص '"' في السطر رقم ${idx + 1}.`,
           fixedCode: smartFixedAll
@@ -3804,7 +3804,7 @@ usingMonaco = true;
           severity: 'error',
           line: idx + 1,
           title: `SyntaxError (Line ${idx + 1}): missing ')' before ';'`,
-          explainAr: `بالمصري: في السطر رقم ${idx + 1} فتحت قوس '(' في جملة (${withoutComment.trim()}) بس نسيت تقفله بـ ')'!`,
+          explainAr: ` في السطر رقم ${idx + 1} فتحت قوس '(' في جملة (${withoutComment.trim()}) بس نسيت تقفله بـ ')'!`,
           explainEn: `Missing closing parenthesis ')' on line ${idx + 1}.`,
           suggestionAr: `إضافة القوس ')' الناقص في السطر رقم ${idx + 1}.`,
           fixedCode: smartFixedAll
@@ -3815,7 +3815,7 @@ usingMonaco = true;
           severity: 'error',
           line: idx + 1,
           title: `SyntaxError (Line ${idx + 1}): extra closing parenthesis ')'`,
-          explainAr: `بالمصري: في السطر رقم ${idx + 1} فيه قوس إغلاق ')' زيادة ملوش قوس فتح مقابله في نفس السطر.`,
+          explainAr: ` في السطر رقم ${idx + 1} فيه قوس إغلاق ')' زيادة ملوش قوس فتح مقابله في نفس السطر.`,
           explainEn: `Unmatched closing parenthesis ')' on line ${idx + 1}.`,
           suggestionAr: `حذف القوس ')' الزائد في السطر رقم ${idx + 1}.`,
           fixedCode: smartFixedAll
@@ -3837,7 +3837,7 @@ usingMonaco = true;
           file: state.activePlaygroundFile,
           severity: 'error',
           title: `SyntaxError: Missing ${openCurly - closeCurly} closing curly brace(s) '}'`,
-          explainAr: `بالمصري: فتحت قوس مجموعة '{' في الكود ونسيت تقفله بـ '}' (ناقص ${openCurly - closeCurly} قوس إغلاق).`,
+          explainAr: ` فتحت قوس مجموعة '{' في الكود ونسيت تقفله بـ '}' (ناقص ${openCurly - closeCurly} قوس إغلاق).`,
           explainEn: `Unbalanced curly braces: ${openCurly} '{' opened vs ${closeCurly} '}' closed.`,
           suggestionAr: `إضافة '${'}'.repeat(openCurly - closeCurly)}' في نهاية الكود لقفل البلوكات المفتوحة.`,
           fixedCode: smartFixedAll
@@ -3847,7 +3847,7 @@ usingMonaco = true;
           file: state.activePlaygroundFile,
           severity: 'error',
           title: `SyntaxError: Extra closing curly brace '}' found`,
-          explainAr: `بالمصري: فيه قوس إغلاق '}' زيادة في الكود ملوش قوس فتح '{' مقابله.`,
+          explainAr: ` فيه قوس إغلاق '}' زيادة في الكود ملوش قوس فتح '{' مقابله.`,
           explainEn: `Found ${closeCurly} '}' but only ${openCurly} '{'.`,
           suggestionAr: `حذف قوس الإغلاق '}' الزائد من الكود.`,
           fixedCode: smartFixedAll
@@ -3866,7 +3866,7 @@ usingMonaco = true;
             severity: 'error',
             line: idx + 1,
             title: `SyntaxError (Line ${idx + 1}): expected ':' after '${trimmed.split(/\s+/)[0]}' statement`,
-            explainAr: `بالمصري: في السطر رقم ${idx + 1} نسيت تحط النقطتين فوق بعض (:) في آخر جملة ${trimmed.split(/\s+/)[0]}.`,
+            explainAr: ` في السطر رقم ${idx + 1} نسيت تحط النقطتين فوق بعض (:) في آخر جملة ${trimmed.split(/\s+/)[0]}.`,
             explainEn: `Python requires ':' at the end of block headers (if, for, def, class).`,
             suggestionAr: `إضافة ':' في نهاية السطر رقم ${idx + 1}.`,
             fixedCode: smartFixedAll
@@ -3878,7 +3878,7 @@ usingMonaco = true;
             severity: 'error',
             line: idx + 1,
             title: `NameError (Line ${idx + 1}): name is not defined (Misspelled 'print')`,
-            explainAr: `بالمصري: في السطر رقم ${idx + 1} كتبت دالة الطباعة غلط، والصحيح في بايثون هو print() بحروف صغيرة.`,
+            explainAr: ` في السطر رقم ${idx + 1} كتبت دالة الطباعة غلط، والصحيح في بايثون هو print() بحروف صغيرة.`,
             explainEn: `Function 'print' is misspelled or capitalized on line ${idx + 1}.`,
             suggestionAr: `تصحيح اسم الدالة إلى print(...) في السطر ${idx + 1}.`,
             fixedCode: smartFixedAll
@@ -3900,7 +3900,7 @@ usingMonaco = true;
               severity: 'error',
               line: idx + 1,
               title: `Compiler Error (Line ${idx + 1}): Invalid System.out print statement`,
-              explainAr: `بالمصري: في السطر ${idx + 1} فيه غلطة في كتابة جملة الطباعة، والصحيح في الجافا هو System.out.println(...) بحرف S كابيتال.`,
+              explainAr: ` في السطر ${idx + 1} فيه غلطة في كتابة جملة الطباعة، والصحيح في الجافا هو System.out.println(...) بحرف S كابيتال.`,
               explainEn: `Use 'System.out.println(...)' or 'System.out.print(...)'.`,
               suggestionAr: `تصحيح جملة الطباعة إلى System.out.println.`,
               fixedCode: smartFixedAll
@@ -3912,7 +3912,7 @@ usingMonaco = true;
               severity: 'error',
               line: idx + 1,
               title: `Compiler Error (Line ${idx + 1}): cannot find symbol class 'string'`,
-              explainAr: `بالمصري: في السطر ${idx + 1} كتبت نوع النص string بحرف s صغير، وفي الجافا لازم يتكتب String بحرف S كابيتال.`,
+              explainAr: ` في السطر ${idx + 1} كتبت نوع النص string بحرف s صغير، وفي الجافا لازم يتكتب String بحرف S كابيتال.`,
               explainEn: `In Java, 'String' is a class and must start with an uppercase 'S'.`,
               suggestionAr: `تحويل كلمة string إلى String.`,
               fixedCode: smartFixedAll
@@ -3926,7 +3926,7 @@ usingMonaco = true;
             severity: 'error',
             line: idx + 1,
             title: `Compiler Error (Line ${idx + 1}): C# is case-sensitive ('Console.WriteLine')`,
-            explainAr: `بالمصري: في السطر ${idx + 1} كتبت جملة الطباعة بحروف صغيرة، وفي C# لازم تتكتب Console.WriteLine.`,
+            explainAr: ` في السطر ${idx + 1} كتبت جملة الطباعة بحروف صغيرة، وفي C# لازم تتكتب Console.WriteLine.`,
             explainEn: `Use 'Console.WriteLine(...)' with proper capitalization in C#.`,
             suggestionAr: `تصحيحها إلى Console.WriteLine.`,
             fixedCode: smartFixedAll
@@ -3939,7 +3939,7 @@ usingMonaco = true;
             severity: 'error',
             line: idx + 1,
             title: `Compiler Error (Line ${idx + 1}): invalid operator '>>' with 'cout'`,
-            explainAr: `بالمصري: في السطر ${idx + 1} استخدمت علامة '>>' مع cout، والصح إن cout بتاخد علامة الأصغر من مرتين '<<'.`,
+            explainAr: ` في السطر ${idx + 1} استخدمت علامة '>>' مع cout، والصح إن cout بتاخد علامة الأصغر من مرتين '<<'.`,
             explainEn: `Use the insertion operator '<<' with cout instead of '>>'.`,
             suggestionAr: `تغيير 'cout >>' إلى 'cout <<'.`,
             fixedCode: smartFixedAll
@@ -3965,7 +3965,7 @@ usingMonaco = true;
             severity: 'error',
             line: idx + 1,
             title: `Compiler Error (Line ${idx + 1}): ';' expected at end of statement`,
-            explainAr: `بالمصري: في السطر رقم ${idx + 1} (${clean}) نسيت تقفل الجملة البرمجية بفصلة منقوطة (;)!`,
+            explainAr: ` في السطر رقم ${idx + 1} (${clean}) نسيت تقفل الجملة البرمجية بفصلة منقوطة (;)!`,
             explainEn: `Missing semicolon ';' at the end of line ${idx + 1}.`,
             suggestionAr: `إضافة فصلة منقوطة ';' في نهاية السطر رقم ${idx + 1}.`,
             fixedCode: smartFixedAll
