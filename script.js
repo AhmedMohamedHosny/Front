@@ -2502,30 +2502,30 @@ function analyzeCodeDiagnostics(htmlCode, cssCode, jsCode, mode) {
    * Translates runtime JavaScript errors (e.g., ReferenceError, TypeError)
    * into friendly Egyptian Arabic + English explanations with suggested fixes.
    */
-  function explainRuntimeError(errMsg) {
+function explainRuntimeError(errMsg) {
     const msg = String(errMsg || '');
-    const refMatch = msg.match(/ReferenceError:\s*(\w+)\s+is not defined/i);
+    const refMatch = msg.match(/ReferenceError:\s*([^\s]+)\s+is not defined/i);
     if (refMatch) {
       const badVar = refMatch[1];
       return {
-        explainAr: `بالمصري: أنت حاولت تستخدم متغير أو دالة باسم (${badVar}) بس الجافاسكريبت مش لاقياه! غالباً كتبت حرف ناقص في الاسم أو نسيت تعرفه بـ let / const قبل ما تستخدمه.`,
-        explainEn: `Identifier '${badVar}' was used before being declared, or its name is misspelled.`
+        explainAr: `بالمصري: الكلمة (${badVar}) مكتوبة من غير علامات تنصيص "${badVar}" لو كنت تقصد تطبعها كنص، أو إنك استخدمت متغير بالاسم ده من غير ما تعرفه الأول!`,
+        explainEn: `'${badVar}' is not defined. Wrap it in quotes "${badVar}" if it is a string, or declare the variable first.`
       };
     }
     if (/TypeError:.*null/i.test(msg)) {
       return {
-        explainAr: `بالمصري: بتحاول تعدل على عنصر HTML (زي getElementById أو querySelector) بس العنصر ده مش موجود أو الـ id بتاعه مكتوب غلط فراجع بقيمة null!`,
+        explainAr: `بالمصري: بتحاول تعدل على عنصر HTML (زي getElementById أو querySelector) بس العنصر ده مش موجود في الصفحة أو الـ id بتاعه مكتوب غلط فراجع بقيمة null!`,
         explainEn: `Attempted to access a property on 'null'. Check that your HTML element ID or selector matches the actual HTML.`
       };
     }
     if (/TypeError:.*is not a function/i.test(msg)) {
       return {
-        explainAr: `بالمصري: بتحاول تشغل حاجة كأنها دالة () وهي مش دالة، أو كتبت اسم الدالة بحروف Capital/Small مختلفة (مثل getElementByid بدل getElementById).`,
-        explainEn: `Tried to call a value that is not a function. Verify method capitalization (e.g., getElementById, addEventListener).`
+        explainAr: `بالمصري: بتحاول تشغل حاجة كأنها دالة () وهي مش دالة، أو كتبت اسم الدالة بحروف Capital/Small مختلفة.`,
+        explainEn: `Tried to call a value that is not a function. Verify method capitalization.`
       };
     }
     return {
-      explainAr: `بالمصري: حصل خطأ أثناء تشغيل الكود (${msg}). راجع السطر المذكور واتأكد من أسماء المتغيرات والأقواس.`,
+      explainAr: `بالمصري: حصل خطأ أثناء تشغيل الكود (${msg}). اضغط على زر الإصلاح التلقائي بالأسفل لمعالجته فوراً.`,
       explainEn: `Runtime Error occurred during execution: ${msg}`
     };
   }
@@ -3556,8 +3556,27 @@ usingMonaco = true;
   }
 
 // دالة إصلاح شامل ذكي لأي كود به أقواس ناقصة أو زائدة أو علامات تنصيص أو فصلات منقوطة أو أخطاء إملائية
-  function buildSmartAutoFixedCode(code, lang) {
+// دالة إصلاح شامل ذكي لأي كود به نصوص بدون علامات تنصيص، متغيرات غير معرفة، أقواس ناقصة أو زائدة، أو فصلات منقوطة
+  function buildSmartAutoFixedCode(code, lang, runtimeErrMsg) {
     let fixed = String(code || '').replace(/\u00A0/g, ' ');
+
+    // 0. إذا كان هناك خطأ ReferenceError لمتغير أو نص غير معرف (مثل صييي بدون علامات تنصيص)
+    if (runtimeErrMsg) {
+      const refMatch = String(runtimeErrMsg).match(/ReferenceError:\s*([^\s]+)\s+is not defined/i);
+      if (refMatch) {
+        const badToken = refMatch[1];
+        const escapedToken = badToken.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // إذا كان مكتوباً كإسناد متغير بدون تعريف مثل x = 5;
+        const assignRegex = new RegExp(`(^|[\\n{;]\\s*)(${escapedToken})(\\s*=\\s*[^=])`, 'm');
+        if (assignRegex.test(fixed) && (lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp')) {
+          fixed = fixed.replace(assignRegex, '$1int $2$3');
+        } else {
+          // تحويل الكلمة غير المعرفة إلى نص بين علامتي تنصيص "صييي"
+          const tokenRegex = new RegExp(`(?<!["'\\w])${escapedToken}(?!["'\\w])`, 'g');
+          fixed = fixed.replace(tokenRegex, `"${badToken}"`);
+        }
+      }
+    }
 
     // 1. تصحيح الأخطاء الإملائية الشائعة حسب اللغة
     if (lang === 'java') {
@@ -3577,7 +3596,23 @@ usingMonaco = true;
       fixed = fixed.replace(/\b(pritn|pirnt|prnt|Pint|Print)\s*\(/g, 'print(');
     }
 
-    // 2. إزالة أي ); أو ) شاردة بعد قوس إغلاق الكلاس الأخير }
+    // 2. إصلاح النصوص العربية أو الجمل متعددة الكلمات المكتوبة بدون علامات تنصيص داخل دوال الطباعة
+    fixed = fixed.replace(
+      /(System\.out\.print(?:ln)?|Console\.Write(?:Line)?|\bprint|\bconsole\.log)\s*\(\s*([^()"';\n]+?)\s*\)/g,
+      function (full, fnName, innerArg) {
+        const arg = innerArg.trim();
+        if (!arg) return full;
+        // إذا كان يحتوي على حروف عربية بدون علامات تنصيص أو كلمتين بينهما مسافة بدون معاملات حسابية
+        const hasArabic = /[\u0600-\u06FF]/.test(arg);
+        const hasSpaceSeparatedWords = /^[a-zA-Z_\u0600-\u06FF][\w\u0600-\u06FF]*(\s+[a-zA-Z_\u0600-\u06FF][\w\u0600-\u06FF]*)+$/.test(arg);
+        if (hasArabic || hasSpaceSeparatedWords) {
+          return `${fnName}("${arg}")`;
+        }
+        return full;
+      }
+    );
+
+    // 3. إزالة أي ); أو ) شاردة بعد قوس إغلاق الكلاس الأخير }
     if (lang === 'java' || lang === 'cpp' || lang === 'c' || lang === 'csharp') {
       fixed = fixed.replace(/\}\s*\)\s*;?\s*$/, '}');
     }
@@ -3590,7 +3625,7 @@ usingMonaco = true;
       const trimmed = codePart.trim();
       if (!trimmed) return rawLine;
 
-      // إصلاح علامة تنصيص مزدوجة أو مفردة مفتوحة في نفس السطر
+      // إصلاح علامة تنصيص مزدوجة مفتوحة في نفس السطر
       const doubleQuotes = (codePart.match(/(?<!\\)"/g) || []).length;
       if (doubleQuotes % 2 !== 0) {
         if (codePart.trimEnd().endsWith(';')) {
@@ -3686,7 +3721,6 @@ usingMonaco = true;
   // 2. فاحص الأخطاء البرمجية الدقيقة لكل اللغات (Java, C++, C, Python, C#, PHP, TypeScript, SQL)
   function checkTerminalSyntaxAndSuggestFix(code, info) {
     const lang = info.lang;
-    // تفريغ التعليقات متعددة الأسطر مع الحفاظ على أرقام الأسطر
     const codeNoBlockComments = String(code || '').replace(/\/\*[\s\S]*?\*\//g, (m) =>
       '\n'.repeat((m.match(/\n/g) || []).length)
     );
@@ -3944,7 +3978,7 @@ usingMonaco = true;
     const normalizedInput = String(code || '').replace(/\u00A0/g, ' ');
 
     // =========================================================================
-    // A. محرك تشغيل Java و C# الكامل (يدعم OOP, Constructor Chaining this(), super(), Overloading, Arrays)
+    // A. محرك تشغيل Java و C# الكامل
     // =========================================================================
     if (lang === 'java' || lang === 'csharp') {
       let src = normalizedInput;
@@ -3982,7 +4016,6 @@ usingMonaco = true;
         const clsMembers = new Set();
         classMembersMap[cls.className] = clsMembers;
 
-        // إزالة خصائص C# التلقائية { get; set; } وتحويلها لحقول قياسية
         b = b.replace(/\{\s*get\s*;\s*set\s*;\s*\}/g, ';');
 
         // 1. استخراج دالة main إن وجدت
@@ -4094,7 +4127,6 @@ usingMonaco = true;
         });
       });
 
-      // توريث أسماء الحقول والدوال من الكلاس الأب إلى الكلاس الابن
       parsedClasses.forEach((cls) => {
         let p = cls.parentName;
         while (p && classMembersMap[p]) {
@@ -4105,7 +4137,6 @@ usingMonaco = true;
       });
 
       const jsClasses = parsedClasses.map((cls) => {
-        // بناء دالة __init لدعم تعدد الـ Constructors واستدعاء this(...) و super(...)
         let initMethodJS = '';
         if (cls.constructors.length === 0) {
           initMethodJS = `__init(...__args) {\n${cls.parentName ? 'if (super.__init) super.__init(...__args);\n' : ''}}`;
@@ -4128,7 +4159,6 @@ usingMonaco = true;
           initMethodJS = `__init(...__args) {\n${branches}\n}`;
         }
 
-        // تجميع الدوال ودعم Method Overloading (أكثر من دالة بنفس الاسم وعدد معاملات مختلف)
         const methodGroups = {};
         cls.methods.forEach((m) => {
           if (!methodGroups[m.mName]) methodGroups[m.mName] = [];
@@ -4240,14 +4270,13 @@ ${staticBindings}`;
     }
 
     // =========================================================================
-    // B. محرك تشغيل C++ و C الكامل (يدعم الكلاسات والـ Structs والمصفوفات والدوال الرياضية)
+    // B. محرك تشغيل C++ و C الكامل
     // =========================================================================
     if (lang === 'cpp' || lang === 'c') {
       let src = normalizedInput;
       src = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       src = src.replace(/^\s*#include.*$/gm, '').replace(/^\s*using\s+namespace\s+\w+\s*;/gm, '');
 
-      // دعم cout و cin و printf
       src = src.replace(/(?:std::)?cout\s*<<([^;]+);/g, function (_, expr) {
         const parts = expr.split('<<').map((p) => {
           const clean = p.trim();
@@ -4259,15 +4288,10 @@ ${staticBindings}`;
       src = src.replace(/(?:std::)?cin\s*>>([^;]+);/g, '/* cin */');
       src = src.replace(/\bprintf\s*\(/g, '__printf(');
       src = src.replace(/\bscanf\s*\([^;]+;/g, '/* scanf */');
-
-      // إزالة public: / private: / protected: داخل كلاسات C++
       src = src.replace(/\b(?:public|private|protected)\s*:/g, '');
-
-      // تحويل struct إلى class وإزالة الفاصلة المنقوطة بعد قوس إغلاق الكلاس };
       src = src.replace(/\bstruct\s+([a-zA-Z_]\w*)\s*\{/g, 'class $1 {');
       src = src.replace(/\}\s*;/g, '}');
 
-      // تحويل الكلاسات في C++ إن وجدت
       const cppClassRegex = /\bclass\s+([a-zA-Z_]\w*)(?:\s*:\s*(?:public|private|protected)?\s*([a-zA-Z_]\w*))?\s*\{/g;
       let cm;
       while ((cm = cppClassRegex.exec(src)) !== null) {
@@ -4286,7 +4310,6 @@ ${staticBindings}`;
         src = src.slice(0, cm.index) + `class ${cName}${cm[2] ? ' extends ' + cm[2] : ''} {` + cBody + '}' + src.slice(k);
       }
 
-      // تحويل الدوال الحرة في C / C++
       src = src.replace(/\b(?:unsigned\s+|signed\s+|long\s+|short\s+|const\s+|static\s+|inline\s+)*(?:int|void|double|float|string|std::string|char|bool|long|short|size_t|auto)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*\{/g, function (_, fnName, params) {
         const pNames = params.trim() && params.trim() !== 'void'
           ? params.split(',').map(p => p.trim().replace(/&|\*/g, '').split(/\s+/).pop().replace(/\[.*\]/g, '')).join(', ')
@@ -4321,7 +4344,7 @@ ${staticBindings}`;
     }
 
     // =========================================================================
-    // C. محرك تشغيل Python الكامل (يدعم المسافات البادئة بأي عدد، الكلاسات، القوائم، f-strings، الدوال المدمجة)
+    // C. محرك تشغيل Python الكامل
     // =========================================================================
     if (lang === 'python') {
       let pyLines = normalizedInput.replace(/\r\n/g, '\n').split('\n');
@@ -4353,13 +4376,10 @@ ${staticBindings}`;
 
       function transformPyExpr(expr) {
         let e = expr;
-        // تحويل f-strings مثل f"Hello {name}" إلى `Hello ${name}`
         e = e.replace(/\bf(["'])(.*?)\1/g, (_, q, inner) => '`' + inner.replace(/\{([^}]+)\}/g, '${$1}') + '`');
         e = e.replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false').replace(/\bNone\b/g, 'null');
         e = e.replace(/\band\b/g, '&&').replace(/\bor\b/g, '||').replace(/\bnot\s+/g, '!');
-        // القسمة الصحيحة // في بايثون
         e = e.replace(/(\b\w+|\([^)]+\))\s*\/\/\s*(\b\w+|\([^)]+\))/g, 'Math.floor($1 / $2)');
-        // الأسس ** تعمل تلقائياً في JS الحديث، وتحويل إنشاء الكائنات بدون new
         definedClasses.forEach((cName) => {
           const reg = new RegExp(`(?<!new\\s+|class\\s+|function\\s+)\\b${cName}\\s*\\(`, 'g');
           e = e.replace(reg, `new ${cName}(`);
@@ -4470,7 +4490,6 @@ ${staticBindings}`;
       src = src.replace(/\becho\s+([^;]+);/g, 'console.log($1);');
       src = src.replace(/\$([a-zA-Z_]\w*)/g, '$1');
       if (lang === 'php') {
-        // تحويل نقطة الدمج (.) في PHP بين النصوص والمتغيرات إلى (+)
         src = src.replace(/(\S)\s+\.\s+(\S)/g, '$1 + $2');
       }
       const runner = `
@@ -4489,7 +4508,6 @@ ${staticBindings}`;
     let s = String(bodyStr || '');
     const localVars = new Set(paramNames || []);
 
-    // 1. حماية النصوص (Strings) حتى لا تتأثر بتحويل الكلمات أو أسماء المتغيرات
     const stringLiterals = [];
     s = s.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, function (match) {
       const idx = stringLiterals.length;
@@ -4497,14 +4515,10 @@ ${staticBindings}`;
       return `__CM_STR_${idx}__`;
     });
 
-    // 2. تحويل استدعاءات this(...) و super(...) داخل الـ Constructor إلى this.__init(...) و super.__init(...)
     s = s.replace(/\bthis\s*\(/g, 'this.__init(');
     s = s.replace(/\bsuper\s*\(/g, 'super.__init(');
-
-    // 3. تحويل .length() في نصوص الجافا إلى .length
     s = s.replace(/\.length\s*\(\s*\)/g, '.length');
 
-    // 4. تحويل إنشاء المصفوفات new int[]{1, 2} أو new int[5]
     s = s.replace(/\bnew\s+(?:String|string|int|double|float|boolean|bool|char|long|short|byte|[A-Z]\w*)\s*(?:\[\s*\])+\s*\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g, function (_, inner) {
       return convertBracedArrayLiteral('{' + inner + '}');
     });
@@ -4512,7 +4526,6 @@ ${staticBindings}`;
     s = s.replace(/\bnew\s+(?:boolean|bool)\s*\[\s*([^\]]+)\s*\]/g, 'new Array($1).fill(false)');
     s = s.replace(/\bnew\s+(?:String|string|char|[A-Z]\w*)\s*\[\s*([^\]]+)\s*\]/g, 'new Array($1).fill(null)');
 
-    // 5. تحويل حلقات for-each وحلقات for القياسية
     s = s.replace(
       /\bfor\s*\(\s*(?:final\s+|const\s+)?(?:String|string|int|double|float|boolean|bool|char|long|short|byte|var|auto|[A-Z][a-zA-Z0-9_]*)(?:\s*\[\s*\])?\s+([a-zA-Z_]\w*)\s*:\s*([^)]+)\)/g,
       function (_, vName, listExpr) {
@@ -4528,7 +4541,6 @@ ${staticBindings}`;
       }
     );
 
-    // 6. تحويل تعريفات المتغيرات والمصفوفات المحلية (المفردة والمتعددة مثل int a = 1, b = 2; أو int x;)
     const localDeclRegex = /(?<!\.)\b(?:final\s+|const\s+|unsigned\s+|signed\s+)*(String|string|int|double|float|boolean|bool|char|long|short|byte|size_t|var|auto|[A-Z][a-zA-Z0-9_]*)(?:\s*\[\s*\])*\s+([a-zA-Z_]\w*(?:\s*\[\s*\d*\s*\])*(?:\s*=\s*[^;,]+)?(?:\s*,\s*[a-zA-Z_]\w*(?:\s*\[\s*\d*\s*\])*(?:\s*=\s*[^;,]+)?)*)\s*;/g;
     s = s.replace(localDeclRegex, function (fullMatch, typeName, declsPart) {
       if (typeName === 'return' || typeName === 'new' || typeName === 'delete' || typeName === 'case') return fullMatch;
@@ -4559,7 +4571,6 @@ ${staticBindings}`;
       return `let ${jsDecls.join(', ')};`;
     });
 
-    // 7. ربط حقول ودوال الكلاس بـ this. عندما لا تكون متغيرات محلية
     if (classMembers && classMembers.size > 0) {
       classMembers.forEach((member) => {
         if (!localVars.has(member)) {
@@ -4569,7 +4580,6 @@ ${staticBindings}`;
       });
     }
 
-    // 8. تنسيق قيم double بـ (.0) عند الطباعة في الجافا و C#
     s = s.replace(/(System\.out\.print(?:ln)?|Console\.Write(?:Line)?)\s*\(([\s\S]*?)\)\s*;/g, function (full, fnCall, insideArgs) {
       let updatedArgs = insideArgs;
       doubleMembers.forEach((dName) => {
@@ -4579,7 +4589,6 @@ ${staticBindings}`;
       return `${fnCall}(${updatedArgs});`;
     });
 
-    // 9. استرجاع النصوص المحمية كما كانت
     s = s.replace(/__CM_STR_(\d+)__/g, (_, idx) => stringLiterals[Number(idx)]);
 
     return s;
@@ -4598,12 +4607,20 @@ ${staticBindings}`;
       typescript: `ts-node ${info.displayName}`
     };
 
-    // 1. فحص الأخطاء البرمجية أولاً وعرض سبب الخطأ والحل المقترح مع زر الإصلاح الفوري
     const syntaxDiagnostics = checkTerminalSyntaxAndSuggestFix(code, info);
     if (syntaxDiagnostics.length > 0) {
       syntaxDiagnostics.forEach(d => appendDiagnosticToConsole(d));
       const firstErr = syntaxDiagnostics[0];
-      const fixedStr = firstErr.fixedCode || buildSmartAutoFixedCode(code, lang);
+      let fixedStr = firstErr.fixedCode || buildSmartAutoFixedCode(code, lang);
+      // اختبار الكود المصحح للتأكد من عدم وجود ReferenceError أخرى بداخله
+      for (let attempt = 0; attempt < 4; attempt++) {
+        try {
+          if (lang !== 'sql') transpileAndRunOOPCode(fixedStr, lang);
+          break;
+        } catch (nextErr) {
+          fixedStr = buildSmartAutoFixedCode(fixedStr, lang, nextErr.toString());
+        }
+      }
       window.__codemasrPendingFix = { fileKey: state.activePlaygroundFile, fixedCode: fixedStr };
       const encodedFix = encodeURIComponent(fixedStr).replace(/'/g, '%27');
       return `<!DOCTYPE html>
@@ -4637,7 +4654,7 @@ ${staticBindings}`;
       </div>
       <div class="solution-box">
         <b>💡 الحل المقترح:</b><br>
-        ${escapeHtml(firstErr.suggestionAr || 'راجع السطر المذكور وصحح القوس أو الفصلة المنقوطة.')}
+        ${escapeHtml(firstErr.suggestionAr || 'اضغط على الزر بالأسفل لإصلاح الكود وتشغيله تلقائياً.')}
         <br><button class="fix-btn" onclick="parent.postMessage({ source: 'codemasr-autofix', fileKey: '${escapeHtml(state.activePlaygroundFile)}', fixedCode: decodeURIComponent('${encodedFix}') }, '*')">⚡ صلح الخطأ تلقائياً وشغّل الكود</button>
       </div>
     </div>
@@ -4646,7 +4663,6 @@ ${staticBindings}`;
 </html>`;
     }
 
-    // 2. إذا كان الكود سليماً، ننفذه فعلياً ونعرض المخرجات
     let outputs = [];
     try {
       if (lang === 'sql') {
@@ -4702,8 +4718,18 @@ ${staticBindings}`;
         outputs = transpileAndRunOOPCode(code, lang);
       }
     } catch (runtimeErr) {
-      const explained = explainRuntimeError(runtimeErr.message);
-      const fallbackFixed = buildSmartAutoFixedCode(code, lang);
+      const errString = runtimeErr.toString();
+      const explained = explainRuntimeError(errString);
+      // تمرير رسالة الخطأ الفعلية لدالة الإصلاح التلقائي واختبارها حتى يختفي الخطأ تماماً
+      let fallbackFixed = buildSmartAutoFixedCode(code, lang, errString);
+      for (let attempt = 0; attempt < 4; attempt++) {
+        try {
+          if (lang !== 'sql') transpileAndRunOOPCode(fallbackFixed, lang);
+          break;
+        } catch (nextErr) {
+          fallbackFixed = buildSmartAutoFixedCode(fallbackFixed, lang, nextErr.toString());
+        }
+      }
       window.__codemasrPendingFix = { fileKey: state.activePlaygroundFile, fixedCode: fallbackFixed };
       const encodedFallbackFix = encodeURIComponent(fallbackFixed).replace(/'/g, '%27');
       appendDiagnosticToConsole({
@@ -4720,9 +4746,9 @@ ${staticBindings}`;
 <body style="margin:0;padding:20px;background:#090d16;color:#e2e8f0;font-family:'Cairo','DM Mono',monospace;">
   <div style="background:#160d12;border:2px solid #f85149;border-radius:14px;padding:18px;direction:rtl;text-align:right;">
     <h3 style="margin:0 0 10px;color:#ff7b72;">⛔ توقف التشغيل بسبب خطأ برمجي (Error Detected)</h3>
-    <div style="direction:ltr;text-align:left;background:#0d1117;padding:10px;border-radius:8px;color:#ffa198;font-family:monospace;margin-bottom:10px;">✖ ${escapeHtml(runtimeErr.toString())}</div>
+    <div style="direction:ltr;text-align:left;background:#0d1117;padding:10px;border-radius:8px;color:#ffa198;font-family:monospace;margin-bottom:10px;">✖ ${escapeHtml(errString)}</div>
     <p style="margin:0 0 8px;"><b>الشرح:</b> ${escapeHtml(explained.explainAr)}</p>
-    <p style="margin:0 0 12px;color:#34d399;"><b>💡 الحل المقترح:</b> اضغط على الزر بالأسفل لإصلاح الأقواس والفصلات المنقوطة وتنسيق الكود تلقائياً.</p>
+    <p style="margin:0 0 12px;color:#34d399;"><b>💡 الحل المقترح:</b> اضغط على الزر بالأسفل لإصلاح الخطأ وتنسيق الكود وتشغيله تلقائياً.</p>
     <button style="background:#10b981;color:#052e16;border:0;padding:9px 16px;border-radius:8px;font-weight:800;cursor:pointer;font-size:12px;" onclick="parent.postMessage({ source: 'codemasr-autofix', fileKey: '${escapeHtml(state.activePlaygroundFile)}', fixedCode: decodeURIComponent('${encodedFallbackFix}') }, '*')">⚡ صلح الخطأ تلقائياً وشغّل الكود</button>
   </div>
 </body>
@@ -4761,32 +4787,49 @@ ${staticBindings}`;
   }
 
   function buildFullPlaygroundDocument(targetHtmlKey) {
+    // تفعيل allow-same-origin في إطارات المعاينة لضمان عمل المكتبات الخارجية و localStorage بدون Script error
+    ['preview-frame', 'vscode-preview-frame', 'in-lesson-iframe'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && (!el.getAttribute('sandbox') || !el.getAttribute('sandbox').includes('allow-same-origin'))) {
+        el.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals allow-same-origin allow-popups');
+      }
+    });
+
     const activeInfo = getFileExtensionInfo(state.activePlaygroundFile);
 
-    // 1. إذا كان الملف المفتوح لغة Terminal (Java, C++, Python, C, C#, SQL, PHP)
+    // 1. إذا كان الملف المفتوح لغة Terminal (Java, C++, Python, C, C#, SQL, PHP, TS)
     if (!targetHtmlKey && activeInfo.isTerminal) {
       const code = state.playgroundFiles[state.activePlaygroundFile] || '';
       return executeTerminalLanguage(code, activeInfo);
     }
 
-    // 2. فحص أخطاء HTML / CSS / JS قبل بناء المعاينة: إذا وُجد خطأ نوقف التشغيل فوراً ولا نعرض الكود المكسور!
+    // 2. تجهيز HTML و CSS و JS لصفحات الويب
     const htmlKeyToRender = targetHtmlKey || (activeInfo.lang === 'html' ? state.activePlaygroundFile : 'html');
-    const htmlPart = state.playgroundFiles[htmlKeyToRender] || state.playgroundFiles.html || '';
+    const rawHtmlPart = state.playgroundFiles[htmlKeyToRender] || state.playgroundFiles.html || '';
+    const isCustomFullPage = /<!DOCTYPE\s+html|<html\b/i.test(rawHtmlPart) && !rawHtmlPart.includes('welcome-box');
 
     let allCss = '';
     let allJs = '';
     Object.keys(state.playgroundFiles).forEach((k) => {
       const inf = getFileExtensionInfo(k);
-      if (inf.lang === 'css') allCss += '\n' + (state.playgroundFiles[k] || '');
-      if (inf.lang === 'javascript') allJs += '\n' + (state.playgroundFiles[k] || '');
+      const fileContent = state.playgroundFiles[k] || '';
+      if (inf.lang === 'css') {
+        if (isCustomFullPage && k === 'css' && fileContent.trim() === DEFAULT_PLAYGROUND_FILES.css.trim()) return;
+        allCss += '\n' + fileContent;
+      }
+      if (inf.lang === 'javascript') {
+        if (isCustomFullPage && k === 'js' && fileContent.trim() === DEFAULT_PLAYGROUND_FILES.js.trim()) return;
+        allJs += '\n' + fileContent;
+      }
     });
 
-    const webIssues = analyzeCodeDiagnostics(htmlPart, allCss, allJs, 'web');
+    const webIssues = analyzeCodeDiagnostics(rawHtmlPart, allCss, allJs, 'web');
     const webErrors = webIssues.filter(i => i.severity === 'error');
     if (webErrors.length > 0) {
       const err = webErrors[0];
       const targetTab = (err.file || 'html').toLowerCase();
-      const encodedFix = encodeURIComponent(err.fixedCode || '');
+      const encodedFix = encodeURIComponent(err.fixedCode || '').replace(/'/g, '%27');
+      window.__codemasrPendingFix = { fileKey: targetTab, fixedCode: err.fixedCode || '' };
       return `<!DOCTYPE html>
 <html dir="rtl">
 <head>
@@ -4816,6 +4859,14 @@ ${staticBindings}`;
 </html>`;
     }
 
+    // تنظيف الروابط المحلية (مثل style.css و script.js و manifest.json و crossorigin) حتى لا تتعارض مع ملفات المنصة
+    let cleanedHtml = rawHtmlPart
+      .replace(/<link\b[^>]*href=["'](?:\.\/)?style\.css["'][^>]*>/gi, '')
+      .replace(/<link\b[^>]*rel=["']manifest["'][^>]*>/gi, '')
+      .replace(/<script\b[^>]*src=["'](?:\.\/)?script\.js["'][^>]*>\s*<\/script>/gi, '')
+      .replace(/\s+crossorigin(?:=["'][^"']*["'])?/gi, '')
+      .replace(/\s+integrity=["'][^"']*["']/gi, '');
+
     const bridgeScript = `
       <script>
         (function(){
@@ -4833,9 +4884,13 @@ ${staticBindings}`;
           console.warn = function(){ send('warn', arguments); origWarn.apply(console, arguments); };
           console.error = function(){ send('error', arguments); origErr.apply(console, arguments); };
           window.onerror = function(msg, url, lineNo) {
-            var fullMsg = msg + (lineNo ? ' (Line ' + lineNo + ')' : '');
+            var m = String(msg || '');
+            // تجاهل Script error الوهمي الخاص بالمكتبات الخارجية أو ResizeObserver حتى لا يوقف عرض الصفحة
+            if (m.indexOf('Script error') !== -1 || m.indexOf('ResizeObserver') !== -1) {
+              return true;
+            }
+            var fullMsg = m + (lineNo ? ' (Line ' + lineNo + ')' : '');
             send('runtime-error', [fullMsg]);
-            document.body.innerHTML = '<div dir="rtl" style="font-family:system-ui,sans-serif;background:#1f111b;color:#fff;border:2px solid #f85149;border-radius:12px;padding:18px;margin:16px;"><h3 style="color:#ff7b72;margin:0 0 8px;">⛔ توقف التشغيل بسبب خطأ في الجافاسكريبت (Runtime Error)</h3><pre style="direction:ltr;text-align:left;background:#0d1117;color:#ffa198;padding:10px;border-radius:6px;overflow:auto;">' + fullMsg + '</pre><p style="margin:8px 0 0;color:#a7f3d0;font-size:13px;">💡 راجع نافذة الـ Console بالأسفل لمعرفة شرح الخطأ بالمصري وكيفية حله.</p></div>';
             return false;
           };
           window.addEventListener('wheel', function(e) {
@@ -4848,7 +4903,7 @@ ${staticBindings}`;
             var link = e.target.closest('a[href]');
             if (!link) return;
             var href = link.getAttribute('href') || '';
-            if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:')) {
+            if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:') && !href.startsWith('tel:') && !href.startsWith('javascript:')) {
               e.preventDefault();
               parent.postMessage({ source: 'codemasr-navigate-file', targetFile: href }, '*');
             }
@@ -4857,22 +4912,35 @@ ${staticBindings}`;
       <\/script>
     `;
 
+    const injectedHeadResources = `${bridgeScript}\n<style>${allCss}</style>`;
+    const injectedBodyScript = allJs.trim()
+      ? `\n<script>\ntry {\n${allJs}\n} catch (err) {\n  if (window.onerror) window.onerror(err.toString(), '', 0);\n}\n<\/script>`
+      : '';
+
+    // إذا كان ملف HTML عبارة عن مستند كامل بالفعل (يحتوي <html أو <!DOCTYPE)، ندمج التنسيقات والاسكريبت بداخله مباشرة مع الحفاظ على خصائص <html> و <body>
+    if (/<!DOCTYPE\s+html|<html\b/i.test(cleanedHtml)) {
+      if (/<\/head>/i.test(cleanedHtml)) {
+        cleanedHtml = cleanedHtml.replace(/<\/head>/i, `${injectedHeadResources}\n</head>`);
+      } else {
+        cleanedHtml = injectedHeadResources + '\n' + cleanedHtml;
+      }
+      if (/<\/body>/i.test(cleanedHtml)) {
+        cleanedHtml = cleanedHtml.replace(/<\/body>/i, `${injectedBodyScript}\n</body>`);
+      } else {
+        cleanedHtml = cleanedHtml + injectedBodyScript;
+      }
+      return cleanedHtml;
+    }
+
     return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <style>${allCss}</style>
-  ${bridgeScript}
+  ${injectedHeadResources}
 </head>
 <body>
-  ${htmlPart}
-  <script>
-    try {
-      ${allJs}
-    } catch (err) {
-      window.onerror(err.toString(), '', 0);
-    }
-  <\/script>
+  ${cleanedHtml}
+  ${injectedBodyScript}
 </body>
 </html>`;
   }
@@ -4892,10 +4960,14 @@ ${staticBindings}`;
 
     const activeInfo = getFileExtensionInfo(state.activePlaygroundFile);
     if (!activeInfo.isTerminal) {
+      const isCustomFullPage = /<!DOCTYPE\s+html|<html\b/i.test(state.playgroundFiles.html || '') && !(state.playgroundFiles.html || '').includes('welcome-box');
+      const cssToCheck = (isCustomFullPage && state.playgroundFiles.css === DEFAULT_PLAYGROUND_FILES.css) ? '' : state.playgroundFiles.css;
+      const jsToCheck = (isCustomFullPage && state.playgroundFiles.js === DEFAULT_PLAYGROUND_FILES.js) ? '' : state.playgroundFiles.js;
+
       const issues = analyzeCodeDiagnostics(
         state.playgroundFiles.html,
-        state.playgroundFiles.css,
-        state.playgroundFiles.js,
+        cssToCheck,
+        jsToCheck,
         'web'
       );
       issues.forEach((diag) => appendDiagnosticToConsole(diag));
